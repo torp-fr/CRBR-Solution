@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(grep -oh 'href=\"\"\"\"[a-z][^\"\"\"\"]*\\\\.html[^\"\"\"\"]*\"\"\"\"' c:/Users/Baptiste-/DST-system/vitrine/*.html)"
+    ]
+  }
+}
