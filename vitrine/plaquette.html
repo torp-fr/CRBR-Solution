@@ -101,7 +101,7 @@
       font-size: 6.5pt; font-weight: 800; letter-spacing: 0.14em;
       text-transform: uppercase; color: var(--red);
       display: flex; align-items: center; gap: 8px;
-      margin-bottom: 3mm;
+      margin-bottom: 2mm;
     }
     .stag::after { content: ''; width: 14mm; height: 1.5pt; background: var(--rb); display: block; }
 
@@ -151,19 +151,19 @@
     }
 
     /* ── GRIDS ───────────────────────────────────────────── */
-    .g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 4mm; flex: 1; }
-    .g3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 4mm; flex: 1; }
+    .g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 3mm; flex: 1; }
+    .g3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 3mm; flex: 1; align-items: start; }
 
     /* ── CARD ────────────────────────────────────────────── */
-    .card { padding: 5mm 5mm; border: 1pt solid var(--bd); border-radius: 4pt; display: flex; flex-direction: column; gap: 2mm; }
+    .card { padding: 3mm 4mm; border: 1pt solid var(--bd); border-radius: 4pt; display: flex; flex-direction: column; gap: 1.5mm; }
     .card--accent { background: var(--rl); border-color: var(--rb); }
     .card--grey   { background: var(--bg); }
     .card-tag { font-size: 6.5pt; font-weight: 800; letter-spacing: 0.1em; color: var(--red); text-transform: uppercase; }
-    .card-icon { margin-bottom: 1mm; }
+    .card-icon { margin-bottom: 0; }
 
     /* ── STAT ROW ────────────────────────────────────────── */
-    .stats { display: flex; gap: 4mm; padding-top: 5mm; margin-top: auto; border-top: 1pt solid var(--bd); }
-    .stat  { flex: 1; text-align: center; padding: 3.5mm 2mm; background: var(--bg); border-radius: 3pt; border: 1pt solid var(--bd); }
+    .stats { display: flex; gap: 3mm; padding-top: 3.5mm; margin-top: auto; border-top: 1pt solid var(--bd); }
+    .stat  { flex: 1; text-align: center; padding: 2.5mm 2mm; background: var(--bg); border-radius: 3pt; border: 1pt solid var(--bd); }
     .stat-n { font-size: 14pt; font-weight: 800; color: var(--red); display: block; line-height: 1; }
     .stat-l { font-size: 6pt; color: var(--t3); font-weight: 500; display: block; margin-top: 1.5mm; line-height: 1.3; }
 
@@ -181,7 +181,7 @@
     /* ── VISUAL FLOW SCHEMA ──────────────────────────────── */
     .flow {
       display: grid; grid-template-columns: 1fr 10mm 1fr 10mm 1fr;
-      gap: 0; margin-bottom: 4mm;
+      gap: 0; margin-bottom: 2mm;
     }
     .flow-box {
       padding: 4mm; background: var(--bg); border: 1pt solid var(--bd); border-radius: 4pt;
@@ -222,18 +222,18 @@
     .tl-sub    { font-size: 6.5pt; color: var(--t3); margin-top: 1mm; }
 
     /* ── IMPACT BLOCKS ───────────────────────────────────── */
-    .iblocks { display: flex; flex-direction: column; gap: 4mm; flex: 1; }
+    .iblocks { display: flex; flex-direction: column; gap: 3mm; flex: 1; justify-content: space-between; }
     .iblock {
-      flex: 1; padding: 4.5mm 5.5mm;
+      padding: 3.5mm 5mm;
       border: 1pt solid var(--bd); border-radius: 4pt;
       border-left: 3.5pt solid var(--red);
-      display: flex; gap: 4.5mm; align-items: flex-start;
+      display: flex; gap: 4mm; align-items: flex-start;
     }
     .iblock-icon { flex-shrink: 0; padding-top: 1pt; }
     .iblock-body { display: flex; flex-direction: column; gap: 1.5mm; }
 
     /* ── LEVELS ──────────────────────────────────────────── */
-    .level { padding: 5mm; border: 1pt solid var(--bd); border-radius: 4pt; display: flex; flex-direction: column; gap: 2.5mm; }
+    .level { padding: 3.5mm 4mm; border: 1pt solid var(--bd); border-radius: 4pt; display: flex; flex-direction: column; gap: 2mm; }
     .level--main { background: var(--rl); border-color: var(--rb); }
     .lv-badge {
       font-size: 6pt; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: var(--red);
@@ -251,19 +251,19 @@
     .lv-list li::before { content: '—'; color: var(--red); font-weight: 700; flex-shrink: 0; }
 
     /* ── BUDGET ──────────────────────────────────────────── */
-    .blist { display: flex; flex-direction: column; gap: 3.5mm; flex: 1; }
+    .blist { display: flex; flex-direction: column; gap: 3mm; flex: 1; justify-content: space-between; }
     .bitem {
-      display: flex; gap: 5mm; align-items: flex-start;
-      padding: 4mm 5mm; background: var(--bg);
+      display: flex; gap: 4mm; align-items: flex-start;
+      padding: 3mm 4mm; background: var(--bg);
       border: 1pt solid var(--bd); border-radius: 4pt;
     }
     .bitem-icon { flex-shrink: 0; padding-top: 1.5pt; }
     .note { padding: 3.5mm 5mm; background: var(--rl); border: 1pt solid var(--rb); border-radius: 4pt; margin-top: 4mm; }
 
     /* ── PORTEUR ─────────────────────────────────────────── */
-    .porteur-grid { display: grid; grid-template-columns: 1fr 82mm; gap: 8mm; flex: 1; }
-    .parc      { display: flex; flex-direction: column; gap: 3mm; margin-top: 1mm; }
-    .parc-item { display: flex; gap: 4mm; align-items: flex-start; font-size: 7.5pt; color: var(--t2); line-height: 1.5; }
+    .porteur-grid { display: grid; grid-template-columns: 1fr 82mm; gap: 6mm; }
+    .parc      { display: flex; flex-direction: column; gap: 2mm; margin-top: 1mm; }
+    .parc-item { display: flex; gap: 3mm; align-items: flex-start; font-size: 7.5pt; color: var(--t2); line-height: 1.4; }
     .parc-dot  { width: 5mm; height: 5mm; border-radius: 50%; background: var(--red); flex-shrink: 0; margin-top: 1.5pt; }
     .quote-block {
       padding: 4mm 5mm; border-left: 3pt solid var(--red);
@@ -303,13 +303,10 @@
     .cta-action__n  { width: 8mm; height: 8mm; border-radius: 50%; background: var(--red); color: #fff; font-size: 7pt; font-weight: 800; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
     .cta-action__title { font-size: 9pt; font-weight: 700; color: var(--t1); margin-bottom: 1mm; }
     .cta-contact { display: flex; gap: 4mm; margin-bottom: 5mm; }
-    .cta-phone-box  { flex: 1; padding: 5mm 6mm; background: var(--ink); border-radius: 4pt; }
-    .cta-phone-label { font-size: 6.5pt; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,255,0.4); margin-bottom: 2.5mm; }
-    .cta-phone-num   { font-size: 22pt; font-weight: 900; color: #fff; letter-spacing: -0.02em; line-height: 1; }
-    .cta-email-box  { flex: 1; padding: 5mm 6mm; background: var(--bg); border: 1pt solid var(--bd); border-radius: 4pt; display: flex; flex-direction: column; justify-content: center; }
-    .cta-email-label { font-size: 6.5pt; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--t3); margin-bottom: 2.5mm; }
-    .cta-email-addr  { font-size: 10pt; font-weight: 700; color: var(--t1); }
-    .cta-hours       { font-size: 7pt; color: var(--t3); margin-top: 2mm; }
+    .cta-email-box  { flex: 1; padding: 6mm 8mm; background: var(--ink); border-radius: 4pt; display: flex; flex-direction: column; justify-content: center; }
+    .cta-email-label { font-size: 6.5pt; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,255,0.4); margin-bottom: 3mm; }
+    .cta-email-addr  { font-size: 14pt; font-weight: 800; color: #fff; letter-spacing: -0.01em; }
+    .cta-hours       { font-size: 7pt; color: rgba(255,255,255,0.45); margin-top: 2.5mm; }
     .cta-page__foot  { padding: 4mm 15mm 12mm; border-top: 1pt solid var(--bd); }
   </style>
 </head>
@@ -352,7 +349,7 @@
     </div>
     <div class="cv-foot">
       <span>DST System · 2026 · Document confidentiel</span>
-      <span>06 65 44 52 26 · contact@dst-system.fr</span>
+      <span>contact@dst-system.fr</span>
     </div>
   </div>
 </section>
@@ -943,12 +940,8 @@
         </div>
       </div>
       <div class="cta-contact">
-        <div class="cta-phone-box">
-          <div class="cta-phone-label">Appelez directement</div>
-          <div class="cta-phone-num">06 65 44 52 26</div>
-        </div>
-        <div class="cta-email-box">
-          <div class="cta-email-label">Email</div>
+        <div class="cta-email-box" style="width:100%;">
+          <div class="cta-email-label">Prise de contact</div>
           <div class="cta-email-addr">contact@dst-system.fr</div>
           <div class="cta-hours">Lun–Ven · 9h–18h · <strong>Réponse sous 48h</strong></div>
         </div>
