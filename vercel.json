@@ -1,9 +1,6 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "buildCommand": "",
-  "outputDirectory": ".",
-  "framework": null,
-  "rewrites": [
-    { "source": "/", "destination": "/DST-SYSTEM.html" }
-  ]
+  "outputDirectory": "vitrine",
+  "framework": null
 }
