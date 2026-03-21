@@ -72,13 +72,13 @@
 
     /* ── PAGE HEADER ─────────────────────────────────────── */
     .ph {
-      height: 11mm; padding: 0 15mm;
+      height: 11mm; padding: 0 15mm 6px; margin-bottom: 12px;
       display: flex; align-items: center; justify-content: space-between;
       border-bottom: 1pt solid var(--bd); flex-shrink: 0;
     }
     .ph-logo { display: flex; align-items: center; gap: 7px; font-size: 8pt; font-weight: 700; color: var(--t1); }
     .ph-logo em { font-style: normal; font-weight: 400; color: var(--t3); }
-    .ph-section { font-size: 6.5pt; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--t3); }
+    .ph-section { font-size: 13px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--t3); }
 
     /* ── PAGE CONTENT ────────────────────────────────────── */
     .pc { flex: 1; padding: 22px 15mm; overflow: hidden; display: flex; flex-direction: column; }
@@ -155,7 +155,7 @@
 
     /* ── GRIDS ───────────────────────────────────────────── */
     .g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 3mm; flex: 1; }
-    .g3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 3mm; flex: 1; align-items: start; }
+    .g3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; flex: 1; align-items: start; }
 
     /* ── CARD ────────────────────────────────────────────── */
     .card { padding: 3mm 4mm; border: 1pt solid var(--bd); border-radius: 4pt; display: flex; flex-direction: column; gap: 1.5mm; }
@@ -236,14 +236,14 @@
     .iblock-body { display: flex; flex-direction: column; gap: 1mm; }
 
     /* ── LEVELS ──────────────────────────────────────────── */
-    .level { padding: 3mm 3.5mm; border: 1pt solid var(--bd); border-radius: 4pt; display: flex; flex-direction: column; gap: 1.5mm; }
+    .level { padding: 10px; border: 1px solid #eee; border-radius: 4px; display: flex; flex-direction: column; gap: 1.5mm; }
     .level--main { background: var(--rl); border-color: var(--rb); }
     .lv-badge {
       font-size: 6pt; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: var(--red);
       background: var(--rl); border: 1pt solid var(--rb);
       padding: 1mm 2.5mm; border-radius: 2pt; width: fit-content;
     }
-    .lv-title { font-size: 11pt; font-weight: 800; color: var(--ink); }
+    .lv-title { font-size: 13px; font-weight: 800; color: var(--ink); }
     .lv-range { font-size: 7pt; color: var(--t3); font-weight: 500; }
     .lv-sep   { height: 1pt; background: var(--bd); margin: 0.5mm 0; }
     .lv-list  { list-style: none; display: flex; flex-direction: column; gap: 1mm; }
@@ -280,17 +280,17 @@
       padding: 35px 18mm 12mm; align-items: center;
     }
     /* Zone 1 — logo */
-    .cv-head   { display: flex; flex-direction: column; align-items: center; flex-shrink: 0; width: 100%; margin-bottom: 4mm; }
+    .cv-head   { display: flex; flex-direction: column; align-items: center; flex-shrink: 0; width: 100%; margin-bottom: 6px; }
     /* Zone 2 — message principal */
     .cv-mid    {
       flex: 1; display: flex; flex-direction: column;
-      justify-content: center; align-items: center;
+      justify-content: flex-start; align-items: center;
       padding: 3mm 0; text-align: center;
     }
     .cv-h1     {
       font-size: 34px; font-weight: 700; color: var(--ink);
       line-height: 1.15; letter-spacing: -0.3px;
-      margin: 8px 0; text-align: center;
+      margin: 4px 0 8px; text-align: center;
     }
     .cv-sub    {
       font-size: 16px; font-weight: 500; color: #444;
@@ -418,7 +418,6 @@
   <header class="ph">
     <div class="ph-logo">
       <img src="img/DST-Light.png" alt="" style="height:20px;width:auto;object-fit:contain;flex-shrink:0;">
-      <span>DST <em>System</em></span>
     </div>
     <span class="ph-section">Constat · Limites actuelles</span>
   </header>
@@ -505,7 +504,6 @@
   <header class="ph">
     <div class="ph-logo">
       <img src="img/DST-Light.png" alt="" style="height:20px;width:auto;object-fit:contain;flex-shrink:0;">
-      <span>DST <em>System</em></span>
     </div>
     <span class="ph-section">La solution · Le programme</span>
   </header>
@@ -624,7 +622,6 @@
   <header class="ph">
     <div class="ph-logo">
       <img src="img/DST-Light.png" alt="" style="height:20px;width:auto;object-fit:contain;flex-shrink:0;">
-      <span>DST <em>System</em></span>
     </div>
     <span class="ph-section">Niveaux de déploiement</span>
   </header>
@@ -698,8 +695,8 @@
         </ul>
       </div>
     </div>
-    <div class="note" style="margin-top:3mm;">
-      <p style="font-size:7.5pt;"><strong style="color:var(--red);">Marchés publics :</strong> Intervention sous le seuil MAPA. Kbis, RC Pro et attestations fournis sur demande.</p>
+    <div style="margin-top:10px;text-align:center;padding:6px 0;border-top:1pt solid var(--bd);">
+      <p style="font-size:13px;color:var(--t3);">Choix du niveau déterminé lors de l'audit initial</p>
     </div>
   </main>
   <footer class="pf">
@@ -716,7 +713,6 @@
   <header class="ph">
     <div class="ph-logo">
       <img src="img/DST-Light.png" alt="" style="height:20px;width:auto;object-fit:contain;flex-shrink:0;">
-      <span>DST <em>System</em></span>
     </div>
     <span class="ph-section">Impact opérationnel · Maîtrise budgétaire</span>
   </header>
@@ -726,8 +722,8 @@
       <div class="col-flex" style="display:flex;flex-direction:column;justify-content:flex-start;gap:0;">
         <div class="stag">06 — Impact</div>
         <h2 style="font-size:15pt;margin-bottom:2mm;">Trois effets directs<br>sur votre organisation.</h2>
-        <div class="alert" style="margin-top:0;margin-bottom:3mm;"><strong>Enjeu :</strong> Un agent non entraîné est un <strong>risque opérationnel et juridique</strong> pour votre organisation.</div>
-        <div class="iblocks" style="flex:none;justify-content:flex-start;gap:2mm;margin-top:auto;">
+        <div class="alert" style="margin-top:0;margin-bottom:8px;"><strong>Enjeu :</strong> Un agent non entraîné est un <strong>risque opérationnel et juridique</strong> pour votre organisation.</div>
+        <div class="iblocks" style="flex:none;justify-content:flex-start;gap:8px;">
           <div class="iblock" style="padding:2.5mm 3.5mm;">
             <div class="iblock-icon">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
@@ -778,7 +774,7 @@
       <!-- Colonne droite : Budget -->
       <div class="col-flex" style="display:flex;flex-direction:column;justify-content:flex-start;gap:0;">
         <div class="stag">07 — Budget</div>
-        <h2 style="font-size:15pt;margin-bottom:8px;">Un coût maîtrisé.<br>Compatible MAPA.</h2>
+        <h2 style="font-size:15pt;margin-bottom:8px;">Un coût maîtrisé.</h2>
         <div style="padding:14px;border:1px solid #e5e5e5;background:#fafafa;border-radius:4px;flex:1;display:flex;flex-direction:column;">
           <div class="blist" style="flex:none;justify-content:flex-start;gap:2mm;">
             <div class="bitem" style="display:flex;justify-content:space-between;margin-bottom:4px;font-size:14px;padding:2.5mm 3mm;">
@@ -818,8 +814,8 @@
               </div>
             </div>
           </div>
-          <div class="note" style="margin-top:auto;">
-            <p style="font-size:7pt;"><strong style="color:var(--red);">Procédure MAPA :</strong> Le montant DST System est généralement inférieur au seuil de procédure formalisée. Documents administratifs fournis sur demande.</p>
+          <div class="note" style="margin-top:3mm;">
+            <p style="font-size:7pt;">Adapté aux procédures d'achat direct des collectivités.</p>
           </div>
         </div>
       </div>
@@ -839,7 +835,6 @@
   <header class="ph">
     <div class="ph-logo">
       <img src="img/DST-Light.png" alt="" style="height:20px;width:auto;object-fit:contain;flex-shrink:0;">
-      <span>DST <em>System</em></span>
     </div>
     <span class="ph-section">Le porteur · Prochaine étape</span>
   </header>
