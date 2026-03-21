@@ -1,0 +1,12 @@
+{
+  "name": "dst-system-vitrine",
+  "version": "1.0.0",
+  "description": "DST System — Site vitrine et génération plaquette PDF",
+  "private": true,
+  "scripts": {
+    "generate:pdf": "node scripts/generate-pdf.js"
+  },
+  "dependencies": {
+    "puppeteer": "^22.0.0"
+  }
+}

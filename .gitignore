@@ -12,3 +12,7 @@ Thumbs.db
 *.tmp
 *.log
 .vercel
+
+# Node
+node_modules/
+npm-debug.log*
