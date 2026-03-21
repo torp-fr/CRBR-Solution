@@ -34,7 +34,7 @@
       print-color-adjust: exact;
     }
 
-    /* ── DOWNLOAD BUTTON ────────────────────────────────── */
+    /* ── DOWNLOAD BUTTON ─────────────────────────────────── */
     .dl-btn {
       position: fixed; top: 16px; right: 16px; z-index: 999;
       background: var(--red); color: #fff;
@@ -42,18 +42,18 @@
       border: none; border-radius: 5px; cursor: pointer;
       box-shadow: 0 4px 20px rgba(0,0,0,0.28);
       display: flex; align-items: center; gap: 8px;
-      letter-spacing: 0.01em;
+      text-decoration: none;
     }
     .dl-btn:hover { background: #a8312a; }
     .dl-hint {
       position: fixed; top: 54px; right: 16px; z-index: 998;
-      font: 400 10px/1.4 var(--f); color: #666; background: #fff;
+      font: 400 10px/1.4 var(--f); color: #555; background: #fff;
       padding: 6px 10px; border-radius: 4px;
       box-shadow: 0 2px 10px rgba(0,0,0,0.15);
       white-space: nowrap;
     }
 
-    /* ── PAGE SHELL ─────────────────────────────────────── */
+    /* ── PAGE SHELL ──────────────────────────────────────── */
     .page {
       width: 210mm; height: 297mm;
       margin: 16px auto;
@@ -69,184 +69,218 @@
       .dl-btn, .dl-hint { display: none !important; }
     }
 
-    /* ── PAGE HEADER ────────────────────────────────────── */
+    /* ── PAGE HEADER ─────────────────────────────────────── */
     .ph {
       height: 13mm; padding: 0 15mm;
       display: flex; align-items: center; justify-content: space-between;
       border-bottom: 1pt solid var(--bd); flex-shrink: 0;
     }
-    .ph-logo {
-      display: flex; align-items: center; gap: 7px;
-      font-size: 8pt; font-weight: 700; color: var(--t1);
-    }
+    .ph-logo { display: flex; align-items: center; gap: 7px; font-size: 8pt; font-weight: 700; color: var(--t1); }
     .ph-logo em { font-style: normal; font-weight: 400; color: var(--t3); }
     .ph-section { font-size: 6.5pt; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--t3); }
 
-    /* ── PAGE CONTENT ───────────────────────────────────── */
-    .pc { flex: 1; padding: 10mm 15mm 9mm; overflow: hidden; display: flex; flex-direction: column; }
+    /* ── PAGE CONTENT ────────────────────────────────────── */
+    .pc { flex: 1; padding: 9mm 15mm 8mm; overflow: hidden; display: flex; flex-direction: column; }
 
-    /* ── PAGE FOOTER ────────────────────────────────────── */
+    /* ── PAGE FOOTER ─────────────────────────────────────── */
     .pf {
       height: 11mm; padding: 0 15mm;
       display: flex; align-items: center; justify-content: space-between;
       border-top: 1pt solid var(--bd); flex-shrink: 0;
     }
     .pf span { font-size: 6pt; color: var(--t3); }
-    .pf-pg { font-weight: 600; color: var(--t3); }
+    .pf-pg { font-weight: 600; }
 
-    /* ── LOGO MARK (SVG inline) ─────────────────────────── */
+    /* ── LOGO MARK ───────────────────────────────────────── */
     .logo-mark { flex-shrink: 0; }
     .logo-mark circle, .logo-mark line { stroke: var(--ink); }
     .logo-mark .dot { fill: var(--red); stroke: none; }
 
-    /* ── SECTION TAG ────────────────────────────────────── */
+    /* ── SECTION TAG ─────────────────────────────────────── */
     .stag {
       font-size: 6.5pt; font-weight: 800; letter-spacing: 0.14em;
       text-transform: uppercase; color: var(--red);
       display: flex; align-items: center; gap: 8px;
-      margin-bottom: 5mm;
+      margin-bottom: 3mm;
     }
     .stag::after { content: ''; width: 14mm; height: 1.5pt; background: var(--rb); display: block; }
 
-    /* ── TYPOGRAPHY ─────────────────────────────────────── */
+    /* ── TYPOGRAPHY ──────────────────────────────────────── */
     h2 {
-      font-size: 18pt; font-weight: 800; color: var(--ink);
-      line-height: 1.08; letter-spacing: -0.03em; margin-bottom: 7mm;
+      font-size: 20pt; font-weight: 800; color: var(--ink);
+      line-height: 1.08; letter-spacing: -0.03em; margin-bottom: 5mm;
     }
-    h3 { font-size: 9.5pt; font-weight: 700; color: var(--t1); line-height: 1.3; margin-bottom: 2mm; }
-    p  { font-size: 8pt; color: var(--t2); line-height: 1.75; }
-    .lead { font-size: 9pt; color: var(--t2); line-height: 1.65; margin-bottom: 7mm; }
+    h3 { font-size: 9.5pt; font-weight: 700; color: var(--t1); line-height: 1.3; margin-bottom: 1.5mm; }
+    p  { font-size: 8pt; color: var(--t2); line-height: 1.7; }
+    .lead { font-size: 8.5pt; color: var(--t2); line-height: 1.6; margin-bottom: 5mm; }
+    /* Keyword emphasis — for decision-maker scanning */
+    .kw  { font-weight: 700; color: var(--t1); }
 
-    /* ── NUMBERED LIST ──────────────────────────────────── */
-    .nlist { display: flex; flex-direction: column; flex: 1; gap: 1mm; }
+    /* ── TENSION BOX ─────────────────────────────────────── */
+    .alert {
+      padding: 3.5mm 5mm; margin-top: 5mm;
+      border-left: 3pt solid var(--red);
+      background: var(--rl);
+      border-radius: 0 4pt 4pt 0;
+      font-size: 8pt; font-style: italic; color: var(--t1); line-height: 1.6;
+    }
+    .alert strong { font-style: normal; color: var(--red); font-weight: 700; }
+
+    /* ── BULLET LIST ─────────────────────────────────────── */
+    .bul { list-style: none; display: flex; flex-direction: column; gap: 2mm; margin-top: 2mm; }
+    .bul li {
+      display: flex; gap: 3.5mm; align-items: flex-start;
+      font-size: 7.5pt; color: var(--t2); line-height: 1.5;
+    }
+    .bul li::before { content: '—'; color: var(--red); font-weight: 800; flex-shrink: 0; line-height: 1.5; }
+
+    /* ── NUMBERED LIST ───────────────────────────────────── */
+    .nlist { display: flex; flex-direction: column; flex: 1; gap: 0; }
     .nitem {
-      display: grid; grid-template-columns: 11mm 1fr;
-      gap: 4mm; padding: 5mm 0;
+      display: grid; grid-template-columns: 10mm 1fr;
+      gap: 4mm; padding: 4.5mm 0;
       border-bottom: 1pt solid var(--bd); align-items: start;
     }
     .nitem:last-child { border-bottom: none; }
     .nn {
-      width: 8mm; height: 8mm; border-radius: 50%;
+      width: 7mm; height: 7mm; border-radius: 50%;
       background: var(--rl); border: 1pt solid var(--rb);
       display: flex; align-items: center; justify-content: center;
       font-size: 6pt; font-weight: 800; color: var(--red);
       flex-shrink: 0; margin-top: 1pt;
     }
 
-    /* ── GRIDS ──────────────────────────────────────────── */
-    .g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 4.5mm; flex: 1; }
+    /* ── GRIDS ───────────────────────────────────────────── */
+    .g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 4mm; flex: 1; }
     .g3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 4mm; flex: 1; }
 
-    /* ── CARD ───────────────────────────────────────────── */
-    .card {
-      padding: 5mm 5.5mm; border: 1pt solid var(--bd); border-radius: 4pt;
-      display: flex; flex-direction: column; gap: 2.5mm;
-    }
+    /* ── CARD ────────────────────────────────────────────── */
+    .card { padding: 5mm 5mm; border: 1pt solid var(--bd); border-radius: 4pt; display: flex; flex-direction: column; gap: 2mm; }
     .card--accent { background: var(--rl); border-color: var(--rb); }
-    .card--grey   { background: var(--bg); border-color: var(--bd); }
+    .card--grey   { background: var(--bg); }
     .card-tag { font-size: 6.5pt; font-weight: 800; letter-spacing: 0.1em; color: var(--red); text-transform: uppercase; }
     .card-icon { margin-bottom: 1mm; }
 
-    /* ── STAT ROW ───────────────────────────────────────── */
-    .stats { display: flex; gap: 4mm; padding-top: 6mm; margin-top: auto; border-top: 1pt solid var(--bd); }
-    .stat  { flex: 1; text-align: center; padding: 4mm 3mm; background: var(--bg); border-radius: 3pt; border: 1pt solid var(--bd); }
+    /* ── STAT ROW ────────────────────────────────────────── */
+    .stats { display: flex; gap: 4mm; padding-top: 5mm; margin-top: auto; border-top: 1pt solid var(--bd); }
+    .stat  { flex: 1; text-align: center; padding: 3.5mm 2mm; background: var(--bg); border-radius: 3pt; border: 1pt solid var(--bd); }
     .stat-n { font-size: 14pt; font-weight: 800; color: var(--red); display: block; line-height: 1; }
     .stat-l { font-size: 6pt; color: var(--t3); font-weight: 500; display: block; margin-top: 1.5mm; line-height: 1.3; }
 
-    /* ── COMPARISON TABLE ───────────────────────────────── */
+    /* ── COMPARISON TABLE ────────────────────────────────── */
     .ctable { width: 100%; border-collapse: collapse; font-size: 8pt; flex: 1; }
     .ctable thead tr { background: var(--bg); }
     .ctable th { padding: 3mm 4mm; text-align: left; font-size: 7pt; font-weight: 700; color: var(--t1); border-bottom: 1.5pt solid var(--bd2); }
     .ctable th.dc { background: var(--rl); color: var(--red); }
-    .ctable td { padding: 3mm 4mm; border-bottom: 1pt solid var(--bd); color: var(--t2); vertical-align: middle; }
+    .ctable td { padding: 2.5mm 4mm; border-bottom: 1pt solid var(--bd); color: var(--t2); vertical-align: middle; }
     .ctable td.dc { font-weight: 600; color: var(--t1); background: rgba(192,57,43,0.03); }
     .ctable tr:last-child td { border-bottom: none; }
-    .ctable tr:hover td { background: var(--bg); }
     .yes { color: var(--red); font-weight: 700; }
-    .no  { color: #b0b0c0; }
+    .no  { color: #b8b8c8; }
 
-    /* ── TIMELINE ───────────────────────────────────────── */
-    .tl { display: flex; flex-direction: column; gap: 4mm; flex: 1; }
+    /* ── VISUAL FLOW SCHEMA ──────────────────────────────── */
+    .flow {
+      display: grid; grid-template-columns: 1fr 10mm 1fr 10mm 1fr;
+      gap: 0; margin-bottom: 4mm;
+    }
+    .flow-box {
+      padding: 4mm; background: var(--bg); border: 1pt solid var(--bd); border-radius: 4pt;
+      text-align: center; display: flex; flex-direction: column; gap: 2mm; align-items: center;
+    }
+    .flow-box--accent { background: var(--rl); border-color: var(--rb); }
+    .flow-box__title  { font-size: 8pt; font-weight: 800; color: var(--ink); }
+    .flow-box__detail { font-size: 6.5pt; color: var(--t3); line-height: 1.4; }
+    .flow-arrow {
+      display: flex; align-items: center; justify-content: center;
+      color: var(--red); font-size: 14pt; font-weight: 900; line-height: 1;
+    }
+
+    /* ── VISUAL PROGRESS BAR ─────────────────────────────── */
+    .prog-bar {
+      display: grid; grid-template-columns: 18% 62% 20%;
+      height: 9mm; border-radius: 4pt; overflow: hidden;
+      border: 1pt solid var(--bd); margin-bottom: 4mm;
+    }
+    .prog-seg {
+      display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 0.5mm;
+      font-size: 6pt; font-weight: 700; color: var(--t3); line-height: 1.2; text-align: center;
+    }
+    .prog-seg span { font-size: 5.5pt; font-weight: 400; color: var(--t3); }
+    .prog-seg--init { background: var(--bg); border-right: 1pt solid var(--bd2); color: var(--t2); }
+    .prog-seg--main { background: var(--rl); color: var(--red); font-weight: 800; }
+    .prog-seg--main span { color: rgba(192,57,43,0.7); }
+    .prog-seg--end  { background: var(--bg); border-left: 1pt solid var(--bd2); color: var(--t2); }
+
+    /* ── TIMELINE ────────────────────────────────────────── */
+    .tl { display: flex; flex-direction: column; gap: 3.5mm; flex: 1; }
     .tl-row {
-      display: grid; grid-template-columns: 28mm 1fr;
-      gap: 5mm; padding: 4.5mm 5mm; border: 1pt solid var(--bd); border-radius: 4pt; align-items: center;
+      display: grid; grid-template-columns: 26mm 1fr;
+      gap: 4mm; padding: 4mm 5mm; border: 1pt solid var(--bd); border-radius: 4pt; align-items: start;
     }
     .tl-row--main { background: var(--rl); border-color: var(--rb); }
     .tl-period { font-size: 7.5pt; font-weight: 800; color: var(--red); line-height: 1.3; }
     .tl-sub    { font-size: 6.5pt; color: var(--t3); margin-top: 1mm; }
 
-    /* ── IMPACT ─────────────────────────────────────────── */
-    .iblocks { display: flex; flex-direction: column; gap: 5mm; flex: 1; }
+    /* ── IMPACT BLOCKS ───────────────────────────────────── */
+    .iblocks { display: flex; flex-direction: column; gap: 4mm; flex: 1; }
     .iblock {
-      flex: 1; padding: 5mm 6mm;
+      flex: 1; padding: 4.5mm 5.5mm;
       border: 1pt solid var(--bd); border-radius: 4pt;
       border-left: 3.5pt solid var(--red);
-      display: flex; gap: 5mm; align-items: flex-start;
+      display: flex; gap: 4.5mm; align-items: flex-start;
     }
     .iblock-icon { flex-shrink: 0; padding-top: 1pt; }
-    .iblock-body { display: flex; flex-direction: column; gap: 2mm; }
+    .iblock-body { display: flex; flex-direction: column; gap: 1.5mm; }
 
-    /* ── LEVELS ─────────────────────────────────────────── */
-    .level {
-      padding: 5.5mm 5mm; border: 1pt solid var(--bd); border-radius: 4pt;
-      display: flex; flex-direction: column; gap: 3mm;
-    }
+    /* ── LEVELS ──────────────────────────────────────────── */
+    .level { padding: 5mm; border: 1pt solid var(--bd); border-radius: 4pt; display: flex; flex-direction: column; gap: 2.5mm; }
     .level--main { background: var(--rl); border-color: var(--rb); }
     .lv-badge {
-      font-size: 6pt; font-weight: 800; letter-spacing: 0.1em;
-      text-transform: uppercase; color: var(--red);
+      font-size: 6pt; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: var(--red);
       background: var(--rl); border: 1pt solid var(--rb);
       padding: 1mm 2.5mm; border-radius: 2pt; width: fit-content;
     }
     .lv-title { font-size: 11pt; font-weight: 800; color: var(--ink); }
     .lv-range { font-size: 7pt; color: var(--t3); font-weight: 500; }
     .lv-sep   { height: 1pt; background: var(--bd); margin: 1mm 0; }
-    .lv-list  { list-style: none; display: flex; flex-direction: column; gap: 2.5mm; }
+    .lv-list  { list-style: none; display: flex; flex-direction: column; gap: 2mm; }
     .lv-list li {
       font-size: 7.5pt; color: var(--t2); line-height: 1.4;
       display: flex; gap: 3mm; align-items: flex-start;
     }
     .lv-list li::before { content: '—'; color: var(--red); font-weight: 700; flex-shrink: 0; }
 
-    /* ── BUDGET ─────────────────────────────────────────── */
-    .blist { display: flex; flex-direction: column; gap: 4mm; flex: 1; }
+    /* ── BUDGET ──────────────────────────────────────────── */
+    .blist { display: flex; flex-direction: column; gap: 3.5mm; flex: 1; }
     .bitem {
       display: flex; gap: 5mm; align-items: flex-start;
-      padding: 4.5mm 5mm; background: var(--bg);
+      padding: 4mm 5mm; background: var(--bg);
       border: 1pt solid var(--bd); border-radius: 4pt;
     }
     .bitem-icon { flex-shrink: 0; padding-top: 1.5pt; }
-    .note {
-      padding: 3.5mm 5mm; background: var(--rl);
-      border: 1pt solid var(--rb); border-radius: 4pt; margin-top: 4mm;
-    }
+    .note { padding: 3.5mm 5mm; background: var(--rl); border: 1pt solid var(--rb); border-radius: 4pt; margin-top: 4mm; }
 
-    /* ── PORTEUR ────────────────────────────────────────── */
+    /* ── PORTEUR ─────────────────────────────────────────── */
     .porteur-grid { display: grid; grid-template-columns: 1fr 82mm; gap: 8mm; flex: 1; }
-    .parc         { display: flex; flex-direction: column; gap: 3.5mm; margin-top: 2mm; }
-    .parc-item    { display: flex; gap: 4mm; align-items: flex-start; font-size: 7.5pt; color: var(--t2); line-height: 1.5; }
-    .parc-dot     { width: 5mm; height: 5mm; border-radius: 50%; background: var(--red); flex-shrink: 0; margin-top: 1.5pt; }
-    .quote-block  {
+    .parc      { display: flex; flex-direction: column; gap: 3mm; margin-top: 1mm; }
+    .parc-item { display: flex; gap: 4mm; align-items: flex-start; font-size: 7.5pt; color: var(--t2); line-height: 1.5; }
+    .parc-dot  { width: 5mm; height: 5mm; border-radius: 50%; background: var(--red); flex-shrink: 0; margin-top: 1.5pt; }
+    .quote-block {
       padding: 4mm 5mm; border-left: 3pt solid var(--red);
       background: var(--bg); border-radius: 0 4pt 4pt 0;
-      font-size: 8pt; font-style: italic; color: var(--t2); line-height: 1.6;
-      margin-top: 4mm;
+      font-size: 8pt; font-style: italic; color: var(--t2); line-height: 1.6; margin-top: 4mm;
     }
 
-    /* ── COVER ──────────────────────────────────────────── */
+    /* ── COVER ───────────────────────────────────────────── */
     .cv-stripe { position: absolute; left: 0; top: 0; bottom: 0; width: 5mm; background: var(--red); }
     .cv-inner  { position: relative; display: flex; flex-direction: column; height: 100%; padding: 14mm 15mm 13mm 22mm; }
     .cv-head   { display: flex; align-items: center; gap: 9px; }
-    .cv-brand  { font-size: 9pt; font-weight: 700; color: var(--t1); line-height: 1; }
+    .cv-brand  { font-size: 9pt; font-weight: 700; color: var(--t1); }
     .cv-brand em { font-style: normal; font-weight: 400; color: var(--t3); }
-    .cv-badge  {
-      margin-top: 4mm; width: fit-content;
-      font-size: 6pt; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase;
-      color: var(--red); padding: 2mm 3.5mm; border: 1pt solid var(--rb); border-radius: 3pt;
-    }
+    .cv-badge  { margin-top: 4mm; width: fit-content; font-size: 6pt; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--red); padding: 2mm 3.5mm; border: 1pt solid var(--rb); border-radius: 3pt; }
     .cv-mid    { flex: 1; display: flex; flex-direction: column; justify-content: center; padding: 8mm 0; }
-    .cv-h1     { font-size: 32pt; font-weight: 900; color: var(--ink); line-height: 1.0; letter-spacing: -0.045em; margin-bottom: 6mm; }
-    .cv-sub    { font-size: 10.5pt; color: var(--t2); line-height: 1.6; max-width: 116mm; font-weight: 400; }
+    .cv-h1     { font-size: 34pt; font-weight: 900; color: var(--ink); line-height: 1.0; letter-spacing: -0.045em; margin-bottom: 6mm; }
+    .cv-sub    { font-size: 10.5pt; color: var(--t2); line-height: 1.6; max-width: 116mm; }
     .cv-divider { height: 1.5pt; background: var(--bd); margin: 8mm 0; width: 30mm; }
     .cv-stats  { display: flex; gap: 4mm; flex-wrap: wrap; }
     .cv-stat   { padding: 4mm 5mm; background: var(--bg); border: 1pt solid var(--bd); border-radius: 3pt; min-width: 28mm; }
@@ -255,35 +289,24 @@
     .cv-foot   { padding-top: 5mm; border-top: 1pt solid var(--bd); display: flex; justify-content: space-between; align-items: center; }
     .cv-foot span { font-size: 6.5pt; color: var(--t3); }
 
-    /* ── FINAL CTA PAGE ─────────────────────────────────── */
-    .cta-page       { position: relative; display: flex; flex-direction: column; height: 100%; }
-    .cta-page__head { padding: 14mm 15mm 0; border-bottom: none; display: flex; align-items: center; gap: 9px; flex-shrink: 0; }
+    /* ── FINAL CTA PAGE ──────────────────────────────────── */
+    .cta-page { position: relative; display: flex; flex-direction: column; height: 100%; }
+    .cta-page__head { padding: 14mm 15mm 0; display: flex; align-items: center; gap: 9px; flex-shrink: 0; }
     .cta-page__head .ph-logo { font-size: 8pt; font-weight: 700; color: var(--t1); display: flex; align-items: center; gap: 7px; }
     .cta-page__head .ph-logo em { font-style: normal; font-weight: 400; color: var(--t3); }
-    .cta-page__body { flex: 1; padding: 8mm 15mm 0; display: flex; flex-direction: column; }
-    .cta-page__h1   { font-size: 22pt; font-weight: 900; color: var(--ink); line-height: 1.08; letter-spacing: -0.035em; margin-bottom: 4mm; }
-    .cta-page__sub  { font-size: 9pt; color: var(--t2); line-height: 1.65; max-width: 140mm; margin-bottom: 8mm; }
-    .cta-actions    { display: flex; flex-direction: column; gap: 3mm; margin-bottom: 8mm; }
+    .cta-page__body { flex: 1; padding: 7mm 15mm 0; display: flex; flex-direction: column; }
+    .cta-page__h1   { font-size: 24pt; font-weight: 900; color: var(--ink); line-height: 1.08; letter-spacing: -0.04em; margin-bottom: 3mm; }
+    .cta-page__sub  { font-size: 9pt; color: var(--t2); line-height: 1.6; max-width: 140mm; margin-bottom: 6mm; }
+    .cta-actions    { display: flex; flex-direction: column; gap: 3mm; margin-bottom: 6mm; }
     .cta-action     { display: flex; align-items: center; gap: 5mm; padding: 4mm 5mm; border: 1pt solid var(--bd); border-radius: 4pt; }
     .cta-action--hi { background: var(--rl); border-color: var(--rb); }
-    .cta-action__n  {
-      width: 8mm; height: 8mm; border-radius: 50%; background: var(--red);
-      color: #fff; font-size: 7pt; font-weight: 800;
-      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
-    }
+    .cta-action__n  { width: 8mm; height: 8mm; border-radius: 50%; background: var(--red); color: #fff; font-size: 7pt; font-weight: 800; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
     .cta-action__title { font-size: 9pt; font-weight: 700; color: var(--t1); margin-bottom: 1mm; }
-    .cta-contact    {
-      display: flex; gap: 4mm; margin-bottom: 7mm;
-    }
-    .cta-phone-box  {
-      flex: 1; padding: 5mm 6mm; background: var(--ink); border-radius: 4pt;
-    }
+    .cta-contact { display: flex; gap: 4mm; margin-bottom: 5mm; }
+    .cta-phone-box  { flex: 1; padding: 5mm 6mm; background: var(--ink); border-radius: 4pt; }
     .cta-phone-label { font-size: 6.5pt; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,255,0.4); margin-bottom: 2.5mm; }
-    .cta-phone-num   { font-size: 20pt; font-weight: 900; color: #fff; letter-spacing: -0.02em; line-height: 1; }
-    .cta-email-box  {
-      flex: 1; padding: 5mm 6mm; background: var(--bg); border: 1pt solid var(--bd); border-radius: 4pt;
-      display: flex; flex-direction: column; justify-content: center;
-    }
+    .cta-phone-num   { font-size: 22pt; font-weight: 900; color: #fff; letter-spacing: -0.02em; line-height: 1; }
+    .cta-email-box  { flex: 1; padding: 5mm 6mm; background: var(--bg); border: 1pt solid var(--bd); border-radius: 4pt; display: flex; flex-direction: column; justify-content: center; }
     .cta-email-label { font-size: 6.5pt; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--t3); margin-bottom: 2.5mm; }
     .cta-email-addr  { font-size: 10pt; font-weight: 700; color: var(--t1); }
     .cta-hours       { font-size: 7pt; color: var(--t3); margin-top: 2mm; }
@@ -292,16 +315,14 @@
 </head>
 <body>
 
-<!-- DOWNLOAD BUTTON -->
-<button class="dl-btn" onclick="window.print()">
+<a class="dl-btn" href="assets/DST_System_Plaquette.pdf" download="DST_System_Plaquette.pdf">
   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-    <polyline points="6 9 6 2 18 2 18 9"/>
-    <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/>
-    <rect x="6" y="14" width="12" height="8"/>
+    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+    <polyline points="7 10 12 15 17 10"/>
+    <line x1="12" y1="15" x2="12" y2="3"/>
   </svg>
   Télécharger la plaquette (PDF)
-</button>
-<div class="dl-hint">Ctrl+P → Enregistrer en PDF → Désactiver en-têtes navigateur</div>
+</a>
 
 
 <!-- ══════════════════════════════════════════════════════
@@ -310,28 +331,17 @@
 <section class="page">
   <div class="cv-stripe"></div>
   <div class="cv-inner">
-
-    <!-- Logo -->
     <div class="cv-head">
-      <svg class="logo-mark" width="36" height="36" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="20" cy="20" r="17" stroke="#0d0d18" stroke-width="1.5"/>
-        <circle class="dot" cx="20" cy="20" r="6"/>
-        <line x1="20" y1="3" x2="20" y2="14" stroke="#0d0d18" stroke-width="1.5" stroke-linecap="round"/>
-        <line x1="20" y1="26" x2="20" y2="37" stroke="#0d0d18" stroke-width="1.5" stroke-linecap="round"/>
-        <line x1="3" y1="20" x2="14" y2="20" stroke="#0d0d18" stroke-width="1.5" stroke-linecap="round"/>
-        <line x1="26" y1="20" x2="37" y2="20" stroke="#0d0d18" stroke-width="1.5" stroke-linecap="round"/>
-      </svg>
+      <img src="img/logo principal DST.png" alt="DST System" style="height:44px;width:auto;object-fit:contain;flex-shrink:0;">
       <div>
         <div class="cv-brand"><strong>DST</strong> <em>System</em></div>
         <div style="font-size:6.5pt;color:var(--t3);margin-top:1mm;">Drill &amp; Skills Training</div>
       </div>
     </div>
     <div class="cv-badge">Document de présentation commerciale</div>
-
-    <!-- Titre -->
     <div class="cv-mid">
       <h1 class="cv-h1">Entraîner<br>vos agents.<br>Sur votre site.</h1>
-      <p class="cv-sub">Programme d'entraînement opérationnel mobile pour les forces de sécurité, services armés et institutions publiques. Déployé chez vous, sans infrastructure à prévoir.</p>
+      <p class="cv-sub">Programme d'entraînement opérationnel mobile pour les forces de sécurité, services armés et institutions publiques.<br><strong style="color:var(--t1);">Déployé chez vous. Sans infrastructure à prévoir.</strong></p>
       <div class="cv-divider"></div>
       <div class="cv-stats">
         <div class="cv-stat"><span class="cv-sn">10</span><span class="cv-sl">mois de programme</span></div>
@@ -340,13 +350,10 @@
         <div class="cv-stat"><span class="cv-sn">MAPA</span><span class="cv-sl">procédure adaptée</span></div>
       </div>
     </div>
-
-    <!-- Pied de couverture -->
     <div class="cv-foot">
       <span>DST System · 2026 · Document confidentiel</span>
       <span>06 65 44 52 26 · contact@dst-system.fr</span>
     </div>
-
   </div>
 </section>
 
@@ -357,14 +364,7 @@
 <section class="page">
   <header class="ph">
     <div class="ph-logo">
-      <svg class="logo-mark" width="18" height="18" viewBox="0 0 40 40" fill="none">
-        <circle cx="20" cy="20" r="17" stroke-width="2"/>
-        <circle class="dot" cx="20" cy="20" r="6"/>
-        <line x1="20" y1="3" x2="20" y2="13" stroke-width="2" stroke-linecap="round"/>
-        <line x1="20" y1="27" x2="20" y2="37" stroke-width="2" stroke-linecap="round"/>
-        <line x1="3" y1="20" x2="13" y2="20" stroke-width="2" stroke-linecap="round"/>
-        <line x1="27" y1="20" x2="37" y2="20" stroke-width="2" stroke-linecap="round"/>
-      </svg>
+      <img src="img/DST-Light.png" alt="" style="height:20px;width:auto;object-fit:contain;flex-shrink:0;">
       <span>DST <em>System</em></span>
     </div>
     <span class="ph-section">Le constat</span>
@@ -377,31 +377,45 @@
         <div class="nn">01</div>
         <div>
           <h3>La cadence réglementaire n'est pas tenue</h3>
-          <p>Les obligations d'entraînement périodique existent par voie réglementaire. La plupart des services ne les atteignent pas, faute d'un dispositif adapté à leurs contraintes.</p>
+          <ul class="bul">
+            <li>Obligation d'entraînement <span class="kw">imposée par voie réglementaire</span></li>
+            <li>La plupart des services n'atteignent <span class="kw">pas la fréquence cible</span></li>
+            <li>Non-conformité latente, invisible jusqu'au contrôle ou à l'incident</li>
+          </ul>
         </div>
       </div>
       <div class="nitem">
         <div class="nn">02</div>
         <div>
           <h3>Le tir réel est un obstacle logistique majeur</h3>
-          <p>Transport, réservation du pas de tir, munitions, coordination administrative : chaque séance mobilise des ressources disproportionnées.</p>
+          <ul class="bul">
+            <li><span class="kw">Transport, réservation, munitions, coordination</span> : chaque session = ressources disproportionnées</li>
+            <li>La logistique absorbe plus d'énergie que la formation elle-même</li>
+          </ul>
         </div>
       </div>
       <div class="nitem">
         <div class="nn">03</div>
         <div>
           <h3>Former sans désorganiser le service</h3>
-          <p>Les absences simultanées créent des tensions opérationnelles. La couverture du terrain ne peut pas être compromise par une formation collective.</p>
+          <ul class="bul">
+            <li>Les absences simultanées <span class="kw">compromettent la couverture du terrain</span></li>
+            <li>La formation collective devient structurellement incompatible avec les impératifs opérationnels</li>
+          </ul>
         </div>
       </div>
       <div class="nitem">
         <div class="nn">04</div>
         <div>
           <h3>L'irrégularité annule la progression</h3>
-          <p>Sans entraînement continu, les acquis disparaissent entre les séances. Chaque cycle repart de zéro. La progression ne s'installe jamais.</p>
+          <ul class="bul">
+            <li>Sans continuité, les acquis disparaissent entre les séances</li>
+            <li><span class="kw">Chaque cycle repart de zéro</span> — aucune progression durable ne s'installe</li>
+          </ul>
         </div>
       </div>
     </div>
+    <div class="alert"><strong>En résumé :</strong> Sans dispositif adapté, la réglementation reste une obligation non tenue — et une responsabilité exposée.</div>
   </main>
   <footer class="pf">
     <span>DST System — Document de présentation</span>
@@ -416,21 +430,14 @@
 <section class="page">
   <header class="ph">
     <div class="ph-logo">
-      <svg class="logo-mark" width="18" height="18" viewBox="0 0 40 40" fill="none">
-        <circle cx="20" cy="20" r="17" stroke-width="2"/>
-        <circle class="dot" cx="20" cy="20" r="6"/>
-        <line x1="20" y1="3" x2="20" y2="13" stroke-width="2" stroke-linecap="round"/>
-        <line x1="20" y1="27" x2="20" y2="37" stroke-width="2" stroke-linecap="round"/>
-        <line x1="3" y1="20" x2="13" y2="20" stroke-width="2" stroke-linecap="round"/>
-        <line x1="27" y1="20" x2="37" y2="20" stroke-width="2" stroke-linecap="round"/>
-      </svg>
+      <img src="img/DST-Light.png" alt="" style="height:20px;width:auto;object-fit:contain;flex-shrink:0;">
       <span>DST <em>System</em></span>
     </div>
     <span class="ph-section">Limites actuelles</span>
   </header>
   <main class="pc">
     <div class="stag">02 — Le modèle actuel</div>
-    <h2>Le centre de tir fixe déplace<br>le problème sans le résoudre.</h2>
+    <h2>Le centre de tir fixe<br>déplace le problème.<br>Il ne le résout pas.</h2>
     <table class="ctable">
       <thead>
         <tr>
@@ -440,46 +447,16 @@
         </tr>
       </thead>
       <tbody>
-        <tr>
-          <td>Lieu de la séance</td>
-          <td><span class="no">Infrastructure externe</span></td>
-          <td class="dc"><span class="yes">✓</span> Votre site</td>
-        </tr>
-        <tr>
-          <td>Déplacement des agents</td>
-          <td><span class="no">Obligatoire</span></td>
-          <td class="dc"><span class="yes">✓</span> Aucun</td>
-        </tr>
-        <tr>
-          <td>Gestion des munitions</td>
-          <td><span class="no">À charge du service</span></td>
-          <td class="dc"><span class="yes">✓</span> Prise en charge DST</td>
-        </tr>
-        <tr>
-          <td>Fréquence possible</td>
-          <td><span class="no">Limitée (disponibilité)</span></td>
-          <td class="dc"><span class="yes">✓</span> 1 à 2×/mois</td>
-        </tr>
-        <tr>
-          <td>Continuité pédagogique</td>
-          <td><span class="no">Séances isolées</span></td>
-          <td class="dc"><span class="yes">✓</span> Programme 10 mois</td>
-        </tr>
-        <tr>
-          <td>Traçabilité</td>
-          <td><span class="no">Variable</span></td>
-          <td class="dc"><span class="yes">✓</span> Rapport systématique</td>
-        </tr>
-        <tr>
-          <td>Maîtrise budgétaire</td>
-          <td><span class="no">Coût variable</span></td>
-          <td class="dc"><span class="yes">✓</span> Fixé à la signature</td>
-        </tr>
+        <tr><td>Lieu de la séance</td><td><span class="no">Infrastructure externe</span></td><td class="dc"><span class="yes">✓</span> <strong>Votre site</strong></td></tr>
+        <tr><td>Déplacement des agents</td><td><span class="no">Obligatoire</span></td><td class="dc"><span class="yes">✓</span> <strong>Aucun</strong></td></tr>
+        <tr><td>Gestion des munitions</td><td><span class="no">À charge du service</span></td><td class="dc"><span class="yes">✓</span> <strong>Prise en charge DST</strong></td></tr>
+        <tr><td>Fréquence possible</td><td><span class="no">Limitée (disponibilité)</span></td><td class="dc"><span class="yes">✓</span> <strong>1 à 2×/mois</strong></td></tr>
+        <tr><td>Continuité pédagogique</td><td><span class="no">Séances isolées</span></td><td class="dc"><span class="yes">✓</span> <strong>Programme 10 mois</strong></td></tr>
+        <tr><td>Traçabilité</td><td><span class="no">Variable</span></td><td class="dc"><span class="yes">✓</span> <strong>Rapport systématique</strong></td></tr>
+        <tr><td>Maîtrise budgétaire</td><td><span class="no">Coût variable</span></td><td class="dc"><span class="yes">✓</span> <strong>Fixé à la signature</strong></td></tr>
       </tbody>
     </table>
-    <div class="note" style="margin-top: 6mm;">
-      <p style="font-size:7.5pt;"><strong style="color:var(--red);">Résultat observé :</strong> Dans la configuration actuelle, la régularité de l'entraînement repose sur la volonté des agents et la disponibilité d'une infrastructure externe — deux facteurs hors de contrôle du service.</p>
-    </div>
+    <div class="alert"><strong>Conséquence directe :</strong> Dans le modèle actuel, la régularité de l'entraînement dépend de la disponibilité d'une infrastructure externe et de la logistique des agents — deux facteurs hors de contrôle du service.</div>
   </main>
   <footer class="pf">
     <span>DST System — Document de présentation</span>
@@ -494,21 +471,14 @@
 <section class="page">
   <header class="ph">
     <div class="ph-logo">
-      <svg class="logo-mark" width="18" height="18" viewBox="0 0 40 40" fill="none">
-        <circle cx="20" cy="20" r="17" stroke-width="2"/>
-        <circle class="dot" cx="20" cy="20" r="6"/>
-        <line x1="20" y1="3" x2="20" y2="13" stroke-width="2" stroke-linecap="round"/>
-        <line x1="20" y1="27" x2="20" y2="37" stroke-width="2" stroke-linecap="round"/>
-        <line x1="3" y1="20" x2="13" y2="20" stroke-width="2" stroke-linecap="round"/>
-        <line x1="27" y1="20" x2="37" y2="20" stroke-width="2" stroke-linecap="round"/>
-      </svg>
+      <img src="img/DST-Light.png" alt="" style="height:20px;width:auto;object-fit:contain;flex-shrink:0;">
       <span>DST <em>System</em></span>
     </div>
     <span class="ph-section">La solution</span>
   </header>
   <main class="pc">
     <div class="stag">03 — DST System</div>
-    <h2>Un dispositif mobile<br>qui vient à vous.</h2>
+    <h2>Un dispositif mobile<br>qui vient à vous.<br>Zéro contrainte externe.</h2>
     <div class="g2">
       <div class="card card--accent">
         <div class="card-icon">
@@ -516,7 +486,11 @@
         </div>
         <div class="card-tag">Déploiement</div>
         <h3>L'instructeur vient sur votre site</h3>
-        <p>Aucun déplacement d'agents. La séance a lieu dans votre espace, selon votre planning.</p>
+        <ul class="bul">
+          <li><span class="kw">Aucun déplacement d'agents</span></li>
+          <li>Séance dans votre espace, selon votre planning</li>
+          <li>Flexible — matin, après-midi, week-end</li>
+        </ul>
       </div>
       <div class="card">
         <div class="card-icon">
@@ -524,29 +498,41 @@
         </div>
         <div class="card-tag">Autonomie</div>
         <h3>Matériel entièrement fourni</h3>
-        <p>DST System apporte son équipement. Zéro infrastructure à prévoir de votre côté.</p>
+        <ul class="bul">
+          <li>DST System apporte <span class="kw">son propre équipement</span></li>
+          <li><span class="kw">Zéro infrastructure</span> à prévoir de votre côté</li>
+          <li>Munitions et matériel pris en charge</li>
+        </ul>
       </div>
       <div class="card">
         <div class="card-icon">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
         </div>
         <div class="card-tag">Calibrage</div>
-        <h3>Programme adapté à vos effectifs</h3>
-        <p>Audit initial, niveaux, rythme, contraintes opérationnelles. Le programme est construit pour vous.</p>
+        <h3>Programme construit pour vous</h3>
+        <ul class="bul">
+          <li>Audit initial : niveaux, rythme, contraintes</li>
+          <li><span class="kw">Adapté à votre effectif réel</span></li>
+          <li>Ajusté en continu selon progression</li>
+        </ul>
       </div>
       <div class="card card--grey">
         <div class="card-icon">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
         </div>
         <div class="card-tag">Traçabilité</div>
-        <h3>Rapport après chaque séance</h3>
-        <p>Compte-rendu systématique. Bilan trimestriel. Rapport annuel de progression.</p>
+        <h3>Documentation systématique</h3>
+        <ul class="bul">
+          <li>Compte-rendu <span class="kw">après chaque séance</span></li>
+          <li>Bilan trimestriel + rapport annuel</li>
+          <li>Dossier mobilisable en cas de contrôle</li>
+        </ul>
       </div>
     </div>
     <div class="stats">
-      <div class="stat"><span class="stat-n">10</span><span class="stat-l">mois de programme continu</span></div>
+      <div class="stat"><span class="stat-n">10</span><span class="stat-l">mois continus</span></div>
       <div class="stat"><span class="stat-n">0</span><span class="stat-l">infrastructure à prévoir</span></div>
-      <div class="stat"><span class="stat-n">1–2×</span><span class="stat-l">séances par mois</span></div>
+      <div class="stat"><span class="stat-n">1–2×</span><span class="stat-l">séances / mois</span></div>
       <div class="stat"><span class="stat-n">48h</span><span class="stat-l">délai de réponse</span></div>
     </div>
   </main>
@@ -563,21 +549,22 @@
 <section class="page">
   <header class="ph">
     <div class="ph-logo">
-      <svg class="logo-mark" width="18" height="18" viewBox="0 0 40 40" fill="none">
-        <circle cx="20" cy="20" r="17" stroke-width="2"/>
-        <circle class="dot" cx="20" cy="20" r="6"/>
-        <line x1="20" y1="3" x2="20" y2="13" stroke-width="2" stroke-linecap="round"/>
-        <line x1="20" y1="27" x2="20" y2="37" stroke-width="2" stroke-linecap="round"/>
-        <line x1="3" y1="20" x2="13" y2="20" stroke-width="2" stroke-linecap="round"/>
-        <line x1="27" y1="20" x2="37" y2="20" stroke-width="2" stroke-linecap="round"/>
-      </svg>
+      <img src="img/DST-Light.png" alt="" style="height:20px;width:auto;object-fit:contain;flex-shrink:0;">
       <span>DST <em>System</em></span>
     </div>
     <span class="ph-section">Le programme</span>
   </header>
   <main class="pc">
     <div class="stag">04 — Programme sur 10 mois</div>
-    <h2>Trois phases.<br>Une progression construite,<br>pas improvisée.</h2>
+    <h2>Une progression construite<br>dans le temps.<br>Pas une série de séances.</h2>
+
+    <!-- Barre visuelle de progression -->
+    <div class="prog-bar">
+      <div class="prog-seg prog-seg--init">M1–M2<br><span>Phase initiale</span></div>
+      <div class="prog-seg prog-seg--main">M3 — M4 — M5 — M6 — M7 — M8 — M9 — M10<br><span>Entraînement mensuel continu · Bilan à M5</span></div>
+      <div class="prog-seg prog-seg--end">Fin M10<br><span>Bilan annuel</span></div>
+    </div>
+
     <div class="tl">
       <div class="tl-row">
         <div>
@@ -586,7 +573,11 @@
         </div>
         <div>
           <h3>Audit · Calibrage · Calendrier</h3>
-          <p>Analyse des niveaux actuels et des contraintes opérationnelles. Élaboration du programme personnalisé et du planning de déploiement sur 10 mois.</p>
+          <ul class="bul">
+            <li>Analyse des <span class="kw">niveaux actuels</span> et des contraintes opérationnelles</li>
+            <li>Élaboration du programme personnalisé</li>
+            <li>Validation du planning de déploiement sur 10 mois</li>
+          </ul>
         </div>
       </div>
       <div class="tl-row tl-row--main">
@@ -596,7 +587,11 @@
         </div>
         <div>
           <h3>Séances régulières · Progression documentée</h3>
-          <p>Sessions mensuelles sur site. Progression par compétence avec bilan intermédiaire à M5. Ajustement du programme en continu selon les résultats observés.</p>
+          <ul class="bul">
+            <li>Sessions sur site, <span class="kw">progressives par compétence</span></li>
+            <li>Bilan intermédiaire à M5 — ajustement du programme</li>
+            <li>Compte-rendu systématique après chaque séance</li>
+          </ul>
         </div>
       </div>
       <div class="tl-row">
@@ -605,13 +600,17 @@
           <div class="tl-sub">Clôture de cycle</div>
         </div>
         <div>
-          <h3>Rapport · Évaluation · Recommandation</h3>
-          <p>Rapport de progression individuel et collectif. Évaluation des acquis. Proposition de reconduction ou d'évolution du programme pour le cycle suivant.</p>
+          <h3>Rapport · Évaluation · Reconduction</h3>
+          <ul class="bul">
+            <li>Rapport de progression <span class="kw">individuel et collectif</span></li>
+            <li>Évaluation des acquis, recommandations écrites</li>
+            <li>Proposition pour le cycle suivant</li>
+          </ul>
         </div>
       </div>
     </div>
-    <div style="padding: 4mm 5mm; background: var(--bg); border: 1pt solid var(--bd); border-radius: 4pt; margin-top: 5mm;">
-      <p style="font-size:7.5pt;"><strong style="color:var(--t1);">Compétences couvertes :</strong> <span style="color:var(--t3);">tir de précision · gestion du stress · intervention sur individu armé · maîtrise physique · légitimité de l'emploi de la force · maintien en condition opérationnelle</span></p>
+    <div style="padding: 3.5mm 5mm; background: var(--bg); border: 1pt solid var(--bd); border-radius: 4pt; margin-top: 4mm;">
+      <p style="font-size:7.5pt;"><strong style="color:var(--t1);">Compétences :</strong> <span style="color:var(--t3);">tir de précision · gestion du stress · intervention sur individu armé · maîtrise physique · légitimité de l'emploi de la force · maintien en condition</span></p>
     </div>
   </main>
   <footer class="pf">
@@ -627,21 +626,43 @@
 <section class="page">
   <header class="ph">
     <div class="ph-logo">
-      <svg class="logo-mark" width="18" height="18" viewBox="0 0 40 40" fill="none">
-        <circle cx="20" cy="20" r="17" stroke-width="2"/>
-        <circle class="dot" cx="20" cy="20" r="6"/>
-        <line x1="20" y1="3" x2="20" y2="13" stroke-width="2" stroke-linecap="round"/>
-        <line x1="20" y1="27" x2="20" y2="37" stroke-width="2" stroke-linecap="round"/>
-        <line x1="3" y1="20" x2="13" y2="20" stroke-width="2" stroke-linecap="round"/>
-        <line x1="27" y1="20" x2="37" y2="20" stroke-width="2" stroke-linecap="round"/>
-      </svg>
+      <img src="img/DST-Light.png" alt="" style="height:20px;width:auto;object-fit:contain;flex-shrink:0;">
       <span>DST <em>System</em></span>
     </div>
     <span class="ph-section">Niveaux de déploiement</span>
   </header>
   <main class="pc">
     <div class="stag">05 — Déploiement</div>
-    <h2>Trois niveaux.<br>Un seul objectif : s'adapter<br>à votre organisation.</h2>
+    <h2>Trois niveaux.<br>Une logique simple :<br>DST s'adapte à vous.</h2>
+
+    <!-- Schéma de logique opérationnelle -->
+    <div class="flow">
+      <div class="flow-box">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2" stroke-linecap="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+        <div class="flow-box__title">Votre site</div>
+        <div class="flow-box__detail">Espace disponible<br>Effectif à former<br>Vos contraintes</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box flow-box--accent">
+        <svg width="18" height="18" viewBox="0 0 40 40" fill="none">
+          <circle cx="20" cy="20" r="17" stroke="#c0392b" stroke-width="2"/>
+          <circle cx="20" cy="20" r="6" fill="#c0392b"/>
+          <line x1="20" y1="3" x2="20" y2="13" stroke="#c0392b" stroke-width="2" stroke-linecap="round"/>
+          <line x1="20" y1="27" x2="20" y2="37" stroke="#c0392b" stroke-width="2" stroke-linecap="round"/>
+          <line x1="3" y1="20" x2="13" y2="20" stroke="#c0392b" stroke-width="2" stroke-linecap="round"/>
+          <line x1="27" y1="20" x2="37" y2="20" stroke="#c0392b" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <div class="flow-box__title" style="color:var(--red);">DST System</div>
+        <div class="flow-box__detail">Instructeur qualifié<br>Matériel complet<br>Programme structuré</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2" stroke-linecap="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+        <div class="flow-box__title">Résultat</div>
+        <div class="flow-box__detail">Séance sur site<br>Rapport immédiat<br>Progression documentée</div>
+      </div>
+    </div>
+
     <div class="g3">
       <div class="level">
         <div class="lv-badge">Niveau 01</div>
@@ -652,7 +673,7 @@
           <li>Site unique</li>
           <li>Planning sur mesure</li>
           <li>Suivi individuel</li>
-          <li>Rapport d'unité inclus</li>
+          <li>Rapport d'unité</li>
         </ul>
       </div>
       <div class="level level--main">
@@ -681,8 +702,8 @@
         </ul>
       </div>
     </div>
-    <div class="note">
-      <p style="font-size:7.5pt;"><strong style="color:var(--red);">Marchés publics :</strong> DST System intervient sous le seuil MAPA (marché à procédure adaptée). Kbis, RC Pro et attestations fournis sur demande pour constitution du dossier de consultation.</p>
+    <div class="note" style="margin-top:3mm;">
+      <p style="font-size:7.5pt;"><strong style="color:var(--red);">Marchés publics :</strong> Intervention sous le seuil MAPA. Kbis, RC Pro et attestations fournis sur demande.</p>
     </div>
   </main>
   <footer class="pf">
@@ -698,31 +719,27 @@
 <section class="page">
   <header class="ph">
     <div class="ph-logo">
-      <svg class="logo-mark" width="18" height="18" viewBox="0 0 40 40" fill="none">
-        <circle cx="20" cy="20" r="17" stroke-width="2"/>
-        <circle class="dot" cx="20" cy="20" r="6"/>
-        <line x1="20" y1="3" x2="20" y2="13" stroke-width="2" stroke-linecap="round"/>
-        <line x1="20" y1="27" x2="20" y2="37" stroke-width="2" stroke-linecap="round"/>
-        <line x1="3" y1="20" x2="13" y2="20" stroke-width="2" stroke-linecap="round"/>
-        <line x1="27" y1="20" x2="37" y2="20" stroke-width="2" stroke-linecap="round"/>
-      </svg>
+      <img src="img/DST-Light.png" alt="" style="height:20px;width:auto;object-fit:contain;flex-shrink:0;">
       <span>DST <em>System</em></span>
     </div>
     <span class="ph-section">Impact opérationnel</span>
   </header>
   <main class="pc">
     <div class="stag">06 — Impact</div>
-    <h2>Ce que ça change<br>concrètement<br>pour votre organisation.</h2>
+    <h2>Trois effets directs<br>sur votre organisation.</h2>
+    <div class="alert" style="margin-top:0; margin-bottom:5mm;"><strong>Enjeu :</strong> Un agent non entraîné n'est pas un agent en repos — c'est un <strong>risque opérationnel et juridique</strong> pour votre organisation.</div>
     <div class="iblocks">
       <div class="iblock">
         <div class="iblock-icon">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-          </svg>
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
         </div>
         <div class="iblock-body">
           <h3>Sécurité opérationnelle renforcée</h3>
-          <p>Des agents régulièrement entraînés réagissent avec plus de maîtrise dans les situations à risque. Les gestes techniques sont automatisés, pas improvisés. La pratique continue réduit les comportements inadaptés sous stress.</p>
+          <ul class="bul">
+            <li>Gestes techniques <span class="kw">automatisés sous stress</span>, pas improvisés</li>
+            <li>Comportements inadaptés réduits en situation réelle</li>
+            <li>Progression mesurable entre chaque bilan</li>
+          </ul>
         </div>
       </div>
       <div class="iblock">
@@ -735,7 +752,11 @@
         </div>
         <div class="iblock-body">
           <h3>Conformité réglementaire documentée</h3>
-          <p>Les obligations d'entraînement périodique sont satisfaites et traçables. Comptes-rendus de séance et bilans annuels constituent un dossier opposable lors d'un contrôle ou d'un audit interne.</p>
+          <ul class="bul">
+            <li>Obligations d'entraînement <span class="kw">satisfaites et traçables</span></li>
+            <li>Dossier complet opposable en cas de contrôle ou d'audit</li>
+            <li>Documentation disponible dès la première séance</li>
+          </ul>
         </div>
       </div>
       <div class="iblock">
@@ -749,7 +770,11 @@
         </div>
         <div class="iblock-body">
           <h3>Responsabilité employeur formalisée</h3>
-          <p>Le devoir de formation des agents armés engage l'employeur. DST System fournit la documentation nécessaire à sa formalisation : attestations de participation, bilans de progression, recommandations écrites.</p>
+          <ul class="bul">
+            <li>Devoir de formation des agents armés <span class="kw">engageant l'employeur</span></li>
+            <li>Attestations et bilans mobilisables en cas d'incident</li>
+            <li>Protection juridique documentée de l'institution</li>
+          </ul>
         </div>
       </div>
     </div>
@@ -767,29 +792,22 @@
 <section class="page">
   <header class="ph">
     <div class="ph-logo">
-      <svg class="logo-mark" width="18" height="18" viewBox="0 0 40 40" fill="none">
-        <circle cx="20" cy="20" r="17" stroke-width="2"/>
-        <circle class="dot" cx="20" cy="20" r="6"/>
-        <line x1="20" y1="3" x2="20" y2="13" stroke-width="2" stroke-linecap="round"/>
-        <line x1="20" y1="27" x2="20" y2="37" stroke-width="2" stroke-linecap="round"/>
-        <line x1="3" y1="20" x2="13" y2="20" stroke-width="2" stroke-linecap="round"/>
-        <line x1="27" y1="20" x2="37" y2="20" stroke-width="2" stroke-linecap="round"/>
-      </svg>
+      <img src="img/DST-Light.png" alt="" style="height:20px;width:auto;object-fit:contain;flex-shrink:0;">
       <span>DST <em>System</em></span>
     </div>
     <span class="ph-section">Maîtrise budgétaire</span>
   </header>
   <main class="pc">
     <div class="stag">07 — Budget</div>
-    <h2>Un coût prévisible.<br>Compatible avec la commande<br>publique.</h2>
+    <h2>Un coût maîtrisé.<br>Inscriptible au budget primitif.<br>Compatible MAPA.</h2>
     <div class="blist">
       <div class="bitem">
         <div class="bitem-icon">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
         </div>
         <div>
-          <h3>Budget arrêté dès la signature</h3>
-          <p>Montant annuel fixe. Aucun dépassement, aucun coût variable. Ligne budgétaire précise inscriptible au budget primitif.</p>
+          <h3>Montant fixé à la signature — <span class="kw">aucun dépassement possible</span></h3>
+          <p>Ligne budgétaire précise, inscriptible au budget primitif dès la commande.</p>
         </div>
       </div>
       <div class="bitem">
@@ -797,8 +815,8 @@
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
         </div>
         <div>
-          <h3>Charge lissée sur l'année</h3>
-          <p>Abonnement annuel étalé sur 10 mois. Compatible avec les logiques de mandatement et de trésorerie des collectivités.</p>
+          <h3>Abonnement annuel — <span class="kw">charge lissée sur 10 mois</span></h3>
+          <p>Compatible avec les logiques de mandatement et de trésorerie des collectivités.</p>
         </div>
       </div>
       <div class="bitem">
@@ -806,8 +824,8 @@
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
         </div>
         <div>
-          <h3>Zéro coût d'infrastructure</h3>
-          <p>Suppression des frais de déplacement, d'hébergement et de location de stand. La formation sur site réduit mécaniquement les charges annexes.</p>
+          <h3>Zéro frais annexes — <span class="kw">déplacement, hébergement, stand</span></h3>
+          <p>Formation sur site = suppression des charges logistiques habituellement associées.</p>
         </div>
       </div>
       <div class="bitem">
@@ -815,13 +833,13 @@
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
         </div>
         <div>
-          <h3>Optimisation de la ressource humaine</h3>
-          <p>Formation par fraction d'effectif. Pas d'interruption de service, pas d'heures supplémentaires de compensation.</p>
+          <h3>Formation par fraction — <span class="kw">service non interrompu</span></h3>
+          <p>Pas d'absence collective, pas d'heures supplémentaires de compensation.</p>
         </div>
       </div>
     </div>
     <div class="note">
-      <p style="font-size:7.5pt;"><strong style="color:var(--red);">Procédure MAPA :</strong> Pour les collectivités et établissements publics, le montant DST System est généralement inférieur au seuil de procédure formalisée. Documents administratifs fournis sur demande.</p>
+      <p style="font-size:7.5pt;"><strong style="color:var(--red);">Procédure MAPA :</strong> Le montant DST System est généralement inférieur au seuil de procédure formalisée. Documents administratifs (Kbis, RC Pro, attestations) fournis sur demande pour constitution du dossier.</p>
     </div>
   </main>
   <footer class="pf">
@@ -837,14 +855,7 @@
 <section class="page">
   <header class="ph">
     <div class="ph-logo">
-      <svg class="logo-mark" width="18" height="18" viewBox="0 0 40 40" fill="none">
-        <circle cx="20" cy="20" r="17" stroke-width="2"/>
-        <circle class="dot" cx="20" cy="20" r="6"/>
-        <line x1="20" y1="3" x2="20" y2="13" stroke-width="2" stroke-linecap="round"/>
-        <line x1="20" y1="27" x2="20" y2="37" stroke-width="2" stroke-linecap="round"/>
-        <line x1="3" y1="20" x2="13" y2="20" stroke-width="2" stroke-linecap="round"/>
-        <line x1="27" y1="20" x2="37" y2="20" stroke-width="2" stroke-linecap="round"/>
-      </svg>
+      <img src="img/DST-Light.png" alt="" style="height:20px;width:auto;object-fit:contain;flex-shrink:0;">
       <span>DST <em>System</em></span>
     </div>
     <span class="ph-section">Le porteur</span>
@@ -854,8 +865,13 @@
     <h2>Un programme conçu<br>de l'intérieur du terrain.</h2>
     <div class="porteur-grid">
       <div>
-        <p style="margin-bottom:4mm;">DST System n'a pas été conçu par des consultants en formation. Il a été créé par un professionnel qui a exercé dans les environnements mêmes que nous formons aujourd'hui.</p>
-        <p style="margin-bottom:5mm;">Le programme est fondé sur une réalité opérationnelle directe : contraintes terrain, réactions sous stress, écarts entre la théorie réglementaire et la pratique quotidienne des agents.</p>
+        <p style="margin-bottom:3.5mm;">DST System n'a pas été conçu par des consultants en formation. Il a été créé par un professionnel qui a exercé dans les <span class="kw">environnements mêmes que nous formons aujourd'hui</span>.</p>
+        <p style="margin-bottom:3.5mm;">Le programme est fondé sur une réalité opérationnelle directe : <span class="kw">contraintes terrain, réactions sous stress</span>, écarts entre la théorie réglementaire et la pratique quotidienne des agents.</p>
+        <ul class="bul" style="margin-bottom:4mm;">
+          <li>Connaissance des dynamiques de groupe en situation de stress</li>
+          <li>Expérience des protocoles d'intervention réels</li>
+          <li>Compréhension des contraintes institutionnelles</li>
+        </ul>
         <div class="quote-block">"Un agent bien préparé ne réfléchit pas sous le feu — il exécute. C'est l'entraînement régulier qui rend cela possible."</div>
       </div>
       <div>
@@ -870,13 +886,13 @@
             </div>
           </div>
           <div style="padding: 5mm; flex: 1;">
-            <div style="font-size:6.5pt;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--t3);margin-bottom:4mm;">Parcours</div>
+            <div style="font-size:6.5pt;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--t3);margin-bottom:3.5mm;">Parcours</div>
             <div class="parc">
               <div class="parc-item"><div class="parc-dot"></div><span>Service militaire actif — unités opérationnelles</span></div>
               <div class="parc-item"><div class="parc-dot"></div><span>Qualification instruction — tir, stress, protocoles d'intervention</span></div>
-              <div class="parc-item"><div class="parc-dot"></div><span>Formateur personnels armés — forces de l'ordre, sécurité, pénitentiaire</span></div>
-              <div class="parc-item"><div class="parc-dot"></div><span>Conception programmes long format — préparation opérationnelle continue</span></div>
-              <div class="parc-item"><div class="parc-dot"></div><span>Création DST System — dispositif mobile de déploiement opérationnel</span></div>
+              <div class="parc-item"><div class="parc-dot"></div><span>Formateur personnels armés — police, sécurité, pénitentiaire</span></div>
+              <div class="parc-item"><div class="parc-dot"></div><span>Conception programmes long format — préparation continue</span></div>
+              <div class="parc-item"><div class="parc-dot"></div><span>Création DST System — dispositif mobile opérationnel</span></div>
             </div>
           </div>
         </div>
@@ -895,69 +911,52 @@
      ══════════════════════════════════════════════════════ -->
 <section class="page">
   <div class="cta-page">
-
-    <!-- Header -->
     <div class="cta-page__head">
-      <svg class="logo-mark" width="22" height="22" viewBox="0 0 40 40" fill="none">
-        <circle cx="20" cy="20" r="17" stroke="#0d0d18" stroke-width="2"/>
-        <circle class="dot" cx="20" cy="20" r="6"/>
-        <line x1="20" y1="3" x2="20" y2="13" stroke="#0d0d18" stroke-width="2" stroke-linecap="round"/>
-        <line x1="20" y1="27" x2="20" y2="37" stroke="#0d0d18" stroke-width="2" stroke-linecap="round"/>
-        <line x1="3" y1="20" x2="13" y2="20" stroke="#0d0d18" stroke-width="2" stroke-linecap="round"/>
-        <line x1="27" y1="20" x2="37" y2="20" stroke="#0d0d18" stroke-width="2" stroke-linecap="round"/>
-      </svg>
+      <img src="img/DST-Light.png" alt="" style="height:24px;width:auto;object-fit:contain;flex-shrink:0;">
       <div class="ph-logo"><span>DST <em>System</em></span></div>
     </div>
-
-    <!-- Body -->
     <div class="cta-page__body">
-      <div class="stag" style="margin-top: 5mm;">10 — Contact</div>
+      <div class="stag" style="margin-top: 5mm;">10 — Prochaine étape</div>
       <h1 class="cta-page__h1">Échangeons sur<br>votre territoire.</h1>
-      <p class="cta-page__sub">Nous analysons votre situation et vous proposons une étude de faisabilité sans engagement, adaptée à vos contraintes réelles.</p>
-
+      <p class="cta-page__sub">Nous analysons votre situation et vous proposons une <strong>étude de faisabilité sans engagement</strong>, adaptée à vos effectifs et vos contraintes réelles.</p>
       <div class="cta-actions">
         <div class="cta-action">
           <div class="cta-action__n">1</div>
           <div>
             <div class="cta-action__title">Demander une présentation du dispositif</div>
-            <p>Présentation complète pour vos interlocuteurs internes : DGS, DRH, élu référent, responsable de service.</p>
+            <p>Présentation pour vos interlocuteurs internes : <span class="kw">DGS, DRH, élu référent</span>, responsable de service.</p>
           </div>
         </div>
         <div class="cta-action cta-action--hi">
           <div class="cta-action__n">2</div>
           <div>
             <div class="cta-action__title">Évaluer un déploiement sur votre territoire</div>
-            <p>Analyse de faisabilité : effectifs, espace, contraintes horaires, calendrier. Aucun engagement à cette étape.</p>
+            <p>Analyse de faisabilité : effectifs, espace, contraintes horaires. <span class="kw">Aucun engagement</span> à cette étape.</p>
           </div>
         </div>
         <div class="cta-action">
           <div class="cta-action__n">3</div>
           <div>
             <div class="cta-action__title">Demander un devis détaillé</div>
-            <p>Proposition chiffrée compatible avec les procédures de commande publique (MAPA).</p>
+            <p>Proposition chiffrée <span class="kw">compatible procédure MAPA</span>. Format prêt pour dossier de consultation.</p>
           </div>
         </div>
       </div>
-
-      <!-- Contact bloc -->
       <div class="cta-contact">
         <div class="cta-phone-box">
-          <div class="cta-phone-label">Téléphone</div>
+          <div class="cta-phone-label">Appelez directement</div>
           <div class="cta-phone-num">06 65 44 52 26</div>
         </div>
         <div class="cta-email-box">
           <div class="cta-email-label">Email</div>
           <div class="cta-email-addr">contact@dst-system.fr</div>
-          <div class="cta-hours">Lun–Ven · 9h–18h · Réponse sous 48h</div>
+          <div class="cta-hours">Lun–Ven · 9h–18h · <strong>Réponse sous 48h</strong></div>
         </div>
       </div>
     </div>
-
-    <!-- Pied de dernière page -->
     <div class="cta-page__foot">
       <p style="font-size:7pt;color:var(--t3);text-align:center;">DST System est en phase de déploiement et accompagne ses premiers partenaires dans la mise en place de dispositifs territoriaux.</p>
     </div>
-
   </div>
 </section>
 
