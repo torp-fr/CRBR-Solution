@@ -718,13 +718,13 @@
     <span class="ph-section">Impact opérationnel · Maîtrise budgétaire</span>
   </header>
   <main class="pc">
-    <div class="g2" style="flex:1;align-items:start;gap:18px;">
+    <div class="g2" style="flex:1;align-items:stretch;gap:18px;">
       <!-- Colonne gauche : Impact -->
-      <div class="col-flex" style="gap:0;">
+      <div class="col-flex" style="display:flex;flex-direction:column;justify-content:flex-start;gap:0;">
         <div class="stag">06 — Impact</div>
         <h2 style="font-size:15pt;margin-bottom:2mm;">Trois effets directs<br>sur votre organisation.</h2>
         <div class="alert" style="margin-top:0;margin-bottom:3mm;"><strong>Enjeu :</strong> Un agent non entraîné est un <strong>risque opérationnel et juridique</strong> pour votre organisation.</div>
-        <div class="iblocks" style="flex:none;justify-content:flex-start;gap:2mm;">
+        <div class="iblocks" style="flex:none;justify-content:flex-start;gap:2mm;margin-top:auto;">
           <div class="iblock" style="padding:2.5mm 3.5mm;">
             <div class="iblock-icon">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
@@ -773,49 +773,51 @@
         </div>
       </div>
       <!-- Colonne droite : Budget -->
-      <div class="col-flex" style="gap:0;">
+      <div class="col-flex" style="display:flex;flex-direction:column;justify-content:flex-start;gap:0;">
         <div class="stag">07 — Budget</div>
-        <h2 style="font-size:15pt;margin-bottom:2mm;">Un coût maîtrisé.<br>Compatible MAPA.</h2>
-        <div class="blist" style="flex:none;justify-content:flex-start;gap:2mm;">
-          <div class="bitem" style="padding:2.5mm 3mm;">
-            <div class="bitem-icon">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        <h2 style="font-size:15pt;margin-bottom:8px;">Un coût maîtrisé.<br>Compatible MAPA.</h2>
+        <div style="padding:14px;border:1px solid #e5e5e5;background:#fafafa;border-radius:4px;flex:1;display:flex;flex-direction:column;">
+          <div class="blist" style="flex:none;justify-content:flex-start;gap:2mm;">
+            <div class="bitem" style="display:flex;justify-content:space-between;margin-bottom:4px;font-size:14px;padding:2.5mm 3mm;">
+              <div class="bitem-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+              </div>
+              <div>
+                <h3>Montant fixé à la signature — <span class="kw">aucun dépassement</span></h3>
+                <p>Ligne budgétaire précise, inscriptible au budget primitif.</p>
+              </div>
             </div>
-            <div>
-              <h3>Montant fixé à la signature — <span class="kw">aucun dépassement</span></h3>
-              <p>Ligne budgétaire précise, inscriptible au budget primitif.</p>
+            <div class="bitem" style="display:flex;justify-content:space-between;margin-bottom:4px;font-size:14px;padding:2.5mm 3mm;">
+              <div class="bitem-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+              </div>
+              <div>
+                <h3>Abonnement annuel — <span class="kw">charge lissée sur 10 mois</span></h3>
+                <p>Compatible mandatement et trésorerie des collectivités.</p>
+              </div>
+            </div>
+            <div class="bitem" style="display:flex;justify-content:space-between;margin-bottom:4px;font-size:14px;padding:2.5mm 3mm;">
+              <div class="bitem-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+              </div>
+              <div>
+                <h3>Zéro frais annexes — <span class="kw">déplacement, stand inclus</span></h3>
+                <p>Formation sur site = suppression des charges logistiques.</p>
+              </div>
+            </div>
+            <div class="bitem" style="display:flex;justify-content:space-between;margin-bottom:4px;font-size:14px;font-weight:600;margin-top:6px;padding:2.5mm 3mm;">
+              <div class="bitem-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+              </div>
+              <div>
+                <h3>Formation par fraction — <span class="kw">service non interrompu</span></h3>
+                <p>Pas d'absence collective, pas d'heures supplémentaires.</p>
+              </div>
             </div>
           </div>
-          <div class="bitem" style="padding:2.5mm 3mm;">
-            <div class="bitem-icon">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
-            </div>
-            <div>
-              <h3>Abonnement annuel — <span class="kw">charge lissée sur 10 mois</span></h3>
-              <p>Compatible mandatement et trésorerie des collectivités.</p>
-            </div>
+          <div class="note" style="margin-top:auto;">
+            <p style="font-size:7pt;"><strong style="color:var(--red);">Procédure MAPA :</strong> Le montant DST System est généralement inférieur au seuil de procédure formalisée. Documents administratifs fournis sur demande.</p>
           </div>
-          <div class="bitem" style="padding:2.5mm 3mm;">
-            <div class="bitem-icon">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
-            </div>
-            <div>
-              <h3>Zéro frais annexes — <span class="kw">déplacement, stand inclus</span></h3>
-              <p>Formation sur site = suppression des charges logistiques.</p>
-            </div>
-          </div>
-          <div class="bitem" style="padding:2.5mm 3mm;">
-            <div class="bitem-icon">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-            </div>
-            <div>
-              <h3>Formation par fraction — <span class="kw">service non interrompu</span></h3>
-              <p>Pas d'absence collective, pas d'heures supplémentaires.</p>
-            </div>
-          </div>
-        </div>
-        <div class="note" style="margin-top:3mm;">
-          <p style="font-size:7pt;"><strong style="color:var(--red);">Procédure MAPA :</strong> Le montant DST System est généralement inférieur au seuil de procédure formalisée. Documents administratifs fournis sur demande.</p>
         </div>
       </div>
     </div>
