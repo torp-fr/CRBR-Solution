@@ -274,10 +274,8 @@
     /* ── COVER ───────────────────────────────────────────── */
     .cv-stripe { position: absolute; left: 0; top: 0; bottom: 0; width: 5mm; background: var(--red); }
     .cv-inner  { position: relative; display: flex; flex-direction: column; height: 100%; padding: 14mm 15mm 13mm 22mm; }
-    .cv-head   { display: flex; align-items: center; gap: 9px; }
-    .cv-brand  { font-size: 9pt; font-weight: 700; color: var(--t1); }
-    .cv-brand em { font-style: normal; font-weight: 400; color: var(--t3); }
-    .cv-badge  { margin-top: 4mm; width: fit-content; font-size: 6pt; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--red); padding: 2mm 3.5mm; border: 1pt solid var(--rb); border-radius: 3pt; }
+    .cv-head   { display: flex; align-items: flex-start; justify-content: space-between; }
+    .cv-badge  { width: fit-content; font-size: 6pt; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--red); padding: 2mm 3.5mm; border: 1pt solid var(--rb); border-radius: 3pt; align-self: center; }
     .cv-mid    { flex: 1; display: flex; flex-direction: column; justify-content: center; padding: 8mm 0; }
     .cv-h1     { font-size: 34pt; font-weight: 900; color: var(--ink); line-height: 1.0; letter-spacing: -0.045em; margin-bottom: 6mm; }
     .cv-sub    { font-size: 10.5pt; color: var(--t2); line-height: 1.6; max-width: 116mm; }
@@ -329,13 +327,9 @@
   <div class="cv-stripe"></div>
   <div class="cv-inner">
     <div class="cv-head">
-      <img src="img/logo principal DST.png" alt="DST System" style="height:44px;width:auto;object-fit:contain;flex-shrink:0;">
-      <div>
-        <div class="cv-brand"><strong>DST</strong> <em>System</em></div>
-        <div style="font-size:6.5pt;color:var(--t3);margin-top:1mm;">Drill &amp; Skills Training</div>
-      </div>
+      <img src="img/logo principal DST.png" alt="DST System" style="height:58px;width:auto;object-fit:contain;flex-shrink:0;">
+      <div class="cv-badge">Document de présentation commerciale</div>
     </div>
-    <div class="cv-badge">Document de présentation commerciale</div>
     <div class="cv-mid">
       <h1 class="cv-h1">Entraîner<br>vos agents.<br>Sur votre site.</h1>
       <p class="cv-sub">Programme d'entraînement opérationnel mobile pour les forces de sécurité, services armés et institutions publiques.<br><strong style="color:var(--t1);">Déployé chez vous. Sans infrastructure à prévoir.</strong></p>
