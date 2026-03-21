@@ -80,7 +80,7 @@
     .ph-section { font-size: 6.5pt; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--t3); }
 
     /* ── PAGE CONTENT ────────────────────────────────────── */
-    .pc { flex: 1; padding: 7mm 15mm 5mm; overflow: hidden; display: flex; flex-direction: column; }
+    .pc { flex: 1; padding: 22px 15mm; overflow: hidden; display: flex; flex-direction: column; }
 
     /* ── PAGE FOOTER ─────────────────────────────────────── */
     .pf {
@@ -107,11 +107,11 @@
 
     /* ── TYPOGRAPHY ──────────────────────────────────────── */
     h2 {
-      font-size: 20pt; font-weight: 800; color: var(--ink);
-      line-height: 1.08; letter-spacing: -0.03em; margin-bottom: 3.5mm;
+      font-size: 20px; font-weight: 800; color: var(--ink);
+      line-height: 1.2; letter-spacing: -0.03em; margin-top: 8px; margin-bottom: 6px;
     }
     h3 { font-size: 9.5pt; font-weight: 700; color: var(--t1); line-height: 1.3; margin-bottom: 1mm; }
-    p  { font-size: 8pt; color: var(--t2); line-height: 1.6; }
+    p  { font-size: 8pt; color: var(--t2); line-height: 1.35; margin-bottom: 6px; }
     .lead { font-size: 8.5pt; color: var(--t2); line-height: 1.6; margin-bottom: 3.5mm; }
     /* Keyword emphasis — for decision-maker scanning */
     .kw  { font-weight: 700; color: var(--t1); }
@@ -127,10 +127,10 @@
     .alert strong { font-style: normal; color: var(--red); font-weight: 700; }
 
     /* ── BULLET LIST ─────────────────────────────────────── */
-    .bul { list-style: none; display: flex; flex-direction: column; gap: 1.5mm; margin-top: 1.5mm; }
+    .bul { list-style: none; display: flex; flex-direction: column; gap: 1mm; margin-top: 1mm; }
     .bul li {
       display: flex; gap: 3mm; align-items: flex-start;
-      font-size: 7.5pt; color: var(--t2); line-height: 1.45;
+      font-size: 7.5pt; color: var(--t2); line-height: 1.35; margin-bottom: 3px;
     }
     .bul li::before { content: '—'; color: var(--red); font-weight: 800; flex-shrink: 0; line-height: 1.5; }
 
@@ -170,9 +170,9 @@
     /* ── COMPARISON TABLE ────────────────────────────────── */
     .ctable { width: 100%; border-collapse: collapse; font-size: 8pt; flex: 1; }
     .ctable thead tr { background: var(--bg); }
-    .ctable th { padding: 3mm 4mm; text-align: left; font-size: 7pt; font-weight: 700; color: var(--t1); border-bottom: 1.5pt solid var(--bd2); }
+    .ctable th { padding: 6px 8px; text-align: left; font-size: 7pt; font-weight: 700; color: var(--t1); border-bottom: 1.5pt solid var(--bd2); }
     .ctable th.dc { background: var(--rl); color: var(--red); }
-    .ctable td { padding: 2.5mm 4mm; border-bottom: 1pt solid var(--bd); color: var(--t2); vertical-align: middle; }
+    .ctable td { padding: 6px 8px; border-bottom: 1pt solid var(--bd); color: var(--t2); vertical-align: middle; }
     .ctable td.dc { font-weight: 600; color: var(--t1); background: rgba(192,57,43,0.03); }
     .ctable tr:last-child td { border-bottom: none; }
     .yes { color: var(--red); font-weight: 700; }
@@ -243,10 +243,10 @@
     .lv-title { font-size: 11pt; font-weight: 800; color: var(--ink); }
     .lv-range { font-size: 7pt; color: var(--t3); font-weight: 500; }
     .lv-sep   { height: 1pt; background: var(--bd); margin: 0.5mm 0; }
-    .lv-list  { list-style: none; display: flex; flex-direction: column; gap: 1.5mm; }
+    .lv-list  { list-style: none; display: flex; flex-direction: column; gap: 1mm; }
     .lv-list li {
-      font-size: 7.5pt; color: var(--t2); line-height: 1.4;
-      display: flex; gap: 3mm; align-items: flex-start;
+      font-size: 7.5pt; color: var(--t2); line-height: 1.35;
+      display: flex; gap: 3mm; align-items: flex-start; margin-bottom: 3px;
     }
     .lv-list li::before { content: '—'; color: var(--red); font-weight: 700; flex-shrink: 0; }
 
@@ -341,7 +341,7 @@
     .cta-page__foot  { padding: 4mm 15mm 12mm; border-top: 1pt solid var(--bd); }
 
     /* ── HELPERS PAGES FUSIONNÉES ────────────────────────── */
-    .pg-sep  { height: 1pt; background: var(--bd2); margin: 3mm 0; }
+    .pg-sep  { height: 1pt; background: var(--bd2); margin: 10px 0; }
     .col-flex { display: flex; flex-direction: column; }
   </style>
 </head>
@@ -718,7 +718,7 @@
     <span class="ph-section">Impact opérationnel · Maîtrise budgétaire</span>
   </header>
   <main class="pc">
-    <div class="g2" style="flex:1;align-items:start;gap:6mm;">
+    <div class="g2" style="flex:1;align-items:start;gap:18px;">
       <!-- Colonne gauche : Impact -->
       <div class="col-flex" style="gap:0;">
         <div class="stag">06 — Impact</div>
@@ -839,7 +839,7 @@
     <span class="ph-section">Le porteur · Prochaine étape</span>
   </header>
   <main class="pc">
-    <div class="g2" style="flex:1;gap:6mm;align-items:start;">
+    <div class="g2" style="flex:1;gap:18px;align-items:start;">
       <!-- Colonne gauche : Porteur -->
       <div class="col-flex" style="gap:0;">
         <div class="stag">08 — Le porteur du projet</div>
