@@ -108,6 +108,7 @@ const DB = (() => {
   const clientSubscriptions = createCRUD('clientSubscriptions');
   const prospects           = createCRUD('prospects');
   const devis               = createCRUD('devis');
+  const factures            = createCRUD('factures');
 
   /* --- Numérotation automatique des devis --- */
   function getNextNumeroDevis() {
@@ -124,6 +125,23 @@ const DB = (() => {
       }
     });
     return 'DEV-' + year + '-' + String(max + 1).padStart(3, '0');
+  }
+
+  /* --- Numérotation automatique des factures --- */
+  function getNextNumeroFacture() {
+    const year = new Date().getFullYear();
+    const all  = getStore('factures');
+    let max = 0;
+    all.forEach(function(f) {
+      if (f.numero) {
+        const m = f.numero.match(/^FAC-(\d{4})-(\d+)$/);
+        if (m && parseInt(m[1]) === year) {
+          const n = parseInt(m[2]);
+          if (n > max) max = n;
+        }
+      }
+    });
+    return 'FAC-' + year + '-' + String(max + 1).padStart(3, '0');
   }
 
   /* --- Paramètres économiques --- */
@@ -428,6 +446,7 @@ const DB = (() => {
         clientSubscriptions: clientSubscriptions.getAll(),
         prospects: prospects.getAll(),
         devis: devis.getAll(),
+        factures: factures.getAll(),
         settings: settings.get()
       }
     };
@@ -445,11 +464,12 @@ const DB = (() => {
     if (d.clientSubscriptions) setStore('clientSubscriptions', d.clientSubscriptions);
     if (d.prospects) setStore('prospects', d.prospects);
     if (d.devis) setStore('devis', d.devis);
+    if (d.factures) setStore('factures', d.factures);
     if (d.settings) settings.set(d.settings);
   }
 
   function clearAll() {
-    ['operators','modules','clients','offers','sessions','locations','clientSubscriptions','prospects','devis'].forEach(k => setStore(k, []));
+    ['operators','modules','clients','offers','sessions','locations','clientSubscriptions','prospects','devis','factures'].forEach(k => setStore(k, []));
     settings.reset();
   }
 
@@ -487,12 +507,14 @@ const DB = (() => {
     clientSubscriptions,
     prospects,
     devis,
+    factures,
     settings,
     exportAll,
     importAll,
     clearAll,
     generateId,
     getNextNumeroDevis,
+    getNextNumeroFacture,
     DEFAULT_OPERATOR
   };
 })();

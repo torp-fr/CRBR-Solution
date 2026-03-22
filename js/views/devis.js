@@ -221,7 +221,9 @@ Views.Devis = (() => {
           '<button class="btn btn-sm btn-statut-devis" data-id="' + d.id + '" data-next="accepte" style="color:#2e7d32;" title="Accept\u00e9">&#10003;&nbsp;Accept\u00e9</button>' +
           '<button class="btn btn-sm btn-statut-devis" data-id="' + d.id + '" data-next="refuse"  style="color:#d32f2f;" title="Refus\u00e9">&#10007;&nbsp;Refus\u00e9</button>';
       } else if (d.statut === 'accepte') {
-        statutActions = '<button class="btn btn-sm btn-convert-devis" data-id="' + d.id + '" style="color:var(--color-success);" title="Cr\u00e9er session(s) depuis ce devis">&#8594;&nbsp;Session(s)</button>';
+        statutActions =
+          '<button class="btn btn-sm btn-convert-devis"  data-id="' + d.id + '" style="color:var(--color-success);" title="Cr\u00e9er session(s) depuis ce devis">&#8594;&nbsp;Session(s)</button>' +
+          '<button class="btn btn-sm btn-facturer-devis" data-id="' + d.id + '" style="color:#1e88e5;" title="Cr\u00e9er une facture depuis ce devis">&#128203;&nbsp;Facturer</button>';
       }
 
       rows +=
@@ -332,6 +334,15 @@ Views.Devis = (() => {
 
     c.querySelectorAll('.btn-convert-devis').forEach(btn => {
       btn.addEventListener('click', e => { e.stopPropagation(); _convertDevisToSessions(btn.dataset.id); });
+    });
+
+    c.querySelectorAll('.btn-facturer-devis').forEach(btn => {
+      btn.addEventListener('click', e => {
+        e.stopPropagation();
+        if (typeof Views !== 'undefined' && Views.Factures && Views.Factures.creerDepuisDevis) {
+          Views.Factures.creerDepuisDevis(btn.dataset.id);
+        }
+      });
     });
   }
 

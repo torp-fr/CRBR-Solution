@@ -49,6 +49,41 @@ Views.Dashboard = {
     const _prospectsActifs  = _allProspects.filter(p => p.statut !== 'converti' && p.statut !== 'perdu').length;
     const _prospectsNouveaux = _allProspects.filter(p => p.statut === 'nouveau').length;
 
+    /* Facturation KPI */
+    const _allFactures = DB.factures ? DB.factures.getAll() : [];
+    let _totalAEncaisser = 0;
+    let _totalEnRetard   = 0;
+    let _nbEnRetard      = 0;
+    _allFactures.forEach(f => {
+      if (f.statut === 'soldee' || f.statut === 'annulee') return;
+      const ttc     = parseFloat(f.totalTTC) || 0;
+      const encaisse = (f.encaissements || []).reduce((s, e) => s + (parseFloat(e.montant) || 0), 0);
+      const solde   = Math.round((ttc - encaisse) * 100) / 100;
+      if (solde > 0) {
+        _totalAEncaisser += solde;
+        if (f.dateLimitePaiement && new Date(f.dateLimitePaiement) < now) {
+          _totalEnRetard += solde;
+          _nbEnRetard++;
+        }
+      }
+    });
+
+    /* Alertes facturation */
+    if (_nbEnRetard > 0) {
+      alerts.push({
+        level:   'critical',
+        message: _nbEnRetard + ' facture' + (_nbEnRetard > 1 ? 's' : '') + ' en retard de paiement — solde impayé\u00a0: ' + _totalEnRetard.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + '\u00a0€',
+        context: 'Facturation'
+      });
+    }
+    if (_totalAEncaisser > 0 && _nbEnRetard === 0) {
+      alerts.push({
+        level:   'info',
+        message: 'Solde à encaisser\u00a0: ' + _totalAEncaisser.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + '\u00a0€ sur ' + _allFactures.filter(f => f.statut === 'emise' || f.statut === 'partiellement_payee').length + ' facture(s) émise(s).',
+        context: 'Facturation'
+      });
+    }
+
     /* ----------------------------------------------------------
        1. CONSTRUCTION DES CARTES KPI
        ---------------------------------------------------------- */
@@ -158,6 +193,16 @@ Views.Dashboard = {
           <div class="kpi-label">Devis en attente <span class="tag tag-blue" style="margin-left:4px;font-size:0.6rem;">CRM</span></div>
           <div class="kpi-value">${_devisEnvoyes.length}</div>
           <div class="kpi-detail">${_devisSansReponse > 0 ? _devisSansReponse + ' sans r\u00e9ponse > 7j' : _devisAccetesMois + ' accept\u00e9(s) ce mois'}</div>
+        </div>
+        <div class="kpi-card ${_totalAEncaisser > 0 ? 'kpi-warning' : ''}" style="cursor:pointer;" onclick="App.navigate('factures')">
+          <div class="kpi-label">\u00c0 encaisser <span class="tag tag-blue" style="margin-left:4px;font-size:0.6rem;">Facturation</span></div>
+          <div class="kpi-value" style="font-size:1.05rem;">${_totalAEncaisser.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}\u00a0\u20ac</div>
+          <div class="kpi-detail">${_allFactures.filter(f => f.statut === 'emise' || f.statut === 'partiellement_payee').length} facture(s) \u00e9mise(s)</div>
+        </div>
+        <div class="kpi-card ${_nbEnRetard > 0 ? 'kpi-alert' : ''}" style="cursor:pointer;" onclick="App.navigate('factures')">
+          <div class="kpi-label">En retard <span class="tag tag-blue" style="margin-left:4px;font-size:0.6rem;">Facturation</span></div>
+          <div class="kpi-value" style="font-size:1.05rem;${_nbEnRetard > 0 ? 'color:#d32f2f;' : ''}">${_totalEnRetard.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}\u00a0\u20ac</div>
+          <div class="kpi-detail">${_nbEnRetard > 0 ? _nbEnRetard + ' facture(s) \u00e9ch\u00e9es' : 'Aucun retard'}</div>
         </div>
         ${pipelineHTML}
       </div>
