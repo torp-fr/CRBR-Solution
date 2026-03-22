@@ -1517,6 +1517,86 @@ const Engine = (() => {
     return result;
   }
 
+  /* ----------------------------------------------------------
+     CAPACITÉ OPÉRATIONNELLE
+     ---------------------------------------------------------- */
+
+  /** Calcule le taux d'utilisation actuel de la capacité */
+  function calculateTauxUtilisation(settings) {
+    const s = settings || DB.settings.get();
+    const cap = s.capacite || {};
+    const sessions = DB.sessions.getAll();
+    const anneeEnCours = new Date().getFullYear();
+
+    const joursFacturesAn = sessions.filter(sess => {
+      if (!sess.date) return false;
+      const annee = new Date(sess.date).getFullYear();
+      const statut = sess.status;
+      return annee === anneeEnCours
+        && statut !== 'annulee'
+        && statut !== 'planifiee';
+    }).length;
+
+    const capaciteTotale = (cap.nbUnites || 1) * (cap.joursMaxParUniteParAn || 150);
+    const tauxUtilisation = capaciteTotale > 0
+      ? (joursFacturesAn / capaciteTotale) * 100
+      : 0;
+
+    return {
+      joursFacturesAn,
+      capaciteTotale,
+      tauxUtilisation: round2(tauxUtilisation),
+      seuilAlerte: cap.seuilAlerteJours || 120,
+      seuilCritique: cap.seuilCritiqueJours || 140,
+      estEnAlerte: joursFacturesAn >= (cap.seuilAlerteJours || 120),
+      estEnCritique: joursFacturesAn >= (cap.seuilCritiqueJours || 140),
+      joursRestants: capaciteTotale - joursFacturesAn
+    };
+  }
+
+  /** Calcule si un investissement doit être anticipé */
+  function calculateBesoinsInvestissement(settings) {
+    const s = settings || DB.settings.get();
+    const cap = s.capacite || {};
+    const util = calculateTauxUtilisation(s);
+
+    const now = new Date();
+    const debutAnnee = new Date(now.getFullYear(), 0, 1);
+    const joursEcoules = Math.max(
+      Math.floor((now - debutAnnee) / (1000 * 60 * 60 * 24)),
+      1
+    );
+    const joursAnnee = 365;
+
+    const rythmeJournalier = joursEcoules > 0
+      ? util.joursFacturesAn / joursEcoules
+      : 0;
+    const projectionAnnuelle = Math.round(rythmeJournalier * joursAnnee);
+
+    const moisAnticip = cap.moisAnticipationInvestissement || 3;
+    const delaiJours = cap.delaiDispoNouvelleUnite || 90;
+    const seuilDeclenchement = cap.seuilCritiqueJours || 140;
+
+    const joursAvantSaturation = seuilDeclenchement > util.joursFacturesAn && rythmeJournalier > 0
+      ? Math.round((seuilDeclenchement - util.joursFacturesAn) / rythmeJournalier)
+      : (util.joursFacturesAn >= seuilDeclenchement ? 0 : Infinity);
+
+    const investissementNecessaire = rythmeJournalier > 0
+      && joursAvantSaturation < (moisAnticip * 30);
+
+    const coutInvestissement = (cap.coutSimulateurNouveauHT || 40000)
+      + (cap.coutRecrutementOperateur || 2000);
+
+    return {
+      projectionAnnuelle,
+      joursAvantSaturation: isFinite(joursAvantSaturation) ? joursAvantSaturation : 0,
+      investissementNecessaire,
+      coutInvestissement,
+      delaiDeploiement: delaiJours,
+      moisAvantSaturation: round2(isFinite(joursAvantSaturation) ? joursAvantSaturation / 30 : 0)
+    };
+  }
+
   /* --- API publique --- */
   return {
     netToCompanyCost,
@@ -1551,6 +1631,9 @@ const Engine = (() => {
     freelanceTjmFacture,
     // Taux horaire
     computeCoutHoraire,
-    compareHoraireJournalier
+    compareHoraireJournalier,
+    // Capacité opérationnelle
+    calculateTauxUtilisation,
+    calculateBesoinsInvestissement
   };
 })();

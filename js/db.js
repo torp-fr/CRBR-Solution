@@ -416,6 +416,25 @@ const DB = (() => {
 
       // === VOLUME DE RÉFÉRENCE ===
       nbJoursFacturesAn:          100    // jours facturés par an (objectif)
+    },
+
+    // Capacité opérationnelle — 1 unité = 1 simulateur + 1 opérateur
+    capacite: {
+      // === PAR UNITÉ OPÉRATIONNELLE ===
+      nbUnites:                      1,    // nombre de simulateurs actifs
+      joursMaxParUniteParAn:         150,  // capacité max réaliste par unité
+      seuilAlerteJours:              120,  // seuil d'alerte jaune (anticiper)
+      seuilCritiqueJours:            140,  // seuil rouge (investir maintenant)
+      joursMoisCible:                13,   // objectif mensuel par unité
+      joursMoisMax:                  15,   // plafond mensuel absolu par unité
+
+      // === COÛT D'UNE UNITÉ SUPPLÉMENTAIRE ===
+      coutSimulateurNouveauHT:       40000, // € HT simulateur + équipements
+      coutRecrutementOperateur:      2000,  // € frais recrutement/formation
+      delaiDispoNouvelleUnite:       90,    // jours entre décision et déploiement
+
+      // === DÉLAI D'ANTICIPATION ===
+      moisAnticipationInvestissement: 3     // mois avant saturation pour déclencher l'alerte
     }
   };
 

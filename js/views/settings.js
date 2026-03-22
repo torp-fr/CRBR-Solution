@@ -52,6 +52,9 @@ Views.Settings = {
       })(),
       coutJournee: JSON.parse(JSON.stringify(
         settings.coutJournee || DB.settings.getDefaults().coutJournee || {}
+      )),
+      capacite: JSON.parse(JSON.stringify(
+        settings.capacite || DB.settings.getDefaults().capacite || {}
       ))
     };
 
@@ -687,6 +690,131 @@ Views.Settings = {
         </div>`;
     }
 
+    /** Section 6c — Capacité opérationnelle */
+    function renderCapacite() {
+      const cap = state.capacite;
+      const nbU   = cap.nbUnites || 1;
+      const jMax  = cap.joursMaxParUniteParAn || 150;
+      const sMois = cap.joursMoisCible || 13;
+      const capaciteTotale = nbU * jMax;
+      const moyMois        = nbU * sMois;
+      const seuilAlertePct  = jMax > 0 ? Math.round((cap.seuilAlerteJours || 120) / jMax * 100) : 80;
+      const seuilCritPct    = jMax > 0 ? Math.round((cap.seuilCritiqueJours || 140) / jMax * 100) : 93;
+      const coutUniteSup    = (cap.coutSimulateurNouveauHT || 40000) + (cap.coutRecrutementOperateur || 2000);
+
+      function numC(id, val, step) {
+        return `<input type="number" id="${id}" class="form-control cap-field" value="${val}" min="0" step="${step || 1}" style="max-width:130px;padding:4px 8px;text-align:right;">`;
+      }
+
+      return `
+        <div class="card" id="section-capacite">
+          <div class="card-header"><h2>Capacit\u00e9 op\u00e9rationnelle</h2></div>
+          <p class="form-help" style="margin-bottom:16px;">
+            1 unit\u00e9 = 1 simulateur + 1 op\u00e9rateur d\u00e9di\u00e9.
+            Ces param\u00e8tres pilotent les alertes d\u2019investissement et le taux d\u2019utilisation du tableau de bord.
+          </p>
+
+          <h3 style="margin:0 0 10px;font-size:0.88rem;color:var(--text-heading);">A. Unit\u00e9s actives</h3>
+          <div class="form-row" style="margin-bottom:8px;">
+            <div class="form-group">
+              <label for="cap-nb-unites">Nombre de simulateurs actifs</label>
+              ${numC('cap-nb-unites', nbU, 1)}
+              <span class="form-help">Chaque unit\u00e9 = 1 simulateur + 1 op\u00e9rateur d\u00e9di\u00e9</span>
+            </div>
+          </div>
+          <div class="alert alert-info" style="margin-bottom:16px;font-size:0.84rem;">
+            Capacit\u00e9 totale actuelle\u00a0:
+            <strong id="cap-total-display">${capaciteTotale}</strong>\u00a0jours/an,
+            soit <strong id="cap-mois-display">${moyMois}</strong>\u00a0jours/mois en moyenne.
+          </div>
+
+          <h3 style="margin:0 0 10px;font-size:0.88rem;color:var(--text-heading);">B. Param\u00e8tres de capacit\u00e9</h3>
+          <div class="form-row" style="margin-bottom:8px;">
+            <div class="form-group">
+              <label for="cap-jours-max">Jours max par unit\u00e9 / an</label>
+              ${numC('cap-jours-max', jMax, 1)}
+            </div>
+            <div class="form-group">
+              <label for="cap-seuil-alerte-pct">Seuil d\u2019alerte (%)</label>
+              ${numC('cap-seuil-alerte-pct', seuilAlertePct, 1)}
+              <span class="form-help">=\u00a0<strong id="cap-seuil-alerte-display">${cap.seuilAlerteJours || 120}</strong>\u00a0j/an</span>
+            </div>
+            <div class="form-group">
+              <label for="cap-seuil-critique-pct">Seuil critique (%)</label>
+              ${numC('cap-seuil-critique-pct', seuilCritPct, 1)}
+              <span class="form-help">=\u00a0<strong id="cap-seuil-critique-display">${cap.seuilCritiqueJours || 140}</strong>\u00a0j/an</span>
+            </div>
+          </div>
+          <div class="form-row" style="margin-bottom:16px;">
+            <div class="form-group">
+              <label for="cap-jours-mois-cible">Objectif mensuel (jours)</label>
+              ${numC('cap-jours-mois-cible', cap.joursMoisCible || 13, 1)}
+            </div>
+            <div class="form-group">
+              <label for="cap-jours-mois-max">Plafond mensuel absolu (jours)</label>
+              ${numC('cap-jours-mois-max', cap.joursMoisMax || 15, 1)}
+            </div>
+          </div>
+
+          <h3 style="margin:0 0 10px;font-size:0.88rem;color:var(--text-heading);">C. Investissement</h3>
+          <div class="form-row" style="margin-bottom:8px;">
+            <div class="form-group">
+              <label for="cap-cout-simu">Co\u00fbt nouveau simulateur + \u00e9quip. (\u20ac\u00a0HT)</label>
+              ${numC('cap-cout-simu', cap.coutSimulateurNouveauHT || 40000)}
+            </div>
+            <div class="form-group">
+              <label for="cap-cout-recrutement">Frais recrutement / formation (\u20ac)</label>
+              ${numC('cap-cout-recrutement', cap.coutRecrutementOperateur || 2000)}
+            </div>
+          </div>
+          <div class="form-row" style="margin-bottom:16px;">
+            <div class="form-group">
+              <label for="cap-delai-dispo">D\u00e9lai d\u00e9ploiement nouvelle unit\u00e9 (jours)</label>
+              ${numC('cap-delai-dispo', cap.delaiDispoNouvelleUnite || 90, 1)}
+            </div>
+            <div class="form-group">
+              <label for="cap-mois-anticip">D\u00e9lai d\u2019anticipation (mois)</label>
+              ${numC('cap-mois-anticip', cap.moisAnticipationInvestissement || 3, 1)}
+              <span class="form-help">L\u2019alerte d\u2019investissement se d\u00e9clenche <strong>${cap.moisAnticipationInvestissement || 3}</strong> mois avant d\u2019atteindre le seuil critique.</span>
+            </div>
+          </div>
+
+          <h3 style="margin:0 0 10px;font-size:0.88rem;color:var(--text-heading);">D. R\u00e9capitulatif capacit\u00e9</h3>
+          <table style="width:100%;border-collapse:collapse;font-size:0.84rem;" id="cap-recap-table">
+            <tbody>
+              <tr style="border-bottom:1px solid var(--border-color);">
+                <td style="padding:6px 4px;color:var(--text-muted);">Capacit\u00e9 totale (jours/an)</td>
+                <td id="cap-recap-total" style="padding:6px 4px;text-align:right;font-weight:600;">${capaciteTotale}</td>
+              </tr>
+              <tr style="border-bottom:1px solid var(--border-color);">
+                <td style="padding:6px 4px;color:var(--text-muted);">Objectif mensuel</td>
+                <td id="cap-recap-mois" style="padding:6px 4px;text-align:right;font-weight:600;">${moyMois}</td>
+              </tr>
+              <tr style="border-bottom:1px solid var(--border-color);">
+                <td style="padding:6px 4px;color:var(--text-muted);">Plafond mensuel</td>
+                <td id="cap-recap-plafond" style="padding:6px 4px;text-align:right;font-weight:600;">${(cap.joursMoisMax || 15) * nbU}</td>
+              </tr>
+              <tr style="border-bottom:1px solid var(--border-color);">
+                <td style="padding:6px 4px;color:var(--text-muted);">Seuil alerte <span class="tag tag-yellow" style="font-size:0.65rem;vertical-align:middle;">Attention</span></td>
+                <td id="cap-recap-alerte" style="padding:6px 4px;text-align:right;font-weight:600;">${cap.seuilAlerteJours || 120}\u00a0j/an</td>
+              </tr>
+              <tr style="border-bottom:1px solid var(--border-color);">
+                <td style="padding:6px 4px;color:var(--text-muted);">Seuil critique <span class="tag tag-red" style="font-size:0.65rem;vertical-align:middle;">Investir</span></td>
+                <td id="cap-recap-critique" style="padding:6px 4px;text-align:right;font-weight:600;color:#d32f2f;">${cap.seuilCritiqueJours || 140}\u00a0j/an</td>
+              </tr>
+              <tr style="border-bottom:1px solid var(--border-color);">
+                <td style="padding:6px 4px;color:var(--text-muted);">Co\u00fbt 1 unit\u00e9 suppl\u00e9mentaire</td>
+                <td id="cap-recap-cout" style="padding:6px 4px;text-align:right;font-weight:600;">${coutUniteSup.toLocaleString('fr-FR')}\u00a0\u20ac</td>
+              </tr>
+              <tr>
+                <td style="padding:6px 4px;color:var(--text-muted);">D\u00e9lai avant dispo</td>
+                <td style="padding:6px 4px;text-align:right;font-weight:600;">${cap.delaiDispoNouvelleUnite || 90}\u00a0j</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>`;
+    }
+
     /** Section 7 — Catalogue tarifaire */
     function renderPricingCatalog() {
       const pc = state.pricingCatalog;
@@ -929,6 +1057,8 @@ Views.Settings = {
       </div>
 
       ${renderCoutJournee()}
+
+      ${renderCapacite()}
 
       ${renderPricingCatalog()}
 
@@ -1224,6 +1354,54 @@ Views.Settings = {
       }
     }
 
+    function syncCapaciteFromDOM() {
+      const cap = state.capacite;
+      function fi(id, def) {
+        const el = $('#' + id);
+        return el ? (parseFloat(el.value) || def) : def;
+      }
+      function ii(id, def) {
+        const el = $('#' + id);
+        return el ? (parseInt(el.value, 10) || def) : def;
+      }
+      const nbU  = Math.max(ii('cap-nb-unites', 1), 1);
+      const jMax = Math.max(ii('cap-jours-max', 150), 1);
+      const alertPct = fi('cap-seuil-alerte-pct', 80);
+      const critPct  = fi('cap-seuil-critique-pct', 93);
+      cap.nbUnites                    = nbU;
+      cap.joursMaxParUniteParAn       = jMax;
+      cap.seuilAlerteJours            = Math.round(jMax * alertPct / 100);
+      cap.seuilCritiqueJours          = Math.round(jMax * critPct / 100);
+      cap.joursMoisCible              = ii('cap-jours-mois-cible', 13);
+      cap.joursMoisMax                = ii('cap-jours-mois-max', 15);
+      cap.coutSimulateurNouveauHT     = fi('cap-cout-simu', 40000);
+      cap.coutRecrutementOperateur    = fi('cap-cout-recrutement', 2000);
+      cap.delaiDispoNouvelleUnite     = ii('cap-delai-dispo', 90);
+      cap.moisAnticipationInvestissement = ii('cap-mois-anticip', 3);
+
+      /* Mise à jour affichages temps réel */
+      const tot = $('#cap-total-display');
+      if (tot) tot.textContent = nbU * jMax;
+      const moy = $('#cap-mois-display');
+      if (moy) moy.textContent = nbU * cap.joursMoisCible;
+      const sa = $('#cap-seuil-alerte-display');
+      if (sa) sa.textContent = cap.seuilAlerteJours;
+      const sc = $('#cap-seuil-critique-display');
+      if (sc) sc.textContent = cap.seuilCritiqueJours;
+      const rt = $('#cap-recap-total');
+      if (rt) rt.textContent = nbU * jMax;
+      const rm = $('#cap-recap-mois');
+      if (rm) rm.textContent = nbU * cap.joursMoisCible;
+      const rp = $('#cap-recap-plafond');
+      if (rp) rp.textContent = cap.joursMoisMax * nbU;
+      const ra = $('#cap-recap-alerte');
+      if (ra) ra.textContent = cap.seuilAlerteJours + '\u00a0j/an';
+      const rc = $('#cap-recap-critique');
+      if (rc) rc.textContent = cap.seuilCritiqueJours + '\u00a0j/an';
+      const rco = $('#cap-recap-cout');
+      if (rco) rco.textContent = (cap.coutSimulateurNouveauHT + cap.coutRecrutementOperateur).toLocaleString('fr-FR') + '\u00a0€';
+    }
+
     /** Synchronise l'intégralité du state depuis les valeurs DOM */
     function syncAllFromDOM() {
       syncFixedCostsFromDOM();
@@ -1232,6 +1410,7 @@ Views.Settings = {
       syncScalarsFromDOM();
       syncPricingCatalogFromDOM();
       syncCoutJourneeFromDOM();
+      syncCapaciteFromDOM();
     }
 
     /* ----------------------------------------------------------
@@ -1239,6 +1418,11 @@ Views.Settings = {
        ---------------------------------------------------------- */
 
     function attachListEditListeners() {
+
+      /* --- Capacité : mise à jour temps réel --- */
+      $$('.cap-field').forEach(input => {
+        input.addEventListener('input', () => syncCapaciteFromDOM());
+      });
 
       /* --- Coûts fixes : modification en temps réel --- */
       $$('[data-section="fixed"] .fc-label, [data-section="fixed"] .fc-amount').forEach(input => {
@@ -1495,7 +1679,8 @@ Views.Settings = {
           urssafRequalificationDays:   state.urssafRequalificationDays,
           chargesConfig:               state.chargesConfig,
           pricingCatalog:              state.pricingCatalog,
-          coutJournee:                 state.coutJournee
+          coutJournee:                 state.coutJournee,
+          capacite:                    state.capacite
         };
 
         DB.settings.update(update);

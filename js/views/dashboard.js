@@ -108,6 +108,41 @@ Views.Dashboard = {
       return '';
     }
 
+    /* CAPACITÉ OPÉRATIONNELLE */
+    const _util   = Engine.calculateTauxUtilisation(settings);
+    const _invest = Engine.calculateBesoinsInvestissement(settings);
+    const _cap    = (settings.capacite || {});
+
+    /* Alertes capacité — ajoutées en tête */
+    if (_invest.investissementNecessaire && _util.estEnCritique) {
+      alerts.unshift({
+        level:   'critical',
+        message: '\u26a0 Capacit\u00e9 critique atteinte \u2014 investissement n\u00e9cessaire d\u00e8s maintenant. Projection\u00a0: ' + _invest.projectionAnnuelle + '\u00a0j/an. D\u00e9lai d\u00e9ploiement\u00a0: ' + _invest.delaiDeploiement + '\u00a0jours. Co\u00fbt estim\u00e9\u00a0: ' + _invest.coutInvestissement.toLocaleString('fr-FR') + '\u00a0\u20ac.',
+        context: 'Capacit\u00e9'
+      });
+    } else if (_invest.investissementNecessaire && _util.estEnAlerte) {
+      alerts.unshift({
+        level:   'warning',
+        message: 'Capacit\u00e9 en approche du seuil \u2014 investissement \u00e0 anticiper dans ~' + _invest.moisAvantSaturation + '\u00a0mois. Projection\u00a0: ' + _invest.projectionAnnuelle + '\u00a0j/an. Co\u00fbt nouvelle unit\u00e9\u00a0: ' + _invest.coutInvestissement.toLocaleString('fr-FR') + '\u00a0\u20ac.',
+        context: 'Capacit\u00e9'
+      });
+    }
+    /* Alerte rythme mensuel dépassé */
+    const _joursMoisMax = (_cap.joursMoisMax || 15) * (_cap.nbUnites || 1);
+    const _nbJoursMois = sessions.filter(s => {
+      const d = new Date(s.date);
+      return d.getFullYear() === now.getFullYear()
+        && d.getMonth() === now.getMonth()
+        && s.status !== 'annulee';
+    }).length;
+    if (_nbJoursMois > _joursMoisMax) {
+      alerts.push({
+        level:   'warning',
+        message: 'Rythme mensuel d\u00e9pass\u00e9 ce mois\u00a0: ' + _nbJoursMois + '\u00a0jours planifi\u00e9s sur ' + _joursMoisMax + '\u00a0max.',
+        context: 'Planning'
+      });
+    }
+
     /* AMÉLIORATION P1 — Seuil plancher auto-calculé */
     const seuilPlancher = Engine.calculateSeuilPlancher(settings);
 
@@ -240,6 +275,16 @@ Views.Dashboard = {
           <div class="kpi-label">En retard <span class="tag tag-blue" style="margin-left:4px;font-size:0.6rem;">Facturation</span></div>
           <div class="kpi-value" style="font-size:1.05rem;${_nbEnRetard > 0 ? 'color:#d32f2f;' : ''}">${_totalEnRetard.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}\u00a0\u20ac</div>
           <div class="kpi-detail">${_nbEnRetard > 0 ? _nbEnRetard + ' facture(s) \u00e9ch\u00e9es' : 'Aucun retard'}</div>
+        </div>
+        <div class="kpi-card ${_util.tauxUtilisation >= 93 ? 'kpi-alert' : _util.tauxUtilisation >= 80 ? 'kpi-warning' : 'kpi-success'}" style="cursor:pointer;" onclick="App.navigate('settings')">
+          <div class="kpi-label">Taux d'utilisation <span class="tag tag-blue" style="margin-left:4px;font-size:0.6rem;">Capacit\u00e9</span></div>
+          <div class="kpi-value">${Engine.fmtPercent(_util.tauxUtilisation)}</div>
+          <div class="kpi-detail">${_util.joursFacturesAn}\u00a0j / ${_util.capaciteTotale}\u00a0j max</div>
+        </div>
+        <div class="kpi-card ${_util.joursRestants <= 10 ? 'kpi-alert' : _util.joursRestants <= 30 ? 'kpi-warning' : ''}" style="cursor:pointer;" onclick="App.navigate('settings')">
+          <div class="kpi-label">Capacit\u00e9 restante <span class="tag tag-blue" style="margin-left:4px;font-size:0.6rem;">Capacit\u00e9</span></div>
+          <div class="kpi-value">${_util.joursRestants}\u00a0<span style="font-size:0.9rem;font-weight:400;">jours</span></div>
+          <div class="kpi-detail">disponibles cette ann\u00e9e</div>
         </div>
         ${pipelineHTML}
       </div>
@@ -706,6 +751,93 @@ Views.Dashboard = {
     }
 
     /* ----------------------------------------------------------
+       5B-BIS. WIDGET CAPACITÉ OPÉRATIONNELLE
+       ---------------------------------------------------------- */
+
+    function buildCapaciteHTML() {
+      const util   = _util;
+      const invest = _invest;
+      const cap    = _cap;
+      const taux   = util.tauxUtilisation;
+
+      /* Couleur de la barre selon le taux */
+      const barColor = taux >= 93 ? '#d32f2f' : taux >= 80 ? '#e65100' : '#2e7d32';
+
+      /* Largeur des segments de couleur — 3 zones empilées */
+      const pctVert    = Math.min(taux, 80);
+      const pctOrange  = taux > 80 ? Math.min(taux - 80, 13) : 0;
+      const pctRouge   = taux > 93 ? Math.min(taux - 93, 7) : 0;
+
+      /* Rythme mensuel actuel */
+      const nowW = new Date();
+      const rythmeMoisActuel = sessions.filter(s => {
+        const d = new Date(s.date);
+        return d.getFullYear() === nowW.getFullYear()
+          && d.getMonth() === nowW.getMonth()
+          && s.status !== 'annulee';
+      }).length;
+
+      const investBox = invest.investissementNecessaire ? `
+        <div style="margin-top:16px;padding:12px 14px;border-radius:6px;border:1px solid ${util.estEnCritique ? '#d32f2f' : '#e65100'};background:${util.estEnCritique ? 'rgba(211,47,47,0.08)' : 'rgba(230,81,0,0.08)'};">
+          <div style="font-weight:700;font-size:0.88rem;color:${util.estEnCritique ? '#d32f2f' : '#e65100'};margin-bottom:6px;">${util.estEnCritique ? '\u26a0 Nouvelle unit\u00e9 recommand\u00e9e — Urgent' : '\u26a1 Nouvelle unit\u00e9 \u00e0 anticiper'}</div>
+          <div style="font-size:0.82rem;color:var(--text-muted);line-height:1.6;">
+            Co\u00fbt estim\u00e9\u00a0: <strong>${invest.coutInvestissement.toLocaleString('fr-FR')}\u00a0\u20ac</strong><br>
+            D\u00e9lai de d\u00e9ploiement\u00a0: <strong>${invest.delaiDeploiement}\u00a0jours</strong><br>
+            Projection annuelle\u00a0: <strong>${invest.projectionAnnuelle}\u00a0j/an</strong>
+          </div>
+          <a href="#settings" onclick="App.navigate('settings')" style="display:inline-block;margin-top:8px;font-size:0.78rem;color:var(--accent-blue);">\u2192 Voir les param\u00e8tres capacit\u00e9</a>
+        </div>
+      ` : '';
+
+      return `
+        <div class="card">
+          <div class="card-header">
+            <h2>Capacit\u00e9 op\u00e9rationnelle</h2>
+            <span class="tag ${taux >= 93 ? 'tag-red' : taux >= 80 ? 'tag-yellow' : 'tag-green'}" style="font-size:0.72rem;">${Engine.fmtPercent(taux)} utilis\u00e9</span>
+          </div>
+
+          <!-- Barre de progression tricolore -->
+          <div style="margin-bottom:8px;position:relative;">
+            <div style="height:16px;background:var(--bg-input);border-radius:8px;overflow:hidden;display:flex;">
+              <div style="width:${pctVert}%;background:#2e7d32;transition:width 0.3s;"></div>
+              <div style="width:${pctOrange}%;background:#e65100;transition:width 0.3s;"></div>
+              <div style="width:${pctRouge}%;background:#d32f2f;transition:width 0.3s;"></div>
+            </div>
+            <!-- Marqueurs -->
+            <div style="position:relative;height:16px;margin-top:2px;font-size:0.66rem;color:var(--text-muted);">
+              <span style="position:absolute;left:80%;transform:translateX(-50%);">\u25b2 Alerte</span>
+              <span style="position:absolute;left:93%;transform:translateX(-50%);">\u25b2 Critique</span>
+            </div>
+          </div>
+
+          <!-- Tableau synthèse -->
+          <table style="width:100%;border-collapse:collapse;font-size:0.84rem;margin-top:12px;">
+            <tbody>
+              <tr style="border-bottom:1px solid var(--border-color);">
+                <td style="padding:6px 4px;color:var(--text-muted);">Jours r\u00e9alis\u00e9s (ann\u00e9e)</td>
+                <td style="padding:6px 4px;text-align:right;font-weight:600;">${util.joursFacturesAn} / ${util.capaciteTotale}</td>
+              </tr>
+              <tr style="border-bottom:1px solid var(--border-color);">
+                <td style="padding:6px 4px;color:var(--text-muted);">Projection annuelle</td>
+                <td style="padding:6px 4px;text-align:right;font-weight:600;">${invest.projectionAnnuelle}\u00a0j/an</td>
+              </tr>
+              <tr style="border-bottom:1px solid var(--border-color);">
+                <td style="padding:6px 4px;color:var(--text-muted);">Jours restants</td>
+                <td style="padding:6px 4px;text-align:right;font-weight:600;color:${util.joursRestants <= 10 ? '#d32f2f' : 'inherit'};">${util.joursRestants}\u00a0j</td>
+              </tr>
+              <tr>
+                <td style="padding:6px 4px;color:var(--text-muted);">Rythme actuel (ce mois)</td>
+                <td style="padding:6px 4px;text-align:right;font-weight:600;">${rythmeMoisActuel}\u00a0j/mois</td>
+              </tr>
+            </tbody>
+          </table>
+
+          ${investBox}
+        </div>
+      `;
+    }
+
+    /* ----------------------------------------------------------
        5B. TABLEAU ABONNEMENTS CLIENTS
        ---------------------------------------------------------- */
 
@@ -827,6 +959,7 @@ Views.Dashboard = {
           ${buildUpcomingSessionsHTML()}
         </div>
         <div>
+          ${buildCapaciteHTML()}
           ${buildEconomicSummaryHTML()}
           ${buildOperatorLoadHTML()}
         </div>
