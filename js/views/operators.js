@@ -199,7 +199,7 @@ Views.Operators = (() => {
     const rows = operators.map(op => {
       const cost = _getDisplayCost(op, settings);
       const tagClass = STATUS_TAG_CLASS[op.status] || 'tag-neutral';
-      const specialties = (op.specialties || []).join(', ') || '—';
+      const specialties = (op.specialites || op.specialties || []).join(', ') || '—';
       const activeLabel = op.active !== false
         ? '<span class="tag tag-green">Actif</span>'
         : '<span class="tag tag-neutral">Inactif</span>';
@@ -323,6 +323,11 @@ Views.Operators = (() => {
   function _openFormModal(operator) {
     const isEdit = !!operator;
     const op = operator || _defaultOperator();
+
+    /* Migration douce : copier specialties → specialites si nécessaire */
+    if (op.specialties && op.specialties.length > 0 && (!op.specialites || op.specialites.length === 0)) {
+      op.specialites = op.specialties.slice();
+    }
 
     const overlay = document.createElement('div');
     overlay.className = 'modal-overlay';
@@ -469,9 +474,9 @@ Views.Operators = (() => {
 
             <!-- Spécialités (tags) -->
             <div class="form-group mt-16">
-              <label for="op-specialties">Spécialités</label>
-              <input type="text" id="op-specialties" class="form-control"
-                     value="${_escapeAttr((op.specialties || []).join(', '))}"
+              <label for="op-specialites">Spécialités</label>
+              <input type="text" id="op-specialites" class="form-control"
+                     value="${_escapeAttr((op.specialites || []).join(', '))}"
                      placeholder="Tir tactique, CQB, médical… (séparées par des virgules)" />
               <span class="form-help">Séparez chaque spécialité par une virgule.</span>
             </div>
@@ -1068,11 +1073,11 @@ Views.Operators = (() => {
                 <span>${op.active !== false ? '<span class="tag tag-green">Oui</span>' : '<span class="tag tag-neutral">Non</span>'}</span>
               </div>
             </div>
-            ${(op.specialties && op.specialties.length > 0) ? `
+            ${((op.specialites && op.specialites.length > 0) || (op.specialties && op.specialties.length > 0)) ? `
               <div class="mt-16">
                 <span class="kpi-label">Spécialités</span><br/>
                 <div class="flex gap-8" style="flex-wrap:wrap;margin-top:4px;">
-                  ${op.specialties.map(s => `<span class="tag tag-blue">${_escape(s)}</span>`).join('')}
+                  ${(op.specialites && op.specialites.length > 0 ? op.specialites : op.specialties).map(s => `<span class="tag tag-blue">${_escape(s)}</span>`).join('')}
                 </div>
               </div>
             ` : ''}
@@ -1272,8 +1277,8 @@ Views.Operators = (() => {
     const isHourly = rateUnit === 'horaire';
 
     // Transformer les spécialités en tableau de tags propres
-    const rawSpecialties = overlay.querySelector('#op-specialties').value;
-    const specialties = rawSpecialties
+    const rawSpecialties = overlay.querySelector('#op-specialites').value;
+    const specialites = rawSpecialties
       .split(',')
       .map(s => s.trim())
       .filter(s => s.length > 0);
@@ -1338,7 +1343,7 @@ Views.Operators = (() => {
       tjmFacture:       Engine.round2(tjmFacture),
       netDaily:         Engine.round2(netDaily),
       companyCostDaily: Engine.round2(companyCostDaily),
-      specialties:      specialties,
+      specialites:      specialites,
       notes:            overlay.querySelector('#op-notes').value.trim(),
       // Zone
       zoneLabel, villeBase, codePostalBase, rayonKm, departements,
@@ -1479,7 +1484,7 @@ Views.Operators = (() => {
       const q = _searchQuery.toLowerCase().trim();
       operators = operators.filter(op => {
         const fullName = `${op.firstName} ${op.lastName}`.toLowerCase();
-        const specs = (op.specialties || []).join(' ').toLowerCase();
+        const specs = (op.specialites || op.specialties || []).join(' ').toLowerCase();
         const statusText = Engine.statusLabel(op.status).toLowerCase();
         const zone = (op.zoneLabel || op.villeBase || '').toLowerCase();
         return fullName.includes(q) || specs.includes(q) || statusText.includes(q) || zone.includes(q);
@@ -1568,7 +1573,7 @@ Views.Operators = (() => {
       costMode: 'net_desired',
       netDaily: 0,
       companyCostDaily: 0,
-      specialties: [],
+      specialites: [],
       notes: ''
     }, DB.DEFAULT_OPERATOR);
   }
