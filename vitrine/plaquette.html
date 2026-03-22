@@ -346,6 +346,18 @@
     /* ── HELPERS PAGES FUSIONNÉES ────────────────────────── */
     .pg-sep  { height: 1pt; background: var(--bd2); margin: 16px 0; }
     .col-flex { display: flex; flex-direction: column; }
+
+    /* ── RÉPARTITION VERTICALE P2/P3 ─────────────────────── */
+    section:nth-of-type(2) .pc,
+    section:nth-of-type(3) .pc { justify-content: space-between; }
+
+    /* Empêcher les enfants flex:1 d'absorber tout l'espace sur P2/P3 */
+    section:nth-of-type(2) .nlist,
+    section:nth-of-type(2) .ctable,
+    section:nth-of-type(3) .tl { flex: none; }
+
+    /* ── ESPACEMENT GLOBAL SECTIONS ──────────────────────── */
+    section { margin-bottom: 14px; }
   </style>
 </head>
 <body>
@@ -422,6 +434,7 @@
     <span class="ph-section">Constat · Limites actuelles</span>
   </header>
   <main class="pc">
+    <div>
     <div class="stag">01 — Constat de terrain</div>
     <h2 style="font-size:15pt;margin-bottom:2mm;">Le problème n'est pas le manque de volonté.<br>C'est le manque de dispositif.</h2>
     <div class="nlist" style="flex:none;">
@@ -467,7 +480,9 @@
         </div>
       </div>
     </div>
+    </div>
     <div class="pg-sep"></div>
+    <div>
     <div class="stag">02 — Le modèle actuel</div>
     <h2 style="font-size:15pt;margin-bottom:2mm;">Le centre de tir fixe déplace le problème.<br>Il ne le résout pas.</h2>
     <table class="ctable" style="flex:none;">
@@ -489,6 +504,7 @@
       </tbody>
     </table>
     <div class="alert" style="margin-top:2mm;"><strong>Conséquence directe :</strong> Dans le modèle actuel, la régularité dépend de la disponibilité d'une infrastructure externe — hors de contrôle du service.</div>
+    </div>
   </main>
   <footer class="pf">
     <span>DST System — Document de présentation</span>
@@ -508,6 +524,7 @@
     <span class="ph-section">La solution · Le programme</span>
   </header>
   <main class="pc">
+    <div>
     <div class="stag">03 — DST System</div>
     <h2 style="font-size:15pt;margin-bottom:2mm;">Un dispositif mobile qui vient à vous.<br>Zéro contrainte externe.</h2>
     <div class="g2" style="flex:none;gap:2.5mm;">
@@ -554,7 +571,9 @@
       <div class="stat"><span class="stat-n">1–2×</span><span class="stat-l">séances / mois</span></div>
       <div class="stat"><span class="stat-n">48h</span><span class="stat-l">délai de réponse</span></div>
     </div>
+    </div>
     <div class="pg-sep"></div>
+    <div>
     <div class="stag">04 — Programme sur 10 mois</div>
     <h2 style="font-size:15pt;margin-bottom:2mm;">Une progression construite dans le temps.<br>Pas une série de séances.</h2>
     <div class="prog-bar" style="margin-bottom:2mm;">
@@ -606,6 +625,7 @@
     </div>
     <div style="padding:2.5mm 4mm;background:var(--bg);border:1pt solid var(--bd);border-radius:4pt;margin-top:2.5mm;">
       <p style="font-size:7.5pt;"><strong style="color:var(--t1);">Compétences :</strong> <span style="color:var(--t3);">tir de précision · gestion du stress · intervention sur individu armé · maîtrise physique · légitimité de l'emploi de la force</span></p>
+    </div>
     </div>
   </main>
   <footer class="pf">
