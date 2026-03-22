@@ -542,8 +542,9 @@ const Engine = (() => {
       result.amortizationShare
     );
 
-    // 7. Seuil plancher (coût total + marge minimale sécurité 5%)
-    result.floorPrice = round2(result.totalCost * 1.05);
+    // 7. Seuil plancher (coût total + marge de sécurité paramétrée)
+    const fpm = (s.floorPriceMargin ?? 5) / 100;
+    result.floorPrice = round2(result.totalCost * (1 + fpm));
 
     // 8. Revenu (prix facturé)
     result.revenue = session.price || 0;
@@ -722,7 +723,7 @@ const Engine = (() => {
       }
     });
 
-    // 4. Dépendance opérateur (un opérateur fait >40% des sessions)
+    // 4. Dépendance opérateur (un opérateur fait > seuil paramétré des sessions)
     if (yearSessions.length > 5) {
       const opCounts = {};
       yearSessions.forEach(sess => {
@@ -732,7 +733,7 @@ const Engine = (() => {
       });
       Object.entries(opCounts).forEach(([opId, count]) => {
         const percent = (count / yearSessions.length) * 100;
-        if (percent > 40) {
+        if (percent > (s.operatorDependencyRiskThreshold ?? 40)) {
           const op = DB.operators.getById(opId);
           if (op) {
             alerts.push({
@@ -982,7 +983,7 @@ const Engine = (() => {
 
     // Charges au prorata du temps écoulé dans l'année
     const dayOfYear = Math.ceil((now - new Date(currentYear, 0, 1)) / 86400000);
-    const prorata = dayOfYear / 365;
+    const prorata = dayOfYear / (s.chargesConfig?.joursOuvresAn ?? 218);
     const chargesProrata = round2((totalFixed + totalAmort) * prorata);
 
     // Coûts variables réels des sessions passées
@@ -1022,14 +1023,16 @@ const Engine = (() => {
         (sess.operatorIds || []).includes(op.id) &&
         new Date(sess.date) >= threeMonthsAgo && new Date(sess.date) <= now
       );
-      if (sessions3m.length > 45) {
+      const urssafThreshold = s.urssafRequalificationDays ?? 45;
+      const urssafWarn = Math.round(urssafThreshold * (30 / 45));
+      if (sessions3m.length > urssafThreshold) {
         alerts.push({
           level: 'critical',
           message: `${op.firstName} ${op.lastName} : ${sessions3m.length} jours en 3 mois — risque requalification URSSAF`,
           context: 'RH — Requalification',
           operatorId: op.id
         });
-      } else if (sessions3m.length > 30) {
+      } else if (sessions3m.length > urssafWarn) {
         alerts.push({
           level: 'warning',
           message: `${op.firstName} ${op.lastName} : ${sessions3m.length} jours en 3 mois — vigilance requalification`,

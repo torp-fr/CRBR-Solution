@@ -506,6 +506,16 @@ Views.Offers = {
                 </div>
               </div>
 
+              <!-- Clients associés -->
+              <div class="form-group">
+                <label>Clients associ\u00e9s</label>
+                <div id="offer-clients-container"
+                     style="max-height:120px;overflow-y:auto;border:1px solid var(--border-color);border-radius:4px;padding:6px;">
+                  ${clientCheckboxes}
+                </div>
+                <small style="color:var(--text-muted)">Optionnel \u2014 associe cette offre \u00e0 un ou plusieurs clients</small>
+              </div>
+
               <!-- Notes -->
               <div class="form-group">
                 <label for="offer-notes">Notes</label>
@@ -656,6 +666,11 @@ Views.Offers = {
           selectedModuleIds.push(cb.value);
         });
 
+        /* Clients sélectionnés */
+        const selectedClientIds = [...overlay.querySelectorAll(
+          '#offer-clients-container input[type="checkbox"]:checked'
+        )].map(cb => cb.value);
+
         /* Vérification finale du prix plancher (alerte non bloquante) */
         const partialOffer = { type, moduleIds: selectedModuleIds, nbSessions };
         const floor = Engine.computeOfferFloor(partialOffer);
@@ -671,7 +686,7 @@ Views.Offers = {
         const offerData = {
           label,
           type,
-          clientIds: [...(data.clientIds || [])],
+          clientIds: selectedClientIds,
           moduleIds: selectedModuleIds,
           price,
           paymentTerms,

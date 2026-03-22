@@ -843,11 +843,13 @@ textarea.form-control {
 
 .tag:hover { transform: scale(1.03); }
 
-.tag-red { background: var(--accent-red-bg); color: var(--accent-red-light); }
-.tag-green { background: var(--color-success-bg); color: var(--color-success); }
-.tag-yellow { background: var(--color-warning-bg); color: var(--color-warning); }
-.tag-blue { background: var(--color-info-bg); color: var(--color-info); }
-.tag-neutral { background: var(--bg-tertiary); color: var(--text-secondary); }
+.tag-red { background: var(--accent-red-bg); color: var(--accent-red-light); border: 1px solid rgba(211, 47, 47, 0.3); }
+.tag-green { background: var(--color-success-bg); color: var(--color-success); border: 1px solid rgba(46, 125, 50, 0.3); }
+.tag-yellow { background: var(--color-warning-bg); color: var(--color-warning); border: 1px solid rgba(245, 180, 0, 0.3); }
+.tag-blue { background: var(--color-info-bg); color: var(--color-info); border: 1px solid rgba(30, 136, 229, 0.3); }
+.tag-neutral { background: var(--bg-tertiary); color: var(--text-secondary); border: 1px solid rgba(160, 160, 168, 0.3); }
+.tag-purple { background: rgba(156, 39, 176, 0.15); color: #ce93d8; border: 1px solid rgba(156, 39, 176, 0.3); }
+.tag-orange { background: rgba(245, 124, 0, 0.15); color: #ffb74d; border: 1px solid rgba(245, 124, 0, 0.3); }
 
 /* --- Tabs --- Neon red underline on active */
 .tabs {

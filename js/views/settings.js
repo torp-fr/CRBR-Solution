@@ -26,6 +26,7 @@ Views.Settings = {
       employerChargeRate:       settings.employerChargeRate ?? 45,
       interimCoefficient:       settings.interimCoefficient ?? 2.0,
       freelanceChargeRate:      settings.freelanceChargeRate ?? 25,
+      estimatedOperatorsPerSession: settings.estimatedOperatorsPerSession ?? 1,
       operatorOverloadThreshold: settings.operatorOverloadThreshold ?? 15,
       cdiThreshold:             settings.cdiThreshold ?? 80,
       targetMarginPercent:      settings.targetMarginPercent ?? 30,
@@ -211,6 +212,12 @@ Views.Settings = {
               <label for="rh-freelance-charge">Charges freelance estimées (%)</label>
               <input type="number" id="rh-freelance-charge" class="form-control" value="${state.freelanceChargeRate}" min="0" max="100" step="any">
               <span class="form-help">Estimation des charges sociales freelance</span>
+            </div>
+            <div class="form-group">
+              <label for="rh-operators-per-session">Opérateurs par session (défaut)</label>
+              <input type="number" id="rh-operators-per-session" class="form-control" value="${state.estimatedOperatorsPerSession}" min="1" max="10" step="1"
+                     title="Nombre d'opérateurs mobilisés par défaut par session. Utilisé dans le calcul du prix plancher des offres.">
+              <span class="form-help">Utilisé dans le calcul du prix plancher des offres</span>
             </div>
             <div class="form-group">
               <label for="rh-overload">Seuil surcharge (sessions/mois)</label>
@@ -637,6 +644,7 @@ Views.Settings = {
       state.employerChargeRate       = parseFloat($('#rh-employer-charge').value) || 0;
       state.interimCoefficient       = parseFloat($('#rh-interim-coeff').value) || 1;
       state.freelanceChargeRate      = parseFloat($('#rh-freelance-charge').value) || 0;
+      state.estimatedOperatorsPerSession = parseInt($('#rh-operators-per-session').value, 10) || 1;
       state.operatorOverloadThreshold = parseInt($('#rh-overload').value, 10) || 1;
       state.cdiThreshold             = parseInt($('#rh-cdi-threshold').value, 10) || 1;
       state.targetMarginPercent      = parseFloat($('#eco-target-margin').value) || 0;
@@ -899,6 +907,7 @@ Views.Settings = {
           employerChargeRate:          state.employerChargeRate,
           interimCoefficient:          state.interimCoefficient,
           freelanceChargeRate:         state.freelanceChargeRate,
+          estimatedOperatorsPerSession: state.estimatedOperatorsPerSession,
           operatorOverloadThreshold:   state.operatorOverloadThreshold,
           cdiThreshold:                state.cdiThreshold,
           targetMarginPercent:         state.targetMarginPercent,
