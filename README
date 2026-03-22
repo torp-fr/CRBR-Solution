@@ -1,1 +1,6 @@
+# DST System
 
+Site vitrine : `/vitrine/`
+Outil interne : `/` (index.html)
+Génération PDF : `npm run generate:pdf`
+Déploiement : Vercel (branche main)
