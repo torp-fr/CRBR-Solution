@@ -46,6 +46,15 @@ Views.Operators = (() => {
   /** Filtre par statut ('' = tous) */
   let _statusFilter = '';
 
+  /** Filtre par segment ('' = tous) */
+  let _segmentFilter = '';
+
+  /** Filtre par disponibilité ('' = tous) */
+  let _dispoFilter = '';
+
+  /** Périodes d'indisponibilité en cours d'édition dans le modal */
+  let _modalIndispo = [];
+
   /* ----------------------------------------------------------
      POINT D'ENTRÉE — RENDER
      ---------------------------------------------------------- */
@@ -58,6 +67,8 @@ Views.Operators = (() => {
     _container = container;
     _searchQuery = '';
     _statusFilter = '';
+    _segmentFilter = '';
+    _dispoFilter = '';
     _renderPage();
   }
 
@@ -115,12 +126,31 @@ Views.Operators = (() => {
                    value="${_escapeAttr(_searchQuery)}" />
           </div>
           <div class="flex gap-8" style="align-items:center;">
-            <label style="font-size:0.8rem;color:var(--text-secondary);white-space:nowrap;">Filtrer par statut :</label>
-            <select id="filter-status" class="form-control" style="width:auto;min-width:160px;">
+            <label style="font-size:0.8rem;color:var(--text-secondary);white-space:nowrap;">Statut :</label>
+            <select id="filter-status" class="form-control" style="width:auto;min-width:140px;">
               <option value="">Tous les statuts</option>
               ${STATUS_OPTIONS.map(s => `
                 <option value="${s}" ${_statusFilter === s ? 'selected' : ''}>${Engine.statusLabel(s)}</option>
               `).join('')}
+            </select>
+          </div>
+          <div class="flex gap-8" style="align-items:center;">
+            <label style="font-size:0.8rem;color:var(--text-secondary);white-space:nowrap;">Segment :</label>
+            <select id="filter-segment" class="form-control" style="width:auto;min-width:140px;">
+              <option value="">Tous</option>
+              <option value="institutionnel" ${_segmentFilter === 'institutionnel' ? 'selected' : ''}>Institutionnel</option>
+              <option value="grand_compte"   ${_segmentFilter === 'grand_compte'   ? 'selected' : ''}>Grand Compte</option>
+              <option value="b2b"            ${_segmentFilter === 'b2b'            ? 'selected' : ''}>B2B</option>
+              <option value="b2c"            ${_segmentFilter === 'b2c'            ? 'selected' : ''}>B2C</option>
+            </select>
+          </div>
+          <div class="flex gap-8" style="align-items:center;">
+            <label style="font-size:0.8rem;color:var(--text-secondary);white-space:nowrap;">Dispo :</label>
+            <select id="filter-dispo" class="form-control" style="width:auto;min-width:140px;">
+              <option value="">Toutes</option>
+              <option value="ponctuelle"  ${_dispoFilter === 'ponctuelle'  ? 'selected' : ''}>Ponctuelle</option>
+              <option value="reguliere"   ${_dispoFilter === 'reguliere'   ? 'selected' : ''}>Régulière</option>
+              <option value="temps_plein" ${_dispoFilter === 'temps_plein' ? 'selected' : ''}>Temps plein</option>
             </select>
           </div>
         </div>
@@ -147,6 +177,24 @@ Views.Operators = (() => {
    */
   function _renderTable(operators) {
     const settings = DB.settings.get();
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    function _dispoBadge(op) {
+      // Vérifier si en période d'indispo aujourd'hui
+      const indispos = op.periodeIndispo || [];
+      const estIndispo = indispos.some(function(p) {
+        if (!p.debut || !p.fin) return false;
+        const debut = new Date(p.debut);
+        const fin   = new Date(p.fin);
+        return today >= debut && today <= fin;
+      });
+      if (estIndispo) return '<span class="tag tag-red" style="font-size:0.7rem;">Indisponible</span>';
+      const dt = op.disponibiliteType || 'ponctuelle';
+      if (dt === 'temps_plein') return '<span class="tag tag-green" style="font-size:0.7rem;">Temps plein</span>';
+      if (dt === 'reguliere')   return '<span class="tag tag-blue" style="font-size:0.7rem;">' + (op.joursDispoParMois || 0) + '\u00a0j/mois</span>';
+      return '<span class="tag tag-neutral" style="font-size:0.7rem;">Ponctuel</span>';
+    }
 
     const rows = operators.map(op => {
       const cost = _getDisplayCost(op, settings);
@@ -160,13 +208,16 @@ Views.Operators = (() => {
         ? '<small class="text-muted" style="display:block;font-size:0.7rem;">' + Engine.fmt(op.hourlyRate) + '/h</small>'
         : (op.costMode === 'tjm_facture' ? '<small class="text-muted" style="display:block;font-size:0.7rem;">TJM facture</small>' : '');
 
+      const zoneDisplay = _escape(op.zoneLabel || op.villeBase || '—');
+
       return `
         <tr>
           <td><strong>${_escape(op.firstName)} ${_escape(op.lastName)}</strong></td>
           <td><span class="tag ${tagClass}">${Engine.statusLabel(op.status)}</span></td>
           <td class="num">${cost !== null ? Engine.fmt(cost) : '—'}${rateInfo}</td>
           <td>${_escape(specialties)}</td>
-          <td>${activeLabel}</td>
+          <td>${zoneDisplay}</td>
+          <td>${activeLabel} ${_dispoBadge(op)}</td>
           <td class="actions-cell">
             <button class="btn btn-sm" data-action="view" data-id="${op.id}" title="Voir détails & arbitrage">Détails</button>
             <button class="btn btn-sm" data-action="edit" data-id="${op.id}" title="Modifier">Modifier</button>
@@ -185,7 +236,8 @@ Views.Operators = (() => {
               <th>Statut</th>
               <th>Coût / jour</th>
               <th>Spécialités</th>
-              <th>Actif</th>
+              <th>Zone</th>
+              <th>Actif / Dispo</th>
               <th class="text-right">Actions</th>
             </tr>
           </thead>
@@ -214,6 +266,50 @@ Views.Operators = (() => {
         <p>Aucun opérateur ne correspond aux critères de recherche.</p>
       </div>
     `;
+  }
+
+  /* ----------------------------------------------------------
+     HELPER — TABLE PÉRIODES D'INDISPONIBILITÉ
+     ---------------------------------------------------------- */
+
+  function _renderIndispoTable(container) {
+    if (!container) return;
+    if (_modalIndispo.length === 0) {
+      container.innerHTML = '<span class="text-muted" style="font-size:0.8rem;">Aucune période saisie.</span>';
+      return;
+    }
+    let html = '<table style="width:100%;font-size:0.82rem;border-collapse:collapse;margin-bottom:4px;">';
+    html += '<thead><tr>';
+    html += '<th style="text-align:left;padding:3px 4px;font-weight:600;font-size:0.75rem;">Début</th>';
+    html += '<th style="text-align:left;padding:3px 4px;font-weight:600;font-size:0.75rem;">Fin</th>';
+    html += '<th style="text-align:left;padding:3px 4px;font-weight:600;font-size:0.75rem;">Motif</th>';
+    html += '<th></th>';
+    html += '</tr></thead><tbody>';
+    _modalIndispo.forEach(function(p, i) {
+      html += '<tr>';
+      html += '<td style="padding:3px;"><input type="date" data-idx="' + i + '" data-field="debut" class="form-control indispo-field" style="font-size:0.8rem;padding:3px 6px;" value="' + _escapeAttr(p.debut || '') + '" /></td>';
+      html += '<td style="padding:3px;"><input type="date" data-idx="' + i + '" data-field="fin" class="form-control indispo-field" style="font-size:0.8rem;padding:3px 6px;" value="' + _escapeAttr(p.fin || '') + '" /></td>';
+      html += '<td style="padding:3px;"><input type="text" data-idx="' + i + '" data-field="motif" class="form-control indispo-field" style="font-size:0.8rem;padding:3px 6px;" value="' + _escapeAttr(p.motif || '') + '" placeholder="Motif" /></td>';
+      html += '<td style="padding:3px;"><button type="button" class="btn btn-sm btn-remove-indispo" data-idx="' + i + '" style="color:var(--accent-red-light);">&times;</button></td>';
+      html += '</tr>';
+    });
+    html += '</tbody></table>';
+    container.innerHTML = html;
+
+    container.querySelectorAll('.indispo-field').forEach(function(input) {
+      input.addEventListener('change', function() {
+        var idx = parseInt(input.dataset.idx, 10);
+        var field = input.dataset.field;
+        if (_modalIndispo[idx]) _modalIndispo[idx][field] = input.value;
+      });
+    });
+    container.querySelectorAll('.btn-remove-indispo').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        var idx = parseInt(btn.dataset.idx, 10);
+        _modalIndispo.splice(idx, 1);
+        _renderIndispoTable(container);
+      });
+    });
   }
 
   /* ----------------------------------------------------------
@@ -387,6 +483,133 @@ Views.Operators = (() => {
                         placeholder="Informations complémentaires…">${_escape(op.notes || '')}</textarea>
             </div>
 
+            <!-- SECTION : Zone d'intervention -->
+            <div class="card" style="margin-top:16px;">
+              <div class="card-header"><h3>Zone d'intervention</h3></div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="op-zoneLabel">Zone / Territoire</label>
+                  <input type="text" id="op-zoneLabel" class="form-control"
+                         value="${_escapeAttr(op.zoneLabel || '')}" placeholder="ex: Normandie, Île-de-France" />
+                </div>
+                <div class="form-group">
+                  <label for="op-villeBase">Ville de base</label>
+                  <input type="text" id="op-villeBase" class="form-control"
+                         value="${_escapeAttr(op.villeBase || '')}" placeholder="ex: Le Mans" />
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="op-codePostalBase">Code postal</label>
+                  <input type="text" id="op-codePostalBase" class="form-control" maxlength="5"
+                         value="${_escapeAttr(op.codePostalBase || '')}" placeholder="72000" />
+                </div>
+                <div class="form-group">
+                  <label for="op-rayonKm">Rayon d'intervention</label>
+                  <div class="flex gap-8" style="align-items:center;">
+                    <input type="number" id="op-rayonKm" class="form-control" min="0"
+                           value="${op.rayonKm != null ? op.rayonKm : 150}" style="max-width:120px;" />
+                    <span class="text-muted" style="font-size:0.85rem;">km</span>
+                  </div>
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="op-departements">Départements couverts</label>
+                <input type="text" id="op-departements" class="form-control"
+                       value="${_escapeAttr((op.departements || []).join(', '))}"
+                       placeholder="ex: 72, 61, 53, 14" />
+                <span class="form-help">Codes séparés par virgule (ex: 72,61,53,14)</span>
+              </div>
+            </div>
+
+            <!-- SECTION : Compétences & Segments -->
+            <div class="card" style="margin-top:8px;">
+              <div class="card-header"><h3>Compétences &amp; Segments</h3></div>
+              <div class="form-group">
+                <label>Segments maîtrisés</label>
+                <div class="flex gap-16" style="flex-wrap:wrap;margin-top:6px;">
+                  ${[['institutionnel','Institutionnel'],['grand_compte','Grand Compte'],['b2b','B2B'],['b2c','B2C']].map(([v,l]) =>
+                    `<label class="form-check"><input type="checkbox" name="op-segments" value="${v}" ${(op.segments || []).includes(v) ? 'checked' : ''} /><span>${l}</span></label>`
+                  ).join('')}
+                </div>
+              </div>
+              <div class="form-group">
+                <label>Niveaux maîtrisés</label>
+                <div class="flex gap-12" style="flex-wrap:wrap;margin-top:6px;">
+                  ${[['ponctuel','Ponctuel'],['essentiel','Essentiel'],['renforce','Renforcé'],['territorial','Territorial'],
+                     ['gc_standard','GC Standard'],['gc_volume','GC Volume'],['gc_partenaire','GC Partenaire']].map(([v,l]) =>
+                    `<label class="form-check"><input type="checkbox" name="op-niveaux" value="${v}" ${(op.niveauxMax || []).includes(v) ? 'checked' : ''} /><span>${l}</span></label>`
+                  ).join('')}
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="op-specialites">Spécialités avancées</label>
+                <input type="text" id="op-specialites" class="form-control"
+                       value="${_escapeAttr((op.specialites || []).join(', '))}"
+                       placeholder="CQB, stress, tir dynamique…" />
+                <span class="form-help">Séparées par virgule</span>
+              </div>
+              <div class="form-group">
+                <label for="op-certifications">Certifications</label>
+                <textarea id="op-certifications" class="form-control" rows="2"
+                          placeholder="Certifications, habilitations…">${_escape(op.certifications || '')}</textarea>
+              </div>
+            </div>
+
+            <!-- SECTION : Disponibilités -->
+            <div class="card" style="margin-top:8px;">
+              <div class="card-header"><h3>Disponibilités</h3></div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="op-dispoType">Type de disponibilité</label>
+                  <select id="op-dispoType" class="form-control">
+                    <option value="ponctuelle" ${(op.disponibiliteType || 'ponctuelle') === 'ponctuelle' ? 'selected' : ''}>Ponctuelle (missions à la demande)</option>
+                    <option value="reguliere"  ${op.disponibiliteType === 'reguliere'  ? 'selected' : ''}>Régulière (volume mensuel estimé)</option>
+                    <option value="temps_plein" ${op.disponibiliteType === 'temps_plein' ? 'selected' : ''}>Temps plein (opérateur dédié)</option>
+                  </select>
+                </div>
+                <div class="form-group" id="group-jours-dispo"
+                     style="${['reguliere','temps_plein'].includes(op.disponibiliteType) ? '' : 'display:none;'}">
+                  <label for="op-joursDispoMois">Jours disponibles / mois</label>
+                  <input type="number" id="op-joursDispoMois" class="form-control" min="0" max="23"
+                         value="${op.joursDispoParMois || 0}" />
+                </div>
+              </div>
+              <div class="form-group">
+                <label>Périodes d'indisponibilité <span class="text-muted" style="font-size:0.75rem;">(max 12)</span></label>
+                <div id="indispo-table" style="margin-bottom:6px;"></div>
+                <button type="button" class="btn btn-sm" id="btn-add-indispo">+ Ajouter une période</button>
+              </div>
+            </div>
+
+            <!-- SECTION : Contrat -->
+            <div class="card" style="margin-top:8px;">
+              <div class="card-header"><h3>Contrat</h3></div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="op-typeContrat">Type de contrat</label>
+                  <select id="op-typeContrat" class="form-control">
+                    <option value="freelance"        ${(op.typeContrat || 'freelance') === 'freelance'        ? 'selected' : ''}>Freelance</option>
+                    <option value="auto_entrepreneur" ${op.typeContrat === 'auto_entrepreneur' ? 'selected' : ''}>Auto-entrepreneur</option>
+                    <option value="cdd"              ${op.typeContrat === 'cdd'              ? 'selected' : ''}>CDD</option>
+                    <option value="cdi"              ${op.typeContrat === 'cdi'              ? 'selected' : ''}>CDI</option>
+                  </select>
+                </div>
+                <div class="form-group" id="group-siret">
+                  <label for="op-siret">SIRET (si freelance / AE)</label>
+                  <input type="text" id="op-siret" class="form-control"
+                         value="${_escapeAttr(op.siretFreelance || '')}" placeholder="12345678900012" />
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="op-noteInterne">Note interne
+                  <span class="text-muted" style="font-size:0.75rem;">(non visible par l'opérateur)</span>
+                </label>
+                <textarea id="op-noteInterne" class="form-control" rows="2"
+                          placeholder="Notes confidentielles…">${_escape(op.noteInterne || '')}</textarea>
+              </div>
+            </div>
+
           </form>
         </div>
         <div class="modal-footer">
@@ -445,6 +668,42 @@ Views.Operators = (() => {
     if (hourlyInput) hourlyInput.addEventListener('input', _updateCostPreview);
     var hpdInput = overlay.querySelector('#op-hoursPerDay');
     if (hpdInput) hpdInput.addEventListener('input', _updateCostPreview);
+
+    // Initialiser periodeIndispo
+    _modalIndispo = JSON.parse(JSON.stringify(op.periodeIndispo || []));
+    _renderIndispoTable(overlay.querySelector('#indispo-table'));
+
+    // Bouton ajout période indispo
+    var btnAddIndispo = overlay.querySelector('#btn-add-indispo');
+    if (btnAddIndispo) {
+      btnAddIndispo.addEventListener('click', function() {
+        if (_modalIndispo.length >= 12) return;
+        _modalIndispo.push({ debut: '', fin: '', motif: '' });
+        _renderIndispoTable(overlay.querySelector('#indispo-table'));
+      });
+    }
+
+    // Affichage conditionnel jours dispo
+    var dispoTypeEl = overlay.querySelector('#op-dispoType');
+    var groupJoursDispo = overlay.querySelector('#group-jours-dispo');
+    if (dispoTypeEl && groupJoursDispo) {
+      dispoTypeEl.addEventListener('change', function() {
+        var v = dispoTypeEl.value;
+        groupJoursDispo.style.display = (v === 'reguliere' || v === 'temps_plein') ? '' : 'none';
+      });
+    }
+
+    // Affichage conditionnel SIRET
+    var typeContratEl = overlay.querySelector('#op-typeContrat');
+    var groupSiret = overlay.querySelector('#group-siret');
+    if (typeContratEl && groupSiret) {
+      function _updateSiretVis() {
+        var v = typeContratEl.value;
+        groupSiret.style.display = (v === 'freelance' || v === 'auto_entrepreneur') ? '' : 'none';
+      }
+      typeContratEl.addEventListener('change', _updateSiretVis);
+      _updateSiretVis();
+    }
 
     // Sauvegarde
     overlay.querySelector('#modal-save').addEventListener('click', () => {
@@ -1044,6 +1303,27 @@ Views.Operators = (() => {
       netDaily = calcC ? calcC.net : 0;
     }
 
+    // Nouveaux champs
+    const zoneLabel      = (overlay.querySelector('#op-zoneLabel')      || {}).value?.trim() || '';
+    const villeBase      = (overlay.querySelector('#op-villeBase')       || {}).value?.trim() || '';
+    const codePostalBase = (overlay.querySelector('#op-codePostalBase')  || {}).value?.trim() || '';
+    const rayonKm        = parseFloat((overlay.querySelector('#op-rayonKm') || {}).value) || 150;
+    const rawDepts       = (overlay.querySelector('#op-departements')    || {}).value || '';
+    const departements   = rawDepts.split(',').map(s => s.trim()).filter(s => s.length > 0);
+
+    const segments  = Array.from(overlay.querySelectorAll('input[name="op-segments"]:checked')).map(cb => cb.value);
+    const niveauxMax = Array.from(overlay.querySelectorAll('input[name="op-niveaux"]:checked')).map(cb => cb.value);
+    const rawSpec2  = (overlay.querySelector('#op-specialites') || {}).value || '';
+    const specialites = rawSpec2.split(',').map(s => s.trim()).filter(s => s.length > 0);
+    const certifications = (overlay.querySelector('#op-certifications') || {}).value?.trim() || '';
+
+    const disponibiliteType  = (overlay.querySelector('#op-dispoType')      || {}).value || 'ponctuelle';
+    const joursDispoParMois  = parseInt((overlay.querySelector('#op-joursDispoMois') || {}).value) || 0;
+
+    const typeContrat    = (overlay.querySelector('#op-typeContrat')  || {}).value || 'freelance';
+    const siretFreelance = (overlay.querySelector('#op-siret')        || {}).value?.trim() || '';
+    const noteInterne    = (overlay.querySelector('#op-noteInterne')  || {}).value?.trim() || '';
+
     const data = {
       firstName:        overlay.querySelector('#op-firstName').value.trim(),
       lastName:         overlay.querySelector('#op-lastName').value.trim(),
@@ -1059,7 +1339,15 @@ Views.Operators = (() => {
       netDaily:         Engine.round2(netDaily),
       companyCostDaily: Engine.round2(companyCostDaily),
       specialties:      specialties,
-      notes:            overlay.querySelector('#op-notes').value.trim()
+      notes:            overlay.querySelector('#op-notes').value.trim(),
+      // Zone
+      zoneLabel, villeBase, codePostalBase, rayonKm, departements,
+      // Compétences
+      segments, niveauxMax, specialites, certifications,
+      // Disponibilités
+      disponibiliteType, joursDispoParMois, periodeIndispo: JSON.parse(JSON.stringify(_modalIndispo)),
+      // Contrat
+      typeContrat, siretFreelance, noteInterne
     };
 
     // Validation minimale
@@ -1119,6 +1407,24 @@ Views.Operators = (() => {
       });
     }
 
+    // Filtre par segment
+    const filterSegment = _container.querySelector('#filter-segment');
+    if (filterSegment) {
+      filterSegment.addEventListener('change', (e) => {
+        _segmentFilter = e.target.value;
+        _renderPage();
+      });
+    }
+
+    // Filtre par disponibilité
+    const filterDispo = _container.querySelector('#filter-dispo');
+    if (filterDispo) {
+      filterDispo.addEventListener('change', (e) => {
+        _dispoFilter = e.target.value;
+        _renderPage();
+      });
+    }
+
     // Actions sur les lignes du tableau (délégation d'événements)
     _container.querySelectorAll('[data-action]').forEach(btn => {
       btn.addEventListener('click', () => {
@@ -1158,14 +1464,25 @@ Views.Operators = (() => {
       operators = operators.filter(op => op.status === _statusFilter);
     }
 
-    // Filtre par recherche textuelle (nom, prénom, spécialités)
+    // Filtre par segment
+    if (_segmentFilter) {
+      operators = operators.filter(op => (op.segments || []).includes(_segmentFilter));
+    }
+
+    // Filtre par disponibilité
+    if (_dispoFilter) {
+      operators = operators.filter(op => (op.disponibiliteType || 'ponctuelle') === _dispoFilter);
+    }
+
+    // Filtre par recherche textuelle (nom, prénom, spécialités, zone)
     if (_searchQuery.trim()) {
       const q = _searchQuery.toLowerCase().trim();
       operators = operators.filter(op => {
         const fullName = `${op.firstName} ${op.lastName}`.toLowerCase();
         const specs = (op.specialties || []).join(' ').toLowerCase();
         const statusText = Engine.statusLabel(op.status).toLowerCase();
-        return fullName.includes(q) || specs.includes(q) || statusText.includes(q);
+        const zone = (op.zoneLabel || op.villeBase || '').toLowerCase();
+        return fullName.includes(q) || specs.includes(q) || statusText.includes(q) || zone.includes(q);
       });
     }
 
@@ -1241,7 +1558,7 @@ Views.Operators = (() => {
    * @returns {object}
    */
   function _defaultOperator() {
-    return {
+    return Object.assign({
       firstName: '',
       lastName: '',
       email: '',
@@ -1253,7 +1570,7 @@ Views.Operators = (() => {
       companyCostDaily: 0,
       specialties: [],
       notes: ''
-    };
+    }, DB.DEFAULT_OPERATOR);
   }
 
   /**

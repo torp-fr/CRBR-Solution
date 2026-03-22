@@ -507,37 +507,79 @@ Views.Dashboard = {
        ---------------------------------------------------------- */
 
     function buildOperatorLoadHTML() {
-      const operators  = DB.operators.getAll();
-      const threshold  = settings.operatorOverloadThreshold;
+      const allOperators = DB.operators.getAll();
+      const threshold    = settings.operatorOverloadThreshold;
       const currentMonth = now.getMonth();
       const currentYear  = now.getFullYear();
+      const todayDate    = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
-      /* Compter les sessions par opérateur ce mois-ci */
+      /* Compter les sessions par opérateur ce mois-ci + CA total toutes sessions terminées */
       const opSessionCount = {};
+      const opCaTotal      = {};
+      const opPrices       = {};  // array of prices for moyenne
+
       sessions.forEach(sess => {
         if (sess.status === 'annulee') return;
         const d = new Date(sess.date);
-        if (d.getMonth() === currentMonth && d.getFullYear() === currentYear) {
-          (sess.operatorIds || []).forEach(opId => {
+        (sess.operatorIds || []).forEach(opId => {
+          // Charge ce mois
+          if (d.getMonth() === currentMonth && d.getFullYear() === currentYear) {
             opSessionCount[opId] = (opSessionCount[opId] || 0) + 1;
-          });
-        }
+          }
+          // CA sessions terminées
+          if (sess.status === 'terminee' && sess.price) {
+            opCaTotal[opId] = (opCaTotal[opId] || 0) + (sess.price || 0);
+            if (!opPrices[opId]) opPrices[opId] = [];
+            opPrices[opId].push(sess.price);
+          }
+        });
       });
 
-      /* Trier par charge décroissante, top 5 */
+      /* Badge disponibilité */
+      function dispoBadge(op) {
+        const indispos = op.periodeIndispo || [];
+        const estIndispo = indispos.some(function(p) {
+          if (!p.debut || !p.fin) return false;
+          return todayDate >= new Date(p.debut) && todayDate <= new Date(p.fin);
+        });
+        if (estIndispo) return '<span class="tag tag-red" style="font-size:0.65rem;">Indispo</span>';
+        const dt = op.disponibiliteType || 'ponctuelle';
+        if (dt === 'temps_plein') return '<span class="tag tag-green" style="font-size:0.65rem;">T. plein</span>';
+        if (dt === 'reguliere')   return '<span class="tag tag-blue"  style="font-size:0.65rem;">' + (op.joursDispoParMois || 0) + '\u00a0j/mois</span>';
+        return '<span class="tag tag-neutral" style="font-size:0.65rem;">Ponctuel</span>';
+      }
+
+      /* Trier par charge décroissante (mois en cours), top 5 */
       const ranked = Object.entries(opSessionCount)
         .map(([opId, count]) => {
           const op = DB.operators.getById(opId);
           return {
             id: opId,
-            name: op ? `${op.firstName || ''} ${op.lastName || ''}`.trim() : opId,
-            count
+            op: op,
+            name: op ? (op.firstName || '') + ' ' + (op.lastName || '') : opId,
+            zone: op ? (op.zoneLabel || op.villeBase || '—') : '—',
+            count,
+            ca: opCaTotal[opId] || 0,
+            nbTerminees: (opPrices[opId] || []).length
           };
         })
         .sort((a, b) => b.count - a.count)
         .slice(0, 5);
 
-      if (ranked.length === 0) {
+      /* Top 5 par CA (toutes sessions terminées, tous opérateurs actifs) */
+      const topCa = allOperators
+        .filter(op => op.active !== false && opCaTotal[op.id])
+        .map(op => ({
+          op,
+          name: ((op.firstName || '') + ' ' + (op.lastName || '')).trim(),
+          zone: op.zoneLabel || op.villeBase || '—',
+          nbSess: (opPrices[op.id] || []).length,
+          ca: opCaTotal[op.id] || 0
+        }))
+        .sort((a, b) => b.ca - a.ca)
+        .slice(0, 5);
+
+      if (ranked.length === 0 && topCa.length === 0) {
         return `
           <div class="card">
             <div class="card-header"><h2>Charge opérateurs — ce mois</h2></div>
@@ -566,7 +608,7 @@ Views.Dashboard = {
         barsHTML += `
           <div class="mb-16">
             <div class="flex-between mb-8">
-              <span style="font-size:0.88rem;">${escapeHTML(op.name)}</span>
+              <span style="font-size:0.88rem;">${escapeHTML(op.name.trim())}</span>
               <span class="text-mono font-bold">${op.count} / ${threshold}</span>
             </div>
             <div class="progress-bar" style="height:10px;">
@@ -576,13 +618,44 @@ Views.Dashboard = {
         `;
       });
 
+      /* Tableau Top opérateurs par CA */
+      let topCaRows = '';
+      topCa.forEach(function(item) {
+        topCaRows += '<tr>' +
+          '<td style="padding:5px 8px;">' + escapeHTML(item.name) + '</td>' +
+          '<td style="padding:5px 8px;font-size:0.78rem;color:var(--text-secondary);">' + escapeHTML(item.zone) + '</td>' +
+          '<td style="padding:5px 8px;text-align:right;">' + item.nbSess + '</td>' +
+          '<td style="padding:5px 8px;text-align:right;font-family:var(--font-mono);font-weight:600;">' + Engine.fmt(item.ca) + '</td>' +
+          '<td style="padding:5px 8px;text-align:center;">' + (item.op ? dispoBadge(item.op) : '—') + '</td>' +
+          '</tr>';
+      });
+
+      const topCaHTML = topCa.length > 0 ? `
+        <div style="margin-top:20px;">
+          <div style="font-size:0.78rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:8px;">Top opérateurs — CA généré (sessions terminées)</div>
+          <table style="width:100%;border-collapse:collapse;font-size:0.82rem;">
+            <thead>
+              <tr style="border-bottom:1px solid var(--border-color);">
+                <th style="text-align:left;padding:4px 8px;font-size:0.75rem;color:var(--text-muted);">Nom</th>
+                <th style="text-align:left;padding:4px 8px;font-size:0.75rem;color:var(--text-muted);">Zone</th>
+                <th style="text-align:right;padding:4px 8px;font-size:0.75rem;color:var(--text-muted);">Sessions</th>
+                <th style="text-align:right;padding:4px 8px;font-size:0.75rem;color:var(--text-muted);">CA généré</th>
+                <th style="text-align:center;padding:4px 8px;font-size:0.75rem;color:var(--text-muted);">Dispo</th>
+              </tr>
+            </thead>
+            <tbody>${topCaRows}</tbody>
+          </table>
+        </div>
+      ` : '';
+
       return `
         <div class="card">
           <div class="card-header">
             <h2>Charge opérateurs — ce mois</h2>
             <span class="text-muted" style="font-size:0.82rem;">Top 5 — seuil : ${threshold} sess/mois</span>
           </div>
-          ${barsHTML}
+          ${barsHTML || '<p class="text-muted" style="font-size:0.82rem;">Aucune session ce mois-ci.</p>'}
+          ${topCaHTML}
         </div>
       `;
     }

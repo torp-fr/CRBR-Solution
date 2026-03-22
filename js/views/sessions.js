@@ -420,6 +420,72 @@ Views.Sessions = (() => {
     });
   }
 
+  /* === SUGGESTION D'OPÉRATEURS === */
+  function _suggestOperators(sessionDate, sessionSegment) {
+    const allOps = DB.operators.getAll().filter(function(o) { return o.active !== false; });
+    var disponibles = [];
+    var segmentNonPrecise = [];
+    var indisponibles = [];
+
+    allOps.forEach(function(op) {
+      // Vérifier indisponibilité
+      var estIndispo = false;
+      if (sessionDate && Array.isArray(op.periodeIndispo) && op.periodeIndispo.length) {
+        var date = new Date(sessionDate);
+        estIndispo = op.periodeIndispo.some(function(p) {
+          if (!p.debut || !p.fin) return false;
+          return date >= new Date(p.debut) && date <= new Date(p.fin);
+        });
+      }
+      if (estIndispo) {
+        indisponibles.push(op);
+        return;
+      }
+      // Vérifier compatibilité segment
+      if (sessionSegment && Array.isArray(op.segments) && op.segments.length > 0) {
+        if (op.segments.includes(sessionSegment)) {
+          disponibles.push(op);
+        } else {
+          indisponibles.push(op);
+        }
+      } else {
+        // Segment non renseigné sur l'opérateur
+        segmentNonPrecise.push(op);
+      }
+    });
+
+    return { disponibles: disponibles, segmentNonPrecise: segmentNonPrecise, indisponibles: indisponibles };
+  }
+
+  function _renderOperatorsWithSuggestion(container, result, currentIds) {
+    var html = '';
+    function opRow(op, badgeCls, badgeLabel, opacity) {
+      var name = ((op.firstName || '') + ' ' + (op.lastName || '')).trim();
+      var checked = currentIds.includes(op.id) ? 'checked' : '';
+      return '<label class="form-check" style="margin-bottom:6px;' + (opacity ? 'opacity:0.5;' : '') + '">' +
+        '<input type="checkbox" name="operators" value="' + _esc(op.id) + '" ' + checked + ' />' +
+        '<span>' + _esc(name) +
+        ' <span class="tag ' + badgeCls + '" style="font-size:0.65rem;margin-left:4px;">' + badgeLabel + '</span>' +
+        ' <span style="color:var(--text-muted);font-size:0.75rem;">(' + Engine.statusLabel(op.status) + ')</span>' +
+        '</span></label>';
+    }
+
+    if (result.disponibles.length > 0) {
+      html += '<div style="font-size:0.72rem;font-weight:700;color:var(--text-muted);margin-bottom:4px;text-transform:uppercase;letter-spacing:0.5px;">Disponibles &amp; compatibles</div>';
+      result.disponibles.forEach(function(op) { html += opRow(op, 'tag-green', 'Disponible', false); });
+    }
+    if (result.segmentNonPrecise.length > 0) {
+      html += '<div style="font-size:0.72rem;font-weight:700;color:var(--text-muted);margin:8px 0 4px;text-transform:uppercase;letter-spacing:0.5px;">Segment non précisé</div>';
+      result.segmentNonPrecise.forEach(function(op) { html += opRow(op, 'tag-blue', 'Non qualifié', false); });
+    }
+    if (result.indisponibles.length > 0) {
+      html += '<div style="font-size:0.72rem;font-weight:700;color:var(--text-muted);margin:8px 0 4px;text-transform:uppercase;letter-spacing:0.5px;">Indisponibles / Segment incompatible</div>';
+      result.indisponibles.forEach(function(op) { html += opRow(op, 'tag-red', 'Indisponible', true); });
+    }
+    if (!html) html = '<span class="text-muted" style="font-size:0.8rem;">Aucun opérateur actif.</span>';
+    container.innerHTML = html;
+  }
+
   /* === FORMULAIRE DE PLANIFICATION (création / modification) === */
   function _openFormModal(session, presetDate) {
     const isEdit = !!session;
@@ -484,6 +550,17 @@ Views.Sessions = (() => {
             <input type="text" class="form-control" id="fm-label" value="${_escAttr(s.label || '')}" placeholder="Ex : Tir tactique Gendarmerie" />
           </div>
 
+          <!-- Segment -->
+          <div class="form-group">
+            <label for="fm-segment">Segment de session</label>
+            <select class="form-control" id="fm-segment" style="max-width:360px;">
+              <option value="institutionnel" ${(!s.segment || s.segment === 'institutionnel') ? 'selected' : ''}>Institutionnel — Programme annuel</option>
+              <option value="grand_compte"   ${s.segment === 'grand_compte'   ? 'selected' : ''}>Grand Compte Itinérant</option>
+              <option value="b2b"            ${s.segment === 'b2b'            ? 'selected' : ''}>B2B — Entreprise / Team Building</option>
+              <option value="b2c"            ${s.segment === 'b2c'            ? 'selected' : ''}>B2C / Événementiel</option>
+            </select>
+          </div>
+
           <!-- Client -->
           <div class="form-group">
             <label for="fm-client">Client *</label>
@@ -509,8 +586,11 @@ Views.Sessions = (() => {
 
           <!-- Opérateurs (multi-select) -->
           <div class="form-group">
-            <label>Opérateurs * <span style="font-size:0.75rem;color:var(--text-muted);">(sélectionnez un ou plusieurs)</span></label>
-            <div id="fm-operators" style="max-height:140px;overflow-y:auto;border:1px solid var(--border-color);border-radius:6px;padding:8px;background:var(--bg-input);">
+            <div class="flex-between" style="margin-bottom:6px;">
+              <label style="margin-bottom:0;">Opérateurs * <span style="font-size:0.75rem;color:var(--text-muted);">(sélectionnez un ou plusieurs)</span></label>
+              <button type="button" class="btn btn-sm" id="btn-suggest-operators" title="Filtrer par disponibilité et segment">&#128269; Trouver les disponibles</button>
+            </div>
+            <div id="fm-operators" style="max-height:200px;overflow-y:auto;border:1px solid var(--border-color);border-radius:6px;padding:8px;background:var(--bg-input);">
               ${operators.map(o => {
                 const name = ((o.firstName || '') + ' ' + (o.lastName || '')).trim();
                 return `
@@ -580,6 +660,19 @@ Views.Sessions = (() => {
     overlay.querySelector('#fm-close').addEventListener('click', close);
     overlay.querySelector('#fm-cancel').addEventListener('click', close);
     overlay.addEventListener('click', e => { if (e.target === overlay) close(); });
+
+    /* Bouton suggestion opérateurs */
+    var btnSuggest = overlay.querySelector('#btn-suggest-operators');
+    var fmOperators = overlay.querySelector('#fm-operators');
+    if (btnSuggest && fmOperators) {
+      btnSuggest.addEventListener('click', function() {
+        var sessionDate    = (overlay.querySelector('#fm-date')    || {}).value || null;
+        var sessionSegment = (overlay.querySelector('#fm-segment') || {}).value || 'institutionnel';
+        var currentIds     = Array.from(fmOperators.querySelectorAll('input[name="operators"]:checked')).map(function(cb) { return cb.value; });
+        var result = _suggestOperators(sessionDate, sessionSegment);
+        _renderOperatorsWithSuggestion(fmOperators, result, currentIds);
+      });
+    }
 
     /* Validation date */
     const dateInput = overlay.querySelector('#fm-date');
@@ -679,6 +772,7 @@ Views.Sessions = (() => {
         date,
         time:        overlay.querySelector('#fm-time').value || '',
         label:       overlay.querySelector('#fm-label').value.trim(),
+        segment:     (overlay.querySelector('#fm-segment') || {}).value || 'institutionnel',
         status:      newStatus,
         clientIds:   [clientId],
         moduleIds:   moduleCheckboxes.map(cb => cb.value),

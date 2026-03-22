@@ -453,6 +453,29 @@ const DB = (() => {
     settings.reset();
   }
 
+  /* --- Modèle par défaut opérateur (migration douce des enregistrements existants) --- */
+  const DEFAULT_OPERATOR = {
+    // === ZONE GÉOGRAPHIQUE ===
+    zoneLabel:        '',
+    departements:     [],
+    villeBase:        '',
+    codePostalBase:   '',
+    rayonKm:          150,
+    // === COMPÉTENCES ===
+    segments:         [],
+    niveauxMax:       [],
+    specialites:      [],
+    certifications:   '',
+    // === DISPONIBILITÉS ===
+    disponibiliteType:    'ponctuelle',
+    joursDispoParMois:    0,
+    periodeIndispo:       [],
+    // === CONTRAT ===
+    typeContrat:      'freelance',
+    siretFreelance:   '',
+    noteInterne:      ''
+  };
+
   /* --- API publique --- */
   return {
     operators,
@@ -469,6 +492,7 @@ const DB = (() => {
     importAll,
     clearAll,
     generateId,
-    getNextNumeroDevis
+    getNextNumeroDevis,
+    DEFAULT_OPERATOR
   };
 })();
