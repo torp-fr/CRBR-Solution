@@ -31,6 +31,7 @@ Views.Devis = (() => {
   const TYPES_LIGNE = [
     { value: 'session',    label: 'Session'    },
     { value: 'abonnement', label: 'Abonnement' },
+    { value: 'one_shot',   label: 'Ponctuel'   },
     { value: 'module',     label: 'Module'     },
     { value: 'forfait',    label: 'Forfait'    },
     { value: 'autre',      label: 'Autre'      }
@@ -192,6 +193,8 @@ Views.Devis = (() => {
      ---------------------------------------------------------- */
 
   function _renderTable(list, today) {
+    const _settings = DB.settings.get();
+    const _targetPct = (_settings.targetMarginPercent || 30) / 100;
     let rows = '';
     list.forEach(d => {
       const dateStr  = d.createdAt ? new Date(d.createdAt).toLocaleDateString('fr-FR') : '\u2014';
@@ -230,6 +233,19 @@ Views.Devis = (() => {
             (d.objet ? '<br><small class="text-muted">' + _esc(d.objet.length > 55 ? d.objet.substring(0, 55) + '\u2026' : d.objet) + '</small>' : '') +
           '</td>' +
           '<td class="text-mono" style="font-size:0.9rem;"><strong>' + _fmtEur(d.totalTTC || 0) + '</strong><br><small class="text-muted">HT\u00a0' + _fmtEur(d.totalHT || 0) + '</small></td>' +
+          '<td>' + (() => {
+            const seuil = d.seuilPlancher || 0;
+            if (!seuil || !d.totalHT) return '<span class="text-muted" style="font-size:0.8rem;">\u2014</span>';
+            const marge = _round2(d.totalHT - seuil);
+            const pct   = _round2((marge / d.totalHT) * 100);
+            if (marge < 0) {
+              return '<span style="background:rgba(211,47,47,0.15);color:#d32f2f;font-size:0.75rem;padding:2px 6px;border-radius:3px;">' + pct + '\u00a0%</span>';
+            } else if (pct < _targetPct * 100) {
+              return '<span style="background:rgba(255,152,0,0.15);color:#f57c00;font-size:0.75rem;padding:2px 6px;border-radius:3px;">' + pct + '\u00a0%</span>';
+            } else {
+              return '<span style="background:rgba(46,125,50,0.15);color:#2e7d32;font-size:0.75rem;padding:2px 6px;border-radius:3px;">+' + pct + '\u00a0%</span>';
+            }
+          })() + '</td>' +
           '<td>' + _statutTag(d.statut) + '</td>' +
           '<td class="text-mono" style="font-size:0.8rem;">' + dateStr + '</td>' +
           '<td>' + validiteHTML + '</td>' +
@@ -250,6 +266,7 @@ Views.Devis = (() => {
         '<th>Destinataire</th>' +
         '<th>Titre</th>' +
         '<th>Total TTC</th>' +
+        '<th>Marge est.</th>' +
         '<th>Statut</th>' +
         '<th>Date</th>' +
         '<th>Validit\u00e9</th>' +
@@ -478,7 +495,7 @@ Views.Devis = (() => {
                 '<div class="form-group"><label>Format</label>' +
                   '<select id="dv-assist-format" class="form-control">' +
                     '<option value="journee">Journ\u00e9e compl\u00e8te</option>' +
-                    '<option value="demi">Demi-journ\u00e9e \u2014 Palier Ponctuel uniquement</option>' +
+                    '<option value="demi">Demi-journ\u00e9e</option>' +
                   '</select></div>' +
                 '<div class="form-group"><label>Nombre de jours</label>' +
                   '<input type="number" id="dv-assist-nb-jours" class="form-control" min="1" step="1" value="1" />' +
@@ -494,6 +511,15 @@ Views.Devis = (() => {
                     '<input type="checkbox" id="dv-assist-reconduction" style="margin-right:6px;">' +
                     '<span>Reconduction client (remise fid\u00e9lit\u00e9)</span>' +
                   '</label>' +
+                '</div>' +
+              '</div>' +
+              '<div class="form-group" style="margin-top:4px;">' +
+                '<label class="form-check" style="font-size:0.85rem;cursor:pointer;">' +
+                  '<input type="checkbox" id="dv-assist-mode-libre" style="margin-right:6px;">' +
+                  '<span>Mode personnalis\u00e9 \u2014 ignorer les paliers</span>' +
+                '</label>' +
+                '<div id="dv-assist-tarif-libre-wrap" style="display:none;margin-top:6px;">' +
+                  '<input type="number" id="dv-assist-tarif-libre" class="form-control" min="0" step="10" placeholder="Tarif jour HT personnalis\u00e9 (\u20ac)" />' +
                 '</div>' +
               '</div>' +
               '<button type="button" class="btn btn-sm" id="dv-assist-calculer">Calculer</button>' +
@@ -565,6 +591,15 @@ Views.Devis = (() => {
       });
     }
 
+    /* Assistant de tarification — Mode libre toggle */
+    const assistModeLibre = overlay.querySelector('#dv-assist-mode-libre');
+    if (assistModeLibre) {
+      assistModeLibre.addEventListener('change', () => {
+        const wrap = overlay.querySelector('#dv-assist-tarif-libre-wrap');
+        if (wrap) wrap.style.display = assistModeLibre.checked ? '' : 'none';
+      });
+    }
+
     /* Assistant de tarification — Calculer */
     const btnCalculer = overlay.querySelector('#dv-assist-calculer');
     if (btnCalculer) {
@@ -574,7 +609,9 @@ Views.Devis = (() => {
         const zoneId         = (overlay.querySelector('#dv-assist-zone')                 || {}).value || 'zone1';
         const estReconduction = !!(overlay.querySelector('#dv-assist-reconduction')       || {}).checked;
 
-        const result = _computeDevisSuggestion({ nbJours, formatJournee, zoneId, estReconduction });
+        const modeLibre  = !!(overlay.querySelector('#dv-assist-mode-libre')  || {}).checked;
+        const tarifLibre = modeLibre ? (parseFloat((overlay.querySelector('#dv-assist-tarif-libre') || {}).value) || null) : null;
+        const result = _computeDevisSuggestion({ nbJours, formatJournee, zoneId, estReconduction, tarifLibre });
 
         const resultatDiv = overlay.querySelector('#dv-assist-resultat');
         if (!resultatDiv) return;
@@ -611,7 +648,11 @@ Views.Devis = (() => {
             '<tr><td style="font-weight:700;">Total TTC</td>' +
               '<td style="text-align:right;font-weight:700;" class="text-mono">' + Engine.fmt(result.totalTTC) + '</td></tr>' +
           '</table>' +
-          '<button type="button" class="btn btn-sm btn-primary" id="dv-assist-utiliser" style="margin-top:10px;">Utiliser ce tarif</button>';
+          '<button type="button" class="btn btn-sm btn-primary" id="dv-assist-utiliser" style="margin-top:10px;">Utiliser ce tarif</button>' +
+          (tarifLibre ? '<div style="margin-top:6px;padding:5px 9px;background:rgba(13,110,253,0.1);border:1px solid rgba(13,110,253,0.4);border-radius:4px;font-size:0.78rem;color:#4a9eff;">Mode personnalis\u00e9 \u2014 tarif libre</div>' : '') +
+          (formatJournee === 'demi' && result.palier && result.palier.id !== 'ponctuel'
+            ? '<div style="margin-top:6px;padding:5px 9px;background:rgba(13,110,253,0.1);border:1px solid rgba(13,110,253,0.4);border-radius:4px;font-size:0.78rem;color:#4a9eff;">\u2139\ufe0f Demi-journ\u00e9e appliqu\u00e9e sur un palier multi-jours \u2014 v\u00e9rifiez que le contrat le pr\u00e9voit.</div>'
+            : '');
 
         overlay.querySelector('#dv-assist-utiliser').addEventListener('click', () => {
           /* Ligne 1 — formation */
@@ -819,15 +860,25 @@ Views.Devis = (() => {
 
     const alertDiv = overlay.querySelector('#dv-alerte-plancher');
     if (alertDiv) {
-      if (seuil > 0 && totaux.totalHT < seuil) {
-        const diff = _fmtEur(seuil - totaux.totalHT);
-        alertDiv.innerHTML = '<div style="background:rgba(211,47,47,0.12);border:1px solid #d32f2f;border-radius:4px;padding:8px 12px;color:#d32f2f;font-size:0.85rem;">' +
-          '\u26a0\ufe0f Total HT inf\u00e9rieur au seuil plancher estim\u00e9\u00a0(' + _fmtEur(seuil) + ')\u00a0\u2014 manque\u00a0' + diff + '</div>';
-      } else if (seuil > 0) {
+      if (seuil > 0 && totaux.totalHT > 0) {
+        const _s = DB.settings.get();
+        const targetPct    = (_s.targetMarginPercent || 30) / 100;
+        const seuilObjectif = _round2(seuil * (1 + targetPct));
         const marge    = _round2(totaux.totalHT - seuil);
-        const margePct = totaux.totalHT > 0 ? _round2((marge / totaux.totalHT) * 100) : 0;
-        alertDiv.innerHTML = '<div style="background:rgba(46,125,50,0.12);border:1px solid #2e7d32;border-radius:4px;padding:8px 12px;color:#2e7d32;font-size:0.85rem;">' +
-          '\u2713 Marge estim\u00e9e\u00a0: ' + _fmtEur(marge) + '\u00a0(' + margePct + '\u00a0%)</div>';
+        const margePct = _round2((marge / totaux.totalHT) * 100);
+        if (totaux.totalHT < seuil) {
+          const diff = _fmtEur(seuil - totaux.totalHT);
+          alertDiv.innerHTML = '<div style="background:rgba(211,47,47,0.12);border:1px solid #d32f2f;border-radius:4px;padding:8px 12px;color:#d32f2f;font-size:0.85rem;">' +
+            '\u26a0\ufe0f Sous seuil plancher \u2014 manque\u00a0' + diff + ' (plancher\u00a0: ' + _fmtEur(seuil) + ')</div>';
+        } else if (totaux.totalHT < seuilObjectif) {
+          alertDiv.innerHTML = '<div style="background:rgba(255,152,0,0.12);border:1px solid #f57c00;border-radius:4px;padding:8px 12px;color:#f57c00;font-size:0.85rem;">' +
+            '~ Rentable mais sous marge objectif\u00a0: ' + _fmtEur(marge) + '\u00a0(' + margePct + '\u00a0%) \u2014 objectif\u00a0: ' + Math.round(targetPct * 100) + '\u00a0%</div>';
+        } else {
+          alertDiv.innerHTML = '<div style="background:rgba(46,125,50,0.12);border:1px solid #2e7d32;border-radius:4px;padding:8px 12px;color:#2e7d32;font-size:0.85rem;">' +
+            '\u2713 Marge objectif atteint\u00a0: ' + _fmtEur(marge) + '\u00a0(' + margePct + '\u00a0%)</div>';
+        }
+      } else if (totaux.totalHT > 0) {
+        alertDiv.innerHTML = '<div style="padding:6px 12px;color:var(--text-muted);font-size:0.82rem;">Configurez les co\u00fbts journ\u00e9e pour activer les alertes plancher.</div>';
       } else {
         alertDiv.innerHTML = '';
       }
@@ -1010,7 +1061,7 @@ Views.Devis = (() => {
      ASSISTANT DE TARIFICATION — Moteur de suggestion devis
      ---------------------------------------------------------- */
 
-  function _computeDevisSuggestion({ nbJours, formatJournee, zoneId, estReconduction, palierId }) {
+  function _computeDevisSuggestion({ nbJours, formatJournee, zoneId, estReconduction, palierId, tarifLibre }) {
     const s  = DB.settings.get();
     const pc = s.pricingCatalog || {};
 
@@ -1019,19 +1070,20 @@ Views.Devis = (() => {
     const palier = palierId
       ? paliersList.find(p => p.id === palierId)
       : paliersList.find(p => nbJours >= p.volumeMin && nbJours <= p.volumeMax);
-    if (!palier) return { palier: null };
+    if (!palier && !tarifLibre) return { palier: null };
 
-    // 2. Tarif unitaire selon format
-    const tarifJourBase = _round2((pc.tarifJourneeBase || 0) * palier.coeff);
-    const tarifUnitaire = (formatJournee === 'demi' && palier.demiJourneeDisponible)
+    // 2. Tarif unitaire selon format (ou tarif libre)
+    const tarifJourBase = palier ? _round2((pc.tarifJourneeBase || 0) * palier.coeff) : 0;
+    const tarifUnitaireCalc = formatJournee === 'demi'
       ? _round2(tarifJourBase * (pc.tarifDemiJourneeCoeff || 0.70))
       : tarifJourBase;
+    const tarifUnitaire = (tarifLibre > 0) ? _round2(tarifLibre) : tarifUnitaireCalc;
 
     // 3. Total avant remise
     const baseHT = _round2(tarifUnitaire * nbJours);
 
-    // 4. Remise fidélité
-    const remiseFidelite = estReconduction ? (pc.remiseFidelitePourcent || 0) : 0;
+    // 4. Remise fidélité (seulement si palier connu)
+    const remiseFidelite = (palier && estReconduction) ? (pc.remiseFidelitePourcent || 0) : 0;
     const remiseTotale   = Math.min(remiseFidelite, pc.remiseMaxAutorisee || 20);
     const totalApresRemise = _round2(baseHT * (1 - remiseTotale / 100));
 
@@ -1051,14 +1103,13 @@ Views.Devis = (() => {
     const totalTTC = totalHT !== null ? _round2(totalHT + tva) : null;
 
     // 8. Texte détaillé
-    const maxLabel = palier.volumeMax === 9999 ? '25+' : palier.volumeMax;
     const fmtJour  = formatJournee === 'demi' ? 'demi-journ\u00e9e(s)' : 'journ\u00e9e(s)';
     const detail = [
       `${nbJours} ${fmtJour} \u00d7 ${Engine.fmt(tarifUnitaire)} = ${Engine.fmt(baseHT)} HT`,
       remiseTotale > 0 ? `Remise fid\u00e9lit\u00e9 (${remiseTotale}\u00a0%) : \u2212${Engine.fmt(_round2(baseHT * remiseTotale / 100))}` : null,
       surplusGeo !== null && surplusGeo > 0 ? `Surco\u00fbt g\u00e9ographique ${zone.label} : +${Engine.fmt(surplusGeo)}` : null,
       surplusGeo === null ? 'Zone\u00a04 : surco\u00fbt \u00e0 pr\u00e9ciser manuellement (sur devis)' : null,
-      `Palier : ${palier.label} (${palier.volumeMin}\u2013${maxLabel} jours/an)`
+      palier ? `Palier : ${palier.label} (${palier.volumeMin}\u2013${palier.volumeMax === 9999 ? '25+' : palier.volumeMax} jours/an)` : 'Tarif personnalis\u00e9'
     ].filter(Boolean).join('\n');
 
     return {

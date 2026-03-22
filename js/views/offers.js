@@ -208,7 +208,7 @@ Views.Offers = {
 
           html += `
                   <tr>
-                    <td><strong>${esc(offer.label || '(sans nom)')}</strong></td>
+                    <td><strong>${esc(offer.label || '(sans nom)')}</strong>${offer.pricingNote ? ' <span title="' + esc(offer.pricingNote).substring(0, 100) + '" style="cursor:default;">&#128221;</span>' : ''}</td>
                     <td><span class="tag ${tagClass(offer.type)}">${esc(Engine.offerTypeLabel(offer.type))}</span></td>
                     <td><small>${esc(encaissementLabel)}</small></td>
                     <td class="num">${Engine.fmt(offer.price || 0)} <small class="text-muted">${(() => {
@@ -366,6 +366,7 @@ Views.Offers = {
         startDate: offer ? (offer.startDate || '') : '',
         endDate: offer ? (offer.endDate || '') : '',
         notes: offer ? (offer.notes || '') : '',
+        pricingNote: offer ? (offer.pricingNote || '') : '',
         active: offer ? (offer.active !== false) : true
       };
 
@@ -487,7 +488,7 @@ Views.Offers = {
               <div class="form-row">
                 <div class="form-group">
                   <label for="offer-discount">Remise client (%)</label>
-                  <input type="number" id="offer-discount" class="form-control" min="0" max="100" step="0.5"
+                  <input type="number" id="offer-discount" class="form-control" min="0" max="99" step="0.5"
                          value="${data.discount}">
                   <div id="discount-info" style="font-size:0.82rem;margin-top:4px;min-height:1.4em;"></div>
                 </div>
@@ -544,6 +545,13 @@ Views.Offers = {
                 <label for="offer-notes">Notes</label>
                 <textarea id="offer-notes" class="form-control" rows="3"
                           placeholder="Remarques, conditions particuli\u00e8res...">${esc(data.notes)}</textarea>
+              </div>
+
+              <!-- Note tarifaire -->
+              <div class="form-group">
+                <label for="offer-pricing-note">Note tarifaire</label>
+                <textarea id="offer-pricing-note" class="form-control" rows="2"
+                          placeholder="Conditions tarifaires particuli\u00e8res, justification prix\u2026">${esc(data.pricingNote)}</textarea>
               </div>
 
             </div>
@@ -743,11 +751,7 @@ Views.Offers = {
         const partialOffer = { type, moduleIds: selectedModuleIds, nbSessions };
         const floor = Engine.computeOfferFloor(partialOffer);
         if (price > 0 && price < floor) {
-          const proceed = confirm(
-            `Attention : le prix (${Engine.fmt(price)}) est inf\u00e9rieur au seuil plancher (${Engine.fmt(floor)}).\n` +
-            `La rentabilit\u00e9 de cette offre n'est pas garantie.\n\nContinuer quand m\u00eame ?`
-          );
-          if (!proceed) return;
+          Toast.show('\u26a0\ufe0f Tarif sous le seuil plancher (' + Engine.fmt(floor) + '). Offre enregistr\u00e9e.', 'warning');
         }
 
         /* Objet offre à persister */
@@ -765,6 +769,7 @@ Views.Offers = {
           startDate,
           endDate,
           notes,
+          pricingNote: (overlay.querySelector('#offer-pricing-note') || {}).value || '',
           active
         };
 
