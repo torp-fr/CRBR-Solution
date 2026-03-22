@@ -9,6 +9,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
 </head>
 <body>
 
@@ -68,7 +69,7 @@
         <p style="color: var(--text-l2); font-size: 0.9rem; margin-bottom: 32px;">
           Remplissez les informations ci-dessous. Plus vous nous donnez de contexte, plus notre réponse sera précise.
         </p>
-        <form class="form" id="contactForm" novalidate>
+        <form class="form" id="contactForm" novalidate onsubmit="sendMail(event)">
 
           <!-- Identité -->
           <div class="form-row">
@@ -364,5 +365,45 @@
 </footer>
 
 <script src="js/main.js"></script>
+<script>
+(function(){
+  emailjs.init("CgTXrA6V-AGhtlJvz");
+})();
+
+function sendMail(e) {
+  e.preventDefault();
+  var btn = e.target.querySelector('button[type="submit"]');
+  var notice = document.getElementById('formNotice');
+  btn.disabled = true;
+  btn.textContent = 'Envoi en cours…';
+
+  emailjs.send("service_q6n1xhc", "template_x629ciw", {
+    prenom:        document.getElementById('prenom').value,
+    nom:           document.getElementById('nom').value,
+    organisation:  document.getElementById('organisation').value,
+    type:          document.getElementById('type_structure').value,
+    fonction:      document.getElementById('fonction').value,
+    email:         document.getElementById('email').value,
+    telephone:     document.getElementById('telephone').value,
+    effectif:      document.getElementById('effectif').value,
+    localisation:  document.getElementById('nb_sites').value,
+    message:       document.getElementById('message').value
+  })
+  .then(function() {
+    alert("Message envoyé avec succès");
+    notice.textContent = "Votre demande a bien été envoyée. Nous vous répondons sous 48h.";
+    notice.style.color = "green";
+    e.target.reset();
+    btn.disabled = false;
+    btn.innerHTML = 'Envoyer la demande <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>';
+  }, function(error) {
+    alert("Erreur lors de l'envoi");
+    notice.textContent = "Une erreur est survenue. Merci de réessayer ou de nous contacter directement.";
+    notice.style.color = "var(--red)";
+    btn.disabled = false;
+    btn.innerHTML = 'Envoyer la demande <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>';
+  });
+}
+</script>
 </body>
 </html>
