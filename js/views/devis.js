@@ -217,6 +217,8 @@ Views.Devis = (() => {
         statutActions =
           '<button class="btn btn-sm btn-statut-devis" data-id="' + d.id + '" data-next="accepte" style="color:#2e7d32;" title="Accept\u00e9">&#10003;&nbsp;Accept\u00e9</button>' +
           '<button class="btn btn-sm btn-statut-devis" data-id="' + d.id + '" data-next="refuse"  style="color:#d32f2f;" title="Refus\u00e9">&#10007;&nbsp;Refus\u00e9</button>';
+      } else if (d.statut === 'accepte') {
+        statutActions = '<button class="btn btn-sm btn-convert-devis" data-id="' + d.id + '" style="color:var(--color-success);" title="Cr\u00e9er session(s) depuis ce devis">&#8594;&nbsp;Session(s)</button>';
       }
 
       rows +=
@@ -304,6 +306,10 @@ Views.Devis = (() => {
 
     c.querySelectorAll('.btn-delete-devis').forEach(btn => {
       btn.addEventListener('click', e => { e.stopPropagation(); _deleteDevis(btn.dataset.id); });
+    });
+
+    c.querySelectorAll('.btn-convert-devis').forEach(btn => {
+      btn.addEventListener('click', e => { e.stopPropagation(); _convertDevisToSessions(btn.dataset.id); });
     });
   }
 
@@ -713,6 +719,132 @@ Views.Devis = (() => {
     return TYPES_LIGNE.map(t =>
       '<option value="' + t.value + '"' + (current === t.value ? ' selected' : '') + '>' + t.label + '</option>'
     ).join('');
+  }
+
+  /* ----------------------------------------------------------
+     CONVERSION DEVIS → SESSIONS
+     ---------------------------------------------------------- */
+
+  function _convertDevisToSessions(devisId) {
+    const d = DB.devis.getById(devisId);
+    if (!d) return;
+
+    /* 1. Résolution du client */
+    let clientId = null;
+
+    if (d.clientId) {
+      clientId = d.clientId;
+    } else if (d.prospectId) {
+      const prospect = DB.prospects.getById(d.prospectId);
+      if (!prospect) {
+        if (typeof Toast !== 'undefined') Toast.show('Prospect introuvable.', 'warning');
+        return;
+      }
+      if (prospect.statut !== 'converti') {
+        if (typeof Toast !== 'undefined') Toast.show('Convertissez d\u2019abord le prospect en client avant de cr\u00e9er des sessions.', 'warning');
+        App.navigate('prospects');
+        return;
+      }
+      const client = DB.clients.find(c => c.contactEmail && prospect.email && c.contactEmail === prospect.email);
+      if (!client) {
+        if (typeof Toast !== 'undefined') Toast.show('Le prospect est converti mais aucun client correspondant n\u2019a \u00e9t\u00e9 trouv\u00e9 (email introuvable).', 'warning');
+        return;
+      }
+      clientId = client.id;
+    } else {
+      if (typeof Toast !== 'undefined') Toast.show('Ce devis n\u2019est pas associ\u00e9 \u00e0 un client ou un prospect.', 'warning');
+      return;
+    }
+
+    /* 2. Lignes convertibles */
+    const lignesConvertibles = (d.lignes || []).filter(l => l.type === 'session' || l.type === 'abonnement');
+    if (lignesConvertibles.length === 0) {
+      if (typeof Toast !== 'undefined') Toast.show('Ce devis ne contient pas de ligne de type Session ou Abonnement. Cr\u00e9ez les sessions manuellement depuis le planning.', 'info');
+      return;
+    }
+
+    /* 3. Nombre total de sessions à créer */
+    const totalSessions = lignesConvertibles.reduce((sum, l) => sum + Math.max(Math.round(l.quantite || 1), 1), 0);
+
+    /* 4. Libellé destinataire */
+    const dest = d.clientId
+      ? (() => { const c = DB.clients.getById(d.clientId); return c ? (c.name || '') : ''; })()
+      : (() => { const p = DB.prospects.getById(d.prospectId); return p ? (((p.prenom || '') + ' ' + (p.nom || '')).trim() + (p.organisation ? ' \u2014 ' + p.organisation : '')) : ''; })();
+
+    /* 5. Modal de confirmation */
+    const lignesRows = lignesConvertibles.map(l =>
+      '<tr>' +
+        '<td>' + _esc(l.description || '\u2014') + '</td>' +
+        '<td>' + _esc(l.type === 'session' ? 'Session' : 'Abonnement') + '</td>' +
+        '<td style="text-align:center;">' + (l.quantite || 1) + '</td>' +
+        '<td style="text-align:right;">' + _fmtEur(l.prixUnitaireHT || 0) + '</td>' +
+      '</tr>'
+    ).join('');
+
+    const overlay = document.createElement('div');
+    overlay.className = 'modal-overlay';
+    overlay.id = 'devis-convert-overlay';
+    overlay.innerHTML =
+      '<div class="modal">' +
+        '<div class="modal-header">' +
+          '<h2>Cr\u00e9er les sessions depuis ce devis</h2>' +
+          '<button class="btn btn-sm btn-ghost" id="conv-close">&times;</button>' +
+        '</div>' +
+        '<div class="modal-body">' +
+          '<p style="margin-bottom:12px;"><strong>' + _esc(d.numero || '') + '</strong> \u2014 ' + _esc(dest) + '</p>' +
+          '<div class="data-table-wrap" style="margin-bottom:12px;">' +
+            '<table class="data-table" style="font-size:0.85rem;">' +
+              '<thead><tr><th>Description</th><th>Type</th><th style="text-align:center;">Qt\u00e9</th><th style="text-align:right;">Prix HT</th></tr></thead>' +
+              '<tbody>' + lignesRows + '</tbody>' +
+            '</table>' +
+          '</div>' +
+          '<p class="text-muted" style="font-size:0.82rem;margin-bottom:0;">Une session sera cr\u00e9\u00e9e par unit\u00e9 de quantit\u00e9.</p>' +
+        '</div>' +
+        '<div class="modal-footer">' +
+          '<button class="btn" id="conv-cancel">Annuler</button>' +
+          '<button class="btn btn-primary" id="conv-confirm">Cr\u00e9er ' + totalSessions + ' session(s)</button>' +
+        '</div>' +
+      '</div>';
+
+    document.body.appendChild(overlay);
+
+    function _closeConv() { if (overlay.parentNode) overlay.parentNode.removeChild(overlay); }
+
+    overlay.querySelector('#conv-close').addEventListener('click', _closeConv);
+    overlay.querySelector('#conv-cancel').addEventListener('click', _closeConv);
+    overlay.addEventListener('click', e => { if (e.target === overlay) _closeConv(); });
+    document.addEventListener('keydown', function escH(e) {
+      if (e.key === 'Escape') { _closeConv(); document.removeEventListener('keydown', escH); }
+    });
+
+    /* 6. Confirmation → création */
+    overlay.querySelector('#conv-confirm').addEventListener('click', () => {
+      let created = 0;
+      lignesConvertibles.forEach(l => {
+        const qty = Math.max(Math.round(l.quantite || 1), 1);
+        for (let i = 0; i < qty; i++) {
+          DB.sessions.create({
+            label:       l.description || d.titre || '',
+            status:      'planifiee',
+            clientIds:   [clientId],
+            price:       l.prixUnitaireHT || 0,
+            offerId:     null,
+            devisRef:    d.numero || '',
+            date:        '',
+            operatorIds: [],
+            moduleIds:   [],
+            locationId:  null,
+            notes:       'Cr\u00e9\u00e9e depuis devis ' + (d.numero || '')
+          });
+          created++;
+        }
+      });
+      _closeConv();
+      if (typeof Toast !== 'undefined') {
+        Toast.show(created + ' session(s) cr\u00e9\u00e9e(s) depuis le devis ' + (d.numero || '') + '. Planifiez-les depuis le module Sessions.', 'success');
+      }
+      App.navigate('sessions');
+    });
   }
 
   /* ----------------------------------------------------------

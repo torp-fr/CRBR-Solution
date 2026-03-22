@@ -19,6 +19,16 @@ Views.Dashboard = {
     const kpis      = Engine.computeDashboardKPIs();
     const alerts    = Engine.computeAllAlerts();
     const sessions  = DB.sessions.getAll();
+
+    /* Alerte sessions créées depuis un devis mais sans date planifiée */
+    const _sessionsSansDate = sessions.filter(s => s.status === 'planifiee' && s.devisRef && (!s.date || s.date === ''));
+    if (_sessionsSansDate.length > 0) {
+      alerts.push({
+        level:   'warning',
+        message: _sessionsSansDate.length + ' session(s) cr\u00e9\u00e9e(s) depuis un devis n\u2019ont pas encore de date planifi\u00e9e.',
+        context: 'Planning'
+      });
+    }
     const now       = new Date();
 
     /* Devis KPI */

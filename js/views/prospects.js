@@ -260,6 +260,11 @@ Views.Prospects = (() => {
 
     DB.prospects.update(id, { statut: 'converti' });
 
+    const _devisProspect = DB.devis.filter(dv => dv.prospectId === p.id);
+    if (_devisProspect.length > 0 && typeof Toast !== 'undefined') {
+      Toast.show(_devisProspect.length + ' devis associ\u00e9(s) \u00e0 ce prospect. Pensez \u00e0 les v\u00e9rifier depuis le module Devis.', 'info');
+    }
+
     if (typeof Toast !== 'undefined') Toast.show('Prospect converti en client avec succ\u00e8s.', 'success');
     App.navigate('clients');
   }

@@ -315,7 +315,7 @@ Views.Sessions = (() => {
               ${filtered.map(s => `
                 <tr>
                   <td>${_formatDateFr(s.date)}${s.time ? '<br><small class="text-muted">' + _esc(s.time) + '</small>' : ''}</td>
-                  <td><strong>${_esc(s.label || '—')}</strong></td>
+                  <td><strong>${_esc(s.label || '—')}</strong>${s.devisRef ? ' <span class="tag tag-blue" style="font-size:0.7rem;">&#128196;&nbsp;' + _esc(s.devisRef) + '</span>' : ''}</td>
                   <td>${_clientName(s.clientIds)}</td>
                   <td><small>${_moduleNames(s.moduleIds)}</small></td>
                   <td><small>${_operatorNames(s.operatorIds)}</small></td>
@@ -376,6 +376,7 @@ Views.Sessions = (() => {
                   <div><strong>Opérateur(s) :</strong> ${_operatorNames(s.operatorIds)}</div>
                   ${s.locationId ? `<div><strong>Lieu :</strong> ${_esc(_locationName(s.locationId))}</div>` : ''}
                   ${client && client.contactName ? `<div><strong>Contact :</strong> ${_esc(client.contactName)}${client.phone ? ' • ' + _esc(client.phone) : ''}</div>` : ''}
+                  ${s.devisRef ? `<div><strong>Origine devis :</strong> <span class="tag tag-blue" style="font-size:0.7rem;">&#128196;&nbsp;${_esc(s.devisRef)}</span></div>` : ''}
                 </div>
                 ${s.price > 0 ? `
                   <div style="font-size:0.85rem;margin-top:6px;">
