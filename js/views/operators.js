@@ -1019,6 +1019,103 @@ Views.Operators = (() => {
      MODALE — VUE DÉTAILS + ARBITRAGE RH
      ---------------------------------------------------------- */
 
+  /* ----------------------------------------------------------
+     PORTAIL OPÉRATEUR — SYNCHRONISATION SUPABASE
+     ---------------------------------------------------------- */
+
+  async function _syncOperateurPortail(opId) {
+    const op = DB.operators.getById(opId);
+    if (!op || !op.portailToken) {
+      if (typeof Toast !== 'undefined') Toast.show('Générez d\'abord un accès portail.', 'error');
+      return;
+    }
+    const token = op.portailToken;
+    const btn = document.getElementById('btn-sync-portail-op');
+    if (btn) { btn.disabled = true; btn.textContent = '☁ Sync…'; }
+
+    try {
+      // 1. Upsert profil opérateur
+      const r1 = await fetch(
+        SUPABASE_URL + '/rest/v1/operateurs_portail',
+        {
+          method: 'POST',
+          headers: { ...sbHeaders(), 'Prefer': 'resolution=merge-duplicates' },
+          body: JSON.stringify({
+            dst_operateur_id: op.id,
+            token,
+            prenom:      op.firstName  || '',
+            nom:         op.lastName   || '',
+            email:       op.email      || '',
+            telephone:   op.phone      || '',
+            ville_base:  op.villeBase  || '',
+            zone_label:  op.zoneLabel  || '',
+            statut:      op.active !== false ? 'actif' : 'inactif',
+            portail_actif: op.portailActif !== false,
+            updated_at:  new Date().toISOString()
+          })
+        }
+      );
+      if (!r1.ok) throw new Error('Erreur profil: ' + r1.status);
+
+      // 2. Supprimer anciennes sessions de cet opérateur
+      await fetch(
+        SUPABASE_URL + '/rest/v1/sessions_operateur_portail'
+          + '?dst_operateur_id=eq.' + encodeURIComponent(op.id),
+        { method: 'DELETE', headers: sbHeaders() }
+      );
+
+      // 3. Insérer les sessions assignées à cet opérateur
+      const sessions = DB.sessions.getAll().filter(s =>
+        (s.operatorIds || []).includes(opId)
+      );
+      const now = new Date();
+
+      if (sessions.length > 0) {
+        const payload = sessions.map(s => {
+          const clientId = (s.clientIds && s.clientIds[0]) || s.clientId;
+          const client   = clientId ? DB.clients.getById(clientId) : null;
+          const location = s.locationId ? DB.locations.getById(s.locationId) : null;
+          return {
+            dst_session_id:     s.id,
+            dst_operateur_id:   op.id,
+            token_operateur:    token,
+            label:              s.label || '',
+            date:               s.date  || null,
+            heure:              s.time  || '',
+            lieu:               location ? (location.name || location.label || '') : '',
+            lieu_ville:         location ? (location.city || location.ville || '') : '',
+            client_nom:         client  ? (client.name  || client.label  || '') : '',
+            statut:             s.statut || s.status || 'planifiee',
+            est_future:         s.date ? new Date(s.date) >= now : true,
+            notes_instructeur:  s.notes || ''
+          };
+        });
+        const r3 = await fetch(
+          SUPABASE_URL + '/rest/v1/sessions_operateur_portail',
+          {
+            method: 'POST',
+            headers: sbHeaders(),
+            body: JSON.stringify(payload)
+          }
+        );
+        if (!r3.ok) throw new Error('Erreur sessions: ' + r3.status);
+      }
+
+      // 4. Mettre à jour la date de sync locale
+      DB.operators.update(opId, { portailDerniereSync: new Date().toISOString() });
+
+      if (typeof Toast !== 'undefined') {
+        Toast.show('✓ Portail synchronisé — ' + sessions.length + ' session(s)', 'success');
+      }
+
+    } catch (err) {
+      console.error('[Sync portail opérateur]', err);
+      if (typeof Toast !== 'undefined') Toast.show('Erreur : ' + err.message, 'error');
+    } finally {
+      if (btn) { btn.disabled = false; btn.textContent = '☁ Synchroniser le portail'; }
+    }
+  }
+
   /**
    * Ouvre la modale de détails d'un opérateur avec l'arbitrage multi-statuts.
    * @param {object} op — opérateur
@@ -1105,10 +1202,15 @@ Views.Operators = (() => {
               <div style="background:var(--bg-secondary,#2a2a32);border-radius:6px;padding:10px 14px;font-family:monospace;font-size:0.82rem;word-break:break-all;margin-bottom:12px;" id="portail-link-display">
                 https://dst-system.fr/operateur/?token=${_escape(op.portailToken)}
               </div>
-              <div style="display:flex;gap:8px;flex-wrap:wrap;">
+              <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
+                <button class="btn btn-sm btn-primary" id="btn-sync-portail-op">☁ Synchroniser le portail</button>
                 <button class="btn btn-sm btn-secondary" id="btn-copy-portail-op">📋 Copier le lien</button>
                 <button class="btn btn-sm btn-danger" id="btn-desactiver-portail-op">Désactiver l'accès</button>
               </div>
+              ${op.portailDerniereSync
+                ? `<div style="font-size:0.78rem;color:var(--text-secondary,#a0a0a8);">Dernière sync : ${new Date(op.portailDerniereSync).toLocaleString('fr-FR')}</div>`
+                : '<div style="font-size:0.78rem;color:var(--text-secondary,#a0a0a8);">Non synchronisé</div>'
+              }
             ` : `
               <p style="font-size:0.82rem;color:var(--text-secondary);margin-bottom:12px;">
                 Aucun accès portail configuré pour cet opérateur.
@@ -1234,6 +1336,12 @@ Views.Operators = (() => {
       closeDetail();
       _openFormModal(op);
     });
+
+    // Portail opérateur — synchroniser
+    const btnSync = overlay.querySelector('#btn-sync-portail-op');
+    if (btnSync) {
+      btnSync.addEventListener('click', () => _syncOperateurPortail(op.id));
+    }
 
     // Portail opérateur — générer
     const btnGenerer = overlay.querySelector('#btn-generer-portail-op');

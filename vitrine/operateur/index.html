@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Espace Instructeur — DST System</title>
+  <meta name="robots" content="noindex, nofollow">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:         #1a1a1e;
+      --bg-card:    #222228;
+      --bg-input:   #2a2a32;
+      --border:     #33333a;
+      --text:       #e8e8ec;
+      --text-muted: #7a7a88;
+      --text-head:  #ffffff;
+      --accent:     #1e88e5;
+      --green:      #2e7d32;
+      --red:        #d32f2f;
+      --orange:     #e65100;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: 15px;
+      min-height: 100vh;
+    }
+
+    /* --- HEADER --- */
+    header {
+      background: var(--bg-card);
+      border-bottom: 1px solid var(--border);
+      padding: 0 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 56px;
+      gap: 12px;
+    }
+    .header-logo {
+      font-size: 1rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      color: var(--text-head);
+      flex-shrink: 0;
+    }
+    .header-logo span { color: var(--accent); }
+    .header-op {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      text-align: right;
+      line-height: 1.4;
+    }
+    .header-op strong { color: var(--text); display: block; }
+    .tag-zone {
+      display: inline-block;
+      font-size: 0.68rem;
+      font-weight: 600;
+      padding: 1px 6px;
+      border-radius: 3px;
+      background: rgba(30,136,229,0.15);
+      color: #64b5f6;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-top: 2px;
+    }
+
+    /* --- WELCOME BANNER --- */
+    .welcome-banner {
+      background: rgba(30,136,229,0.12);
+      border: 1px solid rgba(30,136,229,0.3);
+      border-radius: 8px;
+      padding: 12px 16px;
+      margin-bottom: 20px;
+      font-size: 0.88rem;
+      color: #90caf9;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .welcome-banner.hidden { display: none; }
+
+    /* --- LAYOUT --- */
+    .container {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 28px 16px 60px;
+    }
+
+    /* --- TABS --- */
+    .tabs {
+      display: flex;
+      gap: 4px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 24px;
+      overflow-x: auto;
+    }
+    .tab-btn {
+      background: none;
+      border: none;
+      border-bottom: 2px solid transparent;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 0.88rem;
+      padding: 10px 16px;
+      white-space: nowrap;
+      transition: color 0.15s, border-color 0.15s;
+    }
+    .tab-btn:hover { color: var(--text); }
+    .tab-btn.active {
+      color: var(--text-head);
+      border-bottom-color: var(--accent);
+      font-weight: 600;
+    }
+
+    /* --- CARDS --- */
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 16px;
+    }
+    .card-title {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--text-head);
+      margin-bottom: 14px;
+    }
+
+    /* --- TABLE --- */
+    table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+    th {
+      text-align: left;
+      color: var(--text-muted);
+      font-weight: 600;
+      font-size: 0.78rem;
+      padding: 0 8px 8px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    td { padding: 9px 8px 9px 0; border-bottom: 1px solid var(--border); vertical-align: top; }
+    tr:last-child td { border-bottom: none; }
+
+    /* --- BADGES --- */
+    .tag {
+      display: inline-block;
+      font-size: 0.72rem;
+      font-weight: 600;
+      padding: 2px 7px;
+      border-radius: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .tag-blue   { background: rgba(30,136,229,0.15); color: #64b5f6; }
+    .tag-green  { background: rgba(46,125,50,0.2);   color: #81c784; }
+    .tag-orange { background: rgba(230,81,0,0.2);    color: #ffb74d; }
+    .tag-gray   { background: rgba(100,100,110,0.2); color: #9e9e9e; }
+    .tag-red    { background: rgba(211,47,47,0.2);   color: #e57373; }
+
+    /* --- FORMS --- */
+    .form-group { margin-bottom: 14px; }
+    label { display: block; font-size: 0.82rem; color: var(--text-muted); margin-bottom: 5px; }
+    input[type="text"],
+    input[type="email"],
+    input[type="tel"],
+    input[type="date"],
+    select,
+    textarea {
+      width: 100%;
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text);
+      font-size: 0.9rem;
+      font-family: inherit;
+      padding: 8px 12px;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+    input:focus, select:focus, textarea:focus { border-color: var(--accent); }
+    textarea { resize: vertical; min-height: 80px; }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    @media (max-width: 520px) { .form-row { grid-template-columns: 1fr; } }
+
+    /* --- BUTTONS --- */
+    .btn {
+      background: var(--accent);
+      border: none;
+      border-radius: 6px;
+      color: #fff;
+      cursor: pointer;
+      font-size: 0.88rem;
+      font-weight: 600;
+      font-family: inherit;
+      padding: 9px 18px;
+      transition: opacity 0.15s;
+    }
+    .btn:hover { opacity: 0.88; }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .btn-danger {
+      background: var(--red);
+      padding: 4px 10px;
+      font-size: 0.78rem;
+      border-radius: 4px;
+    }
+    .btn-sm { padding: 5px 12px; font-size: 0.82rem; }
+
+    /* --- STATES --- */
+    .loading, .error-state, .empty-state {
+      text-align: center;
+      padding: 48px 20px;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+    }
+    .error-state { color: var(--red); }
+
+    /* --- SUCCESS MSG --- */
+    .save-msg {
+      display: none;
+      margin-top: 10px;
+      padding: 8px 12px;
+      background: rgba(46,125,50,0.15);
+      border: 1px solid rgba(46,125,50,0.3);
+      border-radius: 5px;
+      font-size: 0.83rem;
+      color: #81c784;
+    }
+    .save-msg.visible { display: block; }
+
+    /* --- DISPO LIST --- */
+    .dispo-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.85rem;
+    }
+    .dispo-row:last-child { border-bottom: none; }
+    .dispo-row .dispo-info { flex: 1; }
+    .dispo-row .dispo-motif { font-size: 0.78rem; color: var(--text-muted); }
+
+    /* --- NOTE BOX --- */
+    .note-box {
+      background: rgba(255,255,255,0.03);
+      border: 1px dashed var(--border);
+      border-radius: 6px;
+      padding: 12px 14px;
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      margin-top: 12px;
+      line-height: 1.6;
+    }
+
+    /* --- HIDDEN --- */
+    .hidden { display: none !important; }
+
+    /* --- FOOTER --- */
+    footer {
+      text-align: center;
+      padding: 24px 16px;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      border-top: 1px solid var(--border);
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="header-logo">DST<span>·</span>SYSTEM</div>
+    <div class="header-op" id="header-op-name">Espace instructeur</div>
+  </header>
+
+  <div class="container" id="app">
+
+    <!-- CHARGEMENT -->
+    <div class="loading" id="loading-state">Chargement de votre espace…</div>
+
+    <!-- ERREUR -->
+    <div class="error-state hidden" id="error-state">
+      <strong>Accès refusé</strong>
+      <p id="error-msg" style="margin-top:8px;">Le lien d'accès est invalide ou a expiré.</p>
+      <p style="margin-top:16px;font-size:0.82rem;">
+        Contactez DST System : <a href="mailto:dst-system@hotmail.com" style="color:var(--accent);">dst-system@hotmail.com</a>
+      </p>
+    </div>
+
+    <!-- CONTENU PRINCIPAL -->
+    <div class="hidden" id="main-content">
+
+      <!-- Bandeau bienvenue (first login) -->
+      <div class="welcome-banner hidden" id="welcome-banner">
+        👋 Bienvenue ! Commencez par compléter votre profil pour que DST System puisse vous contacter facilement.
+      </div>
+
+      <div class="tabs" id="tabs">
+        <button class="tab-btn active" data-tab="planning">📅 Mon planning</button>
+        <button class="tab-btn" data-tab="dispos">📆 Mes disponibilités</button>
+        <button class="tab-btn" data-tab="profil">👤 Mon profil</button>
+        <button class="tab-btn" data-tab="contact">✉ Contact DST</button>
+      </div>
+
+      <!-- TAB 1 — PLANNING -->
+      <div id="tab-planning">
+        <div class="card">
+          <div class="card-title">Vos prochaines missions</div>
+          <div id="planning-content">
+            <p class="empty-state">Aucune mission planifiée pour le moment.</p>
+          </div>
+        </div>
+        <div class="card" id="historique-missions-card">
+          <div class="card-title">Missions passées</div>
+          <div id="historique-content">
+            <p class="empty-state">Aucun historique disponible.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 2 — DISPONIBILITÉS -->
+      <div id="tab-dispos" class="hidden">
+        <div class="card">
+          <div class="card-title">Déclarer mes disponibilités</div>
+          <form id="dispo-form">
+            <div class="form-row">
+              <div class="form-group">
+                <label for="dispo-type">Type</label>
+                <select id="dispo-type">
+                  <option value="disponible">🟢 Disponible</option>
+                  <option value="indisponible" selected>🔴 Indisponible</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="dispo-motif">Motif (optionnel)</label>
+                <input type="text" id="dispo-motif" placeholder="Congés, formation…">
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="dispo-debut">Date de début</label>
+                <input type="date" id="dispo-debut" required>
+              </div>
+              <div class="form-group">
+                <label for="dispo-fin">Date de fin</label>
+                <input type="date" id="dispo-fin" required>
+              </div>
+            </div>
+            <button type="submit" class="btn">Enregistrer</button>
+            <div class="save-msg" id="dispo-save-msg">✓ Disponibilité enregistrée.</div>
+          </form>
+        </div>
+
+        <div class="card">
+          <div class="card-title">Mes déclarations</div>
+          <div id="dispos-list">
+            <p class="empty-state">Aucune déclaration pour le moment.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 3 — PROFIL -->
+      <div id="tab-profil" class="hidden">
+        <div class="card">
+          <div class="card-title">Mes informations</div>
+          <form id="profil-form">
+            <div class="form-row">
+              <div class="form-group">
+                <label for="profil-prenom">Prénom</label>
+                <input type="text" id="profil-prenom" placeholder="Votre prénom">
+              </div>
+              <div class="form-group">
+                <label for="profil-nom">Nom</label>
+                <input type="text" id="profil-nom" placeholder="Votre nom">
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="profil-email">Email</label>
+                <input type="email" id="profil-email" placeholder="votre@email.fr">
+              </div>
+              <div class="form-group">
+                <label for="profil-tel">Téléphone</label>
+                <input type="tel" id="profil-tel" placeholder="06 xx xx xx xx">
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="profil-ville">Ville de base</label>
+              <input type="text" id="profil-ville" placeholder="Ville depuis laquelle vous intervenez">
+            </div>
+            <div class="form-group">
+              <label for="profil-bio">Bio / Présentation</label>
+              <textarea id="profil-bio" rows="3" placeholder="Décrivez votre expérience et vos spécialités…"></textarea>
+            </div>
+
+            <button type="submit" class="btn">Enregistrer mon profil</button>
+            <div class="save-msg" id="profil-save-msg">✓ Profil mis à jour.</div>
+          </form>
+
+          <div class="note-box">
+            Vos informations administratives (zone, statut, spécialités) sont gérées par DST System.
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">Accès</div>
+          <p style="font-size:0.84rem;color:var(--text-muted);line-height:1.6;">
+            Votre lien d'accès personnel est confidentiel. Conservez-le dans vos favoris.<br>
+            Pour tout changement d'identifiant, contactez DST System.
+          </p>
+        </div>
+      </div>
+
+      <!-- TAB 4 — CONTACT DST -->
+      <div id="tab-contact" class="hidden">
+        <div class="card">
+          <div class="card-title">Contacter DST System</div>
+          <p style="font-size:0.85rem;color:var(--text-muted);margin-bottom:18px;">
+            Pour toute question concernant vos missions, votre planning ou votre rémunération :
+          </p>
+          <div style="margin-bottom:16px;font-size:0.9rem;line-height:2;">
+            <div>
+              📧 <a href="mailto:dst-system@hotmail.com" style="color:var(--accent);">dst-system@hotmail.com</a>
+            </div>
+            <div>
+              📞 <a href="tel:+33665445226" style="color:var(--accent);">06 65 44 52 26</a>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Message pré-rempli</label>
+            <textarea id="contact-message" rows="4"></textarea>
+          </div>
+          <button class="btn" id="btn-contact-mail">Ouvrir dans ma messagerie</button>
+        </div>
+      </div>
+
+    </div><!-- /main-content -->
+  </div><!-- /container -->
+
+  <footer>
+    &copy; DST — Drill &amp; Skills Training &nbsp;·&nbsp; Espace instructeur sécurisé
+  </footer>
+
+  <script src="../js/supabase-config.js"></script>
+  <script>
+  (function () {
+    'use strict';
+
+    /* ---- Utilitaires ---- */
+    function esc(str) {
+      return String(str || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    function fmtDate(iso) {
+      if (!iso) return '—';
+      const d = new Date(iso);
+      return d.toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' });
+    }
+
+    function statusTag(statut) {
+      const map = {
+        planifiee:  { cls: 'tag-blue',   label: 'Planifiée'  },
+        confirmee:  { cls: 'tag-green',  label: 'Confirmée'  },
+        en_cours:   { cls: 'tag-orange', label: 'En cours'   },
+        terminee:   { cls: 'tag-gray',   label: 'Terminée'   },
+        annulee:    { cls: 'tag-red',    label: 'Annulée'    }
+      };
+      const s = map[statut] || { cls: 'tag-gray', label: esc(statut || '—') };
+      return '<span class="tag ' + s.cls + '">' + s.label + '</span>';
+    }
+
+    function dispoTag(type) {
+      return type === 'disponible'
+        ? '<span class="tag tag-green">Disponible</span>'
+        : '<span class="tag tag-red">Indisponible</span>';
+    }
+
+    function showError(msg) {
+      document.getElementById('loading-state').classList.add('hidden');
+      document.getElementById('error-state').classList.remove('hidden');
+      document.getElementById('error-msg').textContent = msg;
+    }
+
+    /* ---- Token depuis URL ---- */
+    var params = new URLSearchParams(window.location.search);
+    var token = params.get('token') || '';
+
+    if (!token || !token.startsWith('ops_')) {
+      document.getElementById('loading-state').classList.add('hidden');
+      document.getElementById('error-state').classList.remove('hidden');
+      document.getElementById('error-msg').textContent = 'Lien d\'accès invalide.';
+      return;
+    }
+
+    /* ---- Données globales ---- */
+    var _opData    = null;
+    var _sessions  = [];
+    var _dispos    = [];
+
+    /* ---- Chargement principal ---- */
+    async function loadOperateurData(tok) {
+      try {
+        // 1. Profil opérateur
+        var r1 = await fetch(
+          SUPABASE_URL + '/rest/v1/operateurs_portail'
+            + '?token=eq.' + encodeURIComponent(tok)
+            + '&portail_actif=eq.true&select=*',
+          { headers: sbHeaders() }
+        );
+        if (!r1.ok) throw new Error('Connexion impossible, réessayez. (' + r1.status + ')');
+        var ops = await r1.json();
+        if (!ops || !ops.length) { showError('Accès non reconnu.'); return; }
+        _opData = ops[0];
+
+        // 2. Sessions assignées
+        var r2 = await fetch(
+          SUPABASE_URL + '/rest/v1/sessions_operateur_portail'
+            + '?token_operateur=eq.' + encodeURIComponent(tok)
+            + '&select=*&order=date.asc',
+          { headers: sbHeaders() }
+        );
+        _sessions = r2.ok ? (await r2.json() || []) : [];
+
+        // 3. Disponibilités
+        var r3 = await fetch(
+          SUPABASE_URL + '/rest/v1/disponibilites_operateur'
+            + '?token_operateur=eq.' + encodeURIComponent(tok)
+            + '&select=*&order=date_debut.asc',
+          { headers: sbHeaders() }
+        );
+        _dispos = r3.ok ? (await r3.json() || []) : [];
+
+        injectOperateurData({ op: _opData, sessions: _sessions, dispos: _dispos });
+
+      } catch (err) {
+        showError(err.message || 'Connexion impossible, réessayez.');
+      }
+    }
+
+    /* ---- Injection des données dans l'UI ---- */
+    function injectOperateurData(data) {
+      var op       = data.op;
+      var sessions = data.sessions;
+      var dispos   = data.dispos;
+
+      // Header
+      var opName = esc((op.prenom || '') + ' ' + (op.nom || '')).trim() || 'Instructeur';
+      var headerEl = document.getElementById('header-op-name');
+      headerEl.innerHTML = '<strong>' + opName + '</strong>'
+        + (op.zone_label ? '<span class="tag-zone">' + esc(op.zone_label) + '</span>' : '');
+
+      // Planning — sessions futures
+      var futures  = sessions.filter(function(s) { return s.est_future; });
+      var passees  = sessions.filter(function(s) { return !s.est_future; });
+
+      var planningEl = document.getElementById('planning-content');
+      if (futures.length === 0) {
+        planningEl.innerHTML = '<p class="empty-state">Aucune mission planifiée pour le moment.</p>';
+      } else {
+        var rows = futures.map(function(s) {
+          return '<tr>'
+            + '<td>' + esc(fmtDate(s.date)) + '</td>'
+            + '<td>' + esc(s.heure || '—') + '</td>'
+            + '<td>' + esc(s.client_nom || '—') + '</td>'
+            + '<td>' + esc(s.lieu_ville || s.lieu || '—') + '</td>'
+            + '<td>' + statusTag(s.statut) + '</td>'
+            + '</tr>';
+        }).join('');
+        planningEl.innerHTML = '<table>'
+          + '<thead><tr><th>Date</th><th>Heure</th><th>Client</th><th>Lieu</th><th>Statut</th></tr></thead>'
+          + '<tbody>' + rows + '</tbody>'
+          + '</table>';
+      }
+
+      // Historique
+      var histEl = document.getElementById('historique-content');
+      if (passees.length === 0) {
+        histEl.innerHTML = '<p class="empty-state">Aucun historique disponible.</p>';
+      } else {
+        var hrows = passees.map(function(s) {
+          return '<tr>'
+            + '<td>' + esc(fmtDate(s.date)) + '</td>'
+            + '<td>' + esc(s.client_nom || '—') + '</td>'
+            + '<td>' + esc(s.lieu_ville || s.lieu || '—') + '</td>'
+            + '<td>' + statusTag(s.statut) + '</td>'
+            + '</tr>';
+        }).join('');
+        histEl.innerHTML = '<table>'
+          + '<thead><tr><th>Date</th><th>Client</th><th>Lieu</th><th>Statut</th></tr></thead>'
+          + '<tbody>' + hrows + '</tbody>'
+          + '</table>';
+      }
+
+      // Disponibilités
+      renderDispos(dispos);
+
+      // Profil — pré-remplir le formulaire
+      document.getElementById('profil-prenom').value = op.prenom || '';
+      document.getElementById('profil-nom').value    = op.nom    || '';
+      document.getElementById('profil-email').value  = op.email  || '';
+      document.getElementById('profil-tel').value    = op.telephone || '';
+      document.getElementById('profil-ville').value  = op.ville_base || '';
+      document.getElementById('profil-bio').value    = op.bio    || '';
+
+      // Message contact pré-rempli
+      document.getElementById('contact-message').value =
+        'Bonjour,\n\nJe suis ' + ((op.prenom || '') + ' ' + (op.nom || '')).trim()
+        + ', instructeur DST System.\n\n[Votre message ici]\n\nCordialement';
+
+      // Afficher le contenu
+      document.getElementById('loading-state').classList.add('hidden');
+      document.getElementById('main-content').classList.remove('hidden');
+
+      // First login — ouvrir onglet profil et afficher bandeau
+      if (!op.profil_complete) {
+        document.getElementById('welcome-banner').classList.remove('hidden');
+        activateTab('profil');
+      }
+    }
+
+    /* ---- Rendu liste disponibilités ---- */
+    function renderDispos(dispos) {
+      var el = document.getElementById('dispos-list');
+      if (!dispos || dispos.length === 0) {
+        el.innerHTML = '<p class="empty-state">Aucune déclaration pour le moment.</p>';
+        return;
+      }
+      el.innerHTML = dispos.map(function(d) {
+        var periode = fmtDate(d.date_debut) + ' → ' + fmtDate(d.date_fin);
+        return '<div class="dispo-row">'
+          + '<div class="dispo-info">'
+          + dispoTag(d.type) + ' '
+          + '<span style="font-size:0.88rem;">' + periode + '</span>'
+          + (d.motif ? '<div class="dispo-motif">' + esc(d.motif) + '</div>' : '')
+          + '</div>'
+          + '<button class="btn btn-danger" data-dispo-id="' + esc(d.id) + '" title="Supprimer">×</button>'
+          + '</div>';
+      }).join('');
+
+      // Listeners suppression
+      el.querySelectorAll('[data-dispo-id]').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          deleteDispo(btn.dataset.dispoId);
+        });
+      });
+    }
+
+    /* ---- Navigation onglets ---- */
+    function activateTab(name) {
+      document.querySelectorAll('.tab-btn').forEach(function(b) {
+        b.classList.toggle('active', b.dataset.tab === name);
+      });
+      ['planning', 'dispos', 'profil', 'contact'].forEach(function(t) {
+        var el = document.getElementById('tab-' + t);
+        if (el) el.classList.toggle('hidden', t !== name);
+      });
+    }
+
+    document.getElementById('tabs').addEventListener('click', function(e) {
+      var btn = e.target.closest('.tab-btn');
+      if (btn) activateTab(btn.dataset.tab);
+    });
+
+    /* ---- Formulaire disponibilités ---- */
+    document.getElementById('dispo-form').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      var type   = document.getElementById('dispo-type').value;
+      var debut  = document.getElementById('dispo-debut').value;
+      var fin    = document.getElementById('dispo-fin').value;
+      var motif  = document.getElementById('dispo-motif').value.trim();
+      var msgEl  = document.getElementById('dispo-save-msg');
+
+      if (!debut || !fin) { alert('Veuillez sélectionner une période.'); return; }
+      if (fin < debut) { alert('La date de fin doit être après la date de début.'); return; }
+
+      var submitBtn = this.querySelector('button[type="submit"]');
+      submitBtn.disabled = true;
+      msgEl.classList.remove('visible');
+
+      try {
+        var r = await fetch(
+          SUPABASE_URL + '/rest/v1/disponibilites_operateur',
+          {
+            method: 'POST',
+            headers: sbHeaders(),
+            body: JSON.stringify({
+              dst_operateur_id: _opData.dst_operateur_id,
+              token_operateur:  token,
+              type:             type,
+              date_debut:       debut,
+              date_fin:         fin,
+              motif:            motif
+            })
+          }
+        );
+        if (!r.ok) throw new Error('Erreur ' + r.status);
+
+        // Recharger les dispos
+        var r2 = await fetch(
+          SUPABASE_URL + '/rest/v1/disponibilites_operateur'
+            + '?token_operateur=eq.' + encodeURIComponent(token)
+            + '&select=*&order=date_debut.asc',
+          { headers: sbHeaders() }
+        );
+        _dispos = r2.ok ? (await r2.json() || []) : _dispos;
+        renderDispos(_dispos);
+
+        // Reset form
+        document.getElementById('dispo-debut').value = '';
+        document.getElementById('dispo-fin').value   = '';
+        document.getElementById('dispo-motif').value = '';
+        msgEl.classList.add('visible');
+        setTimeout(function() { msgEl.classList.remove('visible'); }, 3000);
+
+      } catch (err) {
+        alert('Erreur lors de l\'enregistrement : ' + err.message);
+      } finally {
+        submitBtn.disabled = false;
+      }
+    });
+
+    /* ---- Suppression disponibilité ---- */
+    async function deleteDispo(dispoId) {
+      if (!confirm('Supprimer cette déclaration ?')) return;
+      try {
+        var r = await fetch(
+          SUPABASE_URL + '/rest/v1/disponibilites_operateur'
+            + '?id=eq.' + encodeURIComponent(dispoId),
+          { method: 'DELETE', headers: sbHeaders() }
+        );
+        if (!r.ok) throw new Error('Erreur ' + r.status);
+        _dispos = _dispos.filter(function(d) { return d.id !== dispoId; });
+        renderDispos(_dispos);
+      } catch (err) {
+        alert('Erreur : ' + err.message);
+      }
+    }
+
+    /* ---- Formulaire profil ---- */
+    document.getElementById('profil-form').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      var submitBtn = this.querySelector('button[type="submit"]');
+      var msgEl = document.getElementById('profil-save-msg');
+      submitBtn.disabled = true;
+      msgEl.classList.remove('visible');
+
+      try {
+        var r = await fetch(
+          SUPABASE_URL + '/rest/v1/operateurs_portail'
+            + '?token=eq.' + encodeURIComponent(token),
+          {
+            method: 'PATCH',
+            headers: sbHeaders(),
+            body: JSON.stringify({
+              prenom:           document.getElementById('profil-prenom').value.trim(),
+              nom:              document.getElementById('profil-nom').value.trim(),
+              email:            document.getElementById('profil-email').value.trim(),
+              telephone:        document.getElementById('profil-tel').value.trim(),
+              ville_base:       document.getElementById('profil-ville').value.trim(),
+              bio:              document.getElementById('profil-bio').value.trim(),
+              profil_complete:  true,
+              updated_at:       new Date().toISOString()
+            })
+          }
+        );
+        if (!r.ok) throw new Error('Erreur ' + r.status);
+
+        _opData.profil_complete = true;
+        document.getElementById('welcome-banner').classList.add('hidden');
+        msgEl.classList.add('visible');
+        setTimeout(function() { msgEl.classList.remove('visible'); }, 3500);
+
+      } catch (err) {
+        alert('Erreur lors de l\'enregistrement : ' + err.message);
+      } finally {
+        submitBtn.disabled = false;
+      }
+    });
+
+    /* ---- Bouton contact mail ---- */
+    document.getElementById('btn-contact-mail').addEventListener('click', function() {
+      var msg = document.getElementById('contact-message').value;
+      var name = _opData ? ((_opData.prenom || '') + ' ' + (_opData.nom || '')).trim() : '';
+      window.location.href = 'mailto:dst-system@hotmail.com'
+        + '?subject=' + encodeURIComponent('Message de ' + name + ' — DST System')
+        + '&body=' + encodeURIComponent(msg);
+    });
+
+    /* ---- Lancement ---- */
+    loadOperateurData(token);
+
+  })();
+  </script>
+
+</body>
+</html>

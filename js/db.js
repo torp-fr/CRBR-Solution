@@ -541,9 +541,10 @@ const DB = (() => {
     siretFreelance:   '',
     noteInterne:      '',
     // === PORTAIL OPÉRATEUR ===
-    portailToken:     '',
-    portailActif:     false,
-    portailGenereeLe: ''
+    portailToken:        '',
+    portailActif:        false,
+    portailGenereeLe:    '',
+    portailDerniereSync: ''
   };
 
   /* --- API publique --- */
