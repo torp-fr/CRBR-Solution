@@ -144,6 +144,16 @@ const DB = (() => {
     return 'FAC-' + year + '-' + String(max + 1).padStart(3, '0');
   }
 
+  /* --- Token d'accès portail client --- */
+  function generatePortailToken() {
+    const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
+    let token = 'tok_';
+    for (let i = 0; i < 16; i++) {
+      token += chars[Math.floor(Math.random() * chars.length)];
+    }
+    return token;
+  }
+
   /* --- Paramètres économiques --- */
   const DEFAULT_SETTINGS = {
     // Coûts fixes annuels
@@ -515,6 +525,7 @@ const DB = (() => {
     generateId,
     getNextNumeroDevis,
     getNextNumeroFacture,
+    generatePortailToken,
     DEFAULT_OPERATOR
   };
 })();

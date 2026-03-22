@@ -359,6 +359,58 @@ Views.Clients = (() => {
       });
     });
 
+    /* --- Portail client --- */
+    const btnGenerer = panel.querySelector('.btn-portail-generer');
+    if (btnGenerer) {
+      btnGenerer.addEventListener('click', () => {
+        const token = DB.generatePortailToken();
+        DB.clients.update(clientId, {
+          portailToken: token,
+          portailActif: true,
+          portailGenereeLe: new Date().toISOString(),
+          portailDerniereVisite: ''
+        });
+        Toast.show('Lien d\'accès généré avec succès.', 'success');
+        _renderDetail(clientId);
+      });
+    }
+
+    const btnCopier = panel.querySelector('.btn-portail-copier');
+    if (btnCopier) {
+      btnCopier.addEventListener('click', () => {
+        const url = btnCopier.dataset.url;
+        if (navigator.clipboard) {
+          navigator.clipboard.writeText(url).then(() => Toast.show('Lien copié dans le presse-papier.', 'success'));
+        } else {
+          Toast.show('Copiez manuellement : ' + url, 'info');
+        }
+      });
+    }
+
+    const btnInviter = panel.querySelector('.btn-portail-inviter');
+    if (btnInviter) {
+      btnInviter.addEventListener('click', () => {
+        const c = DB.clients.getById(btnInviter.dataset.id);
+        if (c) _openInvitationModal(c);
+      });
+    }
+
+    const btnExporter = panel.querySelector('.btn-portail-exporter');
+    if (btnExporter) {
+      btnExporter.addEventListener('click', () => _exportPortailData(btnExporter.dataset.id));
+    }
+
+    const btnDesactiver = panel.querySelector('#btn-portail-desactiver');
+    if (btnDesactiver) {
+      btnDesactiver.addEventListener('click', () => {
+        if (confirm('Désactiver l\'espace client ? Le lien d\'accès sera invalidé.')) {
+          DB.clients.update(clientId, { portailActif: false, portailToken: '' });
+          Toast.show('Espace client désactivé.', 'warning');
+          _renderDetail(clientId);
+        }
+      });
+    }
+
     panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
@@ -406,7 +458,40 @@ Views.Clients = (() => {
       </div>
     `;
 
-    return profitabilityHTML + `
+    /* --- Bloc Espace client --- */
+    const portailActif = client.portailActif && client.portailToken;
+    const portailUrl = portailActif
+      ? window.location.origin + window.location.pathname.replace('index.html', '').replace(/\/$/, '') + '/vitrine/client/index.html?token=' + _escapeAttr(client.portailToken)
+      : '';
+
+    const portailHTML = `
+      <div style="margin-bottom:20px;">
+        <h3 style="font-size:0.95rem;font-weight:600;color:var(--text-heading);margin-bottom:12px;">🔗 Espace client</h3>
+        ${portailActif ? `
+          <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:8px;padding:14px 16px;">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+              <span class="tag tag-green" style="font-size:0.72rem;">Actif</span>
+              <span class="text-muted" style="font-size:0.78rem;">Généré le ${_formatDate(client.portailGenereeLe)}</span>
+              ${client.portailDerniereVisite ? `<span class="text-muted" style="font-size:0.78rem;">· Dernière visite : ${_formatDate(client.portailDerniereVisite)}</span>` : ''}
+            </div>
+            <div style="font-size:0.78rem;color:var(--text-muted);word-break:break-all;margin-bottom:12px;font-family:monospace;background:var(--bg-input);padding:6px 10px;border-radius:4px;">${_escapeHtml(portailUrl)}</div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;">
+              <button class="btn btn-sm btn-portail-copier" data-url="${_escapeAttr(portailUrl)}">📋 Copier le lien</button>
+              <button class="btn btn-sm btn-portail-inviter" data-id="${_escapeAttr(client.id)}">✉ Envoyer l'invitation</button>
+              <button class="btn btn-sm btn-portail-exporter" data-id="${_escapeAttr(client.id)}">⬇ Exporter données</button>
+              <button class="btn btn-sm" style="color:#d32f2f;" id="btn-portail-desactiver" data-id="${_escapeAttr(client.id)}">⊘ Désactiver</button>
+            </div>
+          </div>
+        ` : `
+          <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:8px;padding:14px 16px;">
+            <p class="text-muted" style="font-size:0.84rem;margin-bottom:12px;">Aucun espace client activé. Générez un lien d'accès sécurisé à partager avec ce client.</p>
+            <button class="btn btn-sm btn-primary btn-portail-generer" data-id="${_escapeAttr(client.id)}">🔑 Générer un lien d'accès</button>
+          </div>
+        `}
+      </div>
+    `;
+
+    return profitabilityHTML + portailHTML + `
       <table class="data-table" style="font-size:0.85rem;">
         <tbody>
           <tr><td class="text-muted" style="width:160px;">Type</td><td><span class="tag ${_typeTagClass(client.type)}">${_escapeHtml(client.type || 'N/C')}</span></td></tr>
@@ -919,6 +1004,130 @@ Views.Clients = (() => {
     });
 
     overlay.querySelector('#client-name').focus();
+  }
+
+  /* -----------------------------------------------------------
+     MODAL INVITATION PORTAIL CLIENT
+     ----------------------------------------------------------- */
+
+  function _openInvitationModal(client) {
+    const portailUrl = window.location.origin + window.location.pathname.replace('index.html', '').replace(/\/$/, '') + '/vitrine/client/index.html?token=' + (client.portailToken || '');
+    const sujet = encodeURIComponent('Votre espace client DST — Accès personnel');
+    const nom = client.contactName || client.name || 'Client';
+    const corps = `Bonjour ${nom},\n\nVotre espace client DST est maintenant disponible.\n\nAccédez à votre planning, votre historique de sessions et vos abonnements en suivant ce lien :\n${portailUrl}\n\nCe lien est personnel et confidentiel.\n\nCordialement,\nL'équipe DST`;
+    const mailtoUrl = `mailto:${encodeURIComponent(client.contactEmail || '')}?subject=${sujet}&body=${encodeURIComponent(corps)}`;
+
+    const overlay = document.createElement('div');
+    overlay.className = 'modal-overlay';
+    overlay.innerHTML = `
+      <div class="modal" style="max-width:580px;">
+        <div class="modal-header">
+          <h2>✉ Invitation — ${_escapeHtml(client.name)}</h2>
+          <button class="btn btn-sm" id="close-inv-modal">✕</button>
+        </div>
+        <div class="modal-body">
+          <p class="text-muted" style="font-size:0.84rem;margin-bottom:12px;">Pré-remplissez l'email d'invitation ci-dessous, puis envoyez-le via votre client mail.</p>
+          <label class="form-label">Lien d'accès</label>
+          <div style="font-family:monospace;font-size:0.78rem;background:var(--bg-input);padding:8px 10px;border-radius:4px;word-break:break-all;margin-bottom:12px;">${_escapeHtml(portailUrl)}</div>
+          <label class="form-label">Corps du message</label>
+          <textarea class="form-control" id="inv-corps" rows="8" style="font-size:0.82rem;resize:vertical;">${_escapeHtml(corps)}</textarea>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-sm" id="btn-inv-copier">📋 Copier le message</button>
+          <a class="btn btn-sm btn-primary" id="btn-inv-mailto" href="${mailtoUrl}" target="_blank">✉ Ouvrir dans la messagerie</a>
+          <button class="btn btn-sm" id="close-inv-modal-2">Fermer</button>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(overlay);
+
+    overlay.querySelector('#close-inv-modal').addEventListener('click', () => overlay.remove());
+    overlay.querySelector('#close-inv-modal-2').addEventListener('click', () => overlay.remove());
+    overlay.addEventListener('click', e => { if (e.target === overlay) overlay.remove(); });
+
+    overlay.querySelector('#btn-inv-copier').addEventListener('click', () => {
+      const txt = overlay.querySelector('#inv-corps').value;
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(txt).then(() => Toast.show('Message copié.', 'success'));
+      } else {
+        Toast.show('Sélectionnez et copiez manuellement.', 'info');
+      }
+    });
+  }
+
+  /* -----------------------------------------------------------
+     EXPORT DONNÉES PORTAIL (JSON)
+     ----------------------------------------------------------- */
+
+  function _exportPortailData(clientId) {
+    const client = DB.clients.getById(clientId);
+    if (!client || !client.portailToken) {
+      Toast.show('Aucun token portail actif pour ce client.', 'warning');
+      return;
+    }
+
+    const allSessions = DB.sessions.filter(s =>
+      (s.clientIds || []).includes(clientId) || s.clientId === clientId
+    );
+    const abonnements = DB.clientSubscriptions.filter(s => s.clientId === clientId);
+    const now = new Date().toISOString();
+    const today = now.slice(0, 10);
+
+    const sessionsFutures = allSessions
+      .filter(s => s.date >= today && s.status !== 'annulee')
+      .map(s => ({
+        id: s.id,
+        date: s.date,
+        titre: s.name || s.titre || '',
+        statut: s.status,
+        lieu: s.locationId ? (DB.locations.getById(s.locationId) || {}).name || '' : '',
+        duree: s.durationDays || 1
+      }));
+
+    const sessionsPassees = allSessions
+      .filter(s => s.date < today || s.status === 'terminee')
+      .slice(0, 50)
+      .map(s => ({
+        id: s.id,
+        date: s.date,
+        titre: s.name || s.titre || '',
+        statut: s.status,
+        lieu: s.locationId ? (DB.locations.getById(s.locationId) || {}).name || '' : '',
+        duree: s.durationDays || 1
+      }));
+
+    const payload = {
+      clientNom: client.name,
+      clientContact: client.contactName || '',
+      generatedAt: now,
+      sessionsFutures,
+      sessionsPassees,
+      abonnements: abonnements.map(a => {
+        const offer = DB.offers.getById(a.offerId);
+        return {
+          id: a.id,
+          offreNom: offer ? offer.name : (a.offerId || ''),
+          sessionsTotal: a.sessionsTotal || 0,
+          sessionsConsommees: a.sessionsConsumed || 0,
+          dateDebut: a.startDate || '',
+          dateFin: a.endDate || ''
+        };
+      })
+    };
+
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'portail-' + client.portailToken + '.json';
+    a.click();
+    URL.revokeObjectURL(url);
+
+    Toast.show(
+      'Fichier exporté. Déposez-le dans vitrine/data/ pour activer l\'espace client.',
+      'info',
+      6000
+    );
   }
 
   /* -----------------------------------------------------------

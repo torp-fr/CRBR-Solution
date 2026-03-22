@@ -127,6 +127,43 @@ Views.Dashboard = {
       return '';
     }
 
+    /* ----------------------------------------------------------
+       1B. WIDGET PIPELINE PAR SEGMENT (déclaré avant kpiCardsHTML)
+       ---------------------------------------------------------- */
+    const _allClients  = DB.clients.getAll();
+    const _segDefs = [
+      { id: 'institutionnel', label: 'Institutionnel', tagCls: 'tag-blue'   },
+      { id: 'grand_compte',   label: 'Grand Compte',   tagCls: 'tag-purple' },
+      { id: 'b2b',            label: 'B2B',            tagCls: 'tag-green'  },
+      { id: 'b2c',            label: 'B2C',            tagCls: 'tag-yellow' }
+    ];
+    const _segRows = _segDefs.map(sd => {
+      const segClients = _allClients.filter(c => (c.segment || 'institutionnel') === sd.id);
+      const segCA = segClients.reduce((sum, c) => {
+        return sum + sessions
+          .filter(s => ((s.clientIds || []).includes(c.id) || s.clientId === c.id) && s.status === 'terminee')
+          .reduce((ss, s) => ss + (s.price || 0), 0);
+      }, 0);
+      return `<tr>
+        <td><span class="tag ${sd.tagCls}" style="font-size:0.72rem;">${sd.label}</span></td>
+        <td style="text-align:center;">${segClients.length}</td>
+        <td style="text-align:right;" class="text-mono" style="font-size:0.82rem;">${Engine.fmt(segCA)}</td>
+      </tr>`;
+    }).join('');
+    const pipelineHTML = `
+      <div class="kpi-card" style="grid-column:span 2;">
+        <div class="kpi-label">Pipeline par segment</div>
+        <table style="width:100%;border-collapse:collapse;margin-top:6px;font-size:0.82rem;">
+          <thead><tr>
+            <th style="text-align:left;font-weight:600;padding-bottom:4px;color:var(--text-muted);">Segment</th>
+            <th style="text-align:center;font-weight:600;padding-bottom:4px;color:var(--text-muted);">Clients</th>
+            <th style="text-align:right;font-weight:600;padding-bottom:4px;color:var(--text-muted);">CA r\u00e9alis\u00e9</th>
+          </tr></thead>
+          <tbody>${_segRows}</tbody>
+        </table>
+      </div>
+    `;
+
     const kpiCardsHTML = `
       <div class="kpi-grid">
         <div class="kpi-card">
@@ -209,44 +246,7 @@ Views.Dashboard = {
     `;
 
     /* ----------------------------------------------------------
-       1B. WIDGET PIPELINE PAR SEGMENT
-       ---------------------------------------------------------- */
-    const _allClients  = DB.clients.getAll();
-    const _segDefs = [
-      { id: 'institutionnel', label: 'Institutionnel', tagCls: 'tag-blue'   },
-      { id: 'grand_compte',   label: 'Grand Compte',   tagCls: 'tag-purple' },
-      { id: 'b2b',            label: 'B2B',            tagCls: 'tag-green'  },
-      { id: 'b2c',            label: 'B2C',            tagCls: 'tag-yellow' }
-    ];
-    const _segRows = _segDefs.map(sd => {
-      const segClients = _allClients.filter(c => (c.segment || 'institutionnel') === sd.id);
-      const segCA = segClients.reduce((sum, c) => {
-        return sum + sessions
-          .filter(s => ((s.clientIds || []).includes(c.id) || s.clientId === c.id) && s.status === 'terminee')
-          .reduce((ss, s) => ss + (s.price || 0), 0);
-      }, 0);
-      return `<tr>
-        <td><span class="tag ${sd.tagCls}" style="font-size:0.72rem;">${sd.label}</span></td>
-        <td style="text-align:center;">${segClients.length}</td>
-        <td style="text-align:right;" class="text-mono" style="font-size:0.82rem;">${Engine.fmt(segCA)}</td>
-      </tr>`;
-    }).join('');
-    const pipelineHTML = `
-      <div class="kpi-card" style="grid-column:span 2;">
-        <div class="kpi-label">Pipeline par segment</div>
-        <table style="width:100%;border-collapse:collapse;margin-top:6px;font-size:0.82rem;">
-          <thead><tr>
-            <th style="text-align:left;font-weight:600;padding-bottom:4px;color:var(--text-muted);">Segment</th>
-            <th style="text-align:center;font-weight:600;padding-bottom:4px;color:var(--text-muted);">Clients</th>
-            <th style="text-align:right;font-weight:600;padding-bottom:4px;color:var(--text-muted);">CA r\u00e9alis\u00e9</th>
-          </tr></thead>
-          <tbody>${_segRows}</tbody>
-        </table>
-      </div>
-    `;
-
-    /* ----------------------------------------------------------
-       1B. SECTION RENTABILITÉ GLOBALE
+       1C. SECTION RENTABILITÉ GLOBALE
        ---------------------------------------------------------- */
 
     function profitabilityStatus(profitPercent) {

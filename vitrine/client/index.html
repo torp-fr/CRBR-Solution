@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Espace Client — DST</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:         #1a1a1e;
+      --bg-card:    #222228;
+      --bg-input:   #2a2a32;
+      --border:     #33333a;
+      --text:       #e8e8ec;
+      --text-muted: #7a7a88;
+      --text-head:  #ffffff;
+      --accent:     #1e88e5;
+      --green:      #2e7d32;
+      --red:        #d32f2f;
+      --orange:     #e65100;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: 15px;
+      min-height: 100vh;
+    }
+
+    /* --- HEADER --- */
+    header {
+      background: var(--bg-card);
+      border-bottom: 1px solid var(--border);
+      padding: 0 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 56px;
+    }
+    .header-logo {
+      font-size: 1rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      color: var(--text-head);
+    }
+    .header-logo span { color: var(--accent); }
+    .header-client {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+    }
+
+    /* --- LAYOUT --- */
+    .container {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 28px 16px 60px;
+    }
+
+    /* --- TABS --- */
+    .tabs {
+      display: flex;
+      gap: 4px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 24px;
+      overflow-x: auto;
+    }
+    .tab-btn {
+      background: none;
+      border: none;
+      border-bottom: 2px solid transparent;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 0.88rem;
+      padding: 10px 16px;
+      white-space: nowrap;
+      transition: color 0.15s, border-color 0.15s;
+    }
+    .tab-btn:hover { color: var(--text); }
+    .tab-btn.active {
+      color: var(--text-head);
+      border-bottom-color: var(--accent);
+      font-weight: 600;
+    }
+
+    /* --- CARDS --- */
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 16px;
+    }
+    .card-title {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--text-head);
+      margin-bottom: 14px;
+    }
+
+    /* --- TABLE --- */
+    table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+    th {
+      text-align: left;
+      color: var(--text-muted);
+      font-weight: 600;
+      font-size: 0.78rem;
+      padding: 0 8px 8px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    td { padding: 9px 8px 9px 0; border-bottom: 1px solid var(--border); vertical-align: top; }
+    tr:last-child td { border-bottom: none; }
+
+    /* --- BADGE/TAG --- */
+    .tag {
+      display: inline-block;
+      font-size: 0.72rem;
+      font-weight: 600;
+      padding: 2px 7px;
+      border-radius: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .tag-blue   { background: rgba(30,136,229,0.15); color: #64b5f6; }
+    .tag-green  { background: rgba(46,125,50,0.2);   color: #81c784; }
+    .tag-orange { background: rgba(230,81,0,0.2);    color: #ffb74d; }
+    .tag-gray   { background: rgba(100,100,110,0.2); color: #9e9e9e; }
+
+    /* --- PROGRESS BAR --- */
+    .progress-wrap { background: var(--bg-input); border-radius: 4px; height: 8px; overflow: hidden; }
+    .progress-bar  { height: 100%; background: var(--accent); border-radius: 4px; transition: width 0.3s; }
+
+    /* --- CONTACT FORM --- */
+    .form-group { margin-bottom: 14px; }
+    label { display: block; font-size: 0.82rem; color: var(--text-muted); margin-bottom: 5px; }
+    input, textarea, select {
+      width: 100%;
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text);
+      font-size: 0.9rem;
+      padding: 8px 12px;
+      outline: none;
+    }
+    input:focus, textarea:focus, select:focus { border-color: var(--accent); }
+    textarea { resize: vertical; min-height: 90px; }
+
+    .btn {
+      background: var(--accent);
+      border: none;
+      border-radius: 6px;
+      color: #fff;
+      cursor: pointer;
+      font-size: 0.88rem;
+      font-weight: 600;
+      padding: 9px 18px;
+    }
+    .btn:hover { opacity: 0.88; }
+
+    /* --- STATES --- */
+    .loading, .error-state, .empty-state {
+      text-align: center;
+      padding: 48px 20px;
+      color: var(--text-muted);
+    }
+    .error-state { color: var(--red); }
+    .empty-state p { margin-top: 8px; font-size: 0.88rem; }
+
+    /* --- HIDDEN --- */
+    .hidden { display: none !important; }
+
+    /* --- FOOTER --- */
+    footer {
+      text-align: center;
+      padding: 24px 16px;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      border-top: 1px solid var(--border);
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="header-logo">DST<span>·</span>SYSTEM</div>
+    <div class="header-client" id="header-client-name">Espace client</div>
+  </header>
+
+  <div class="container" id="app">
+    <div class="loading" id="loading-state">Chargement de votre espace…</div>
+    <div class="error-state hidden" id="error-state">
+      <strong>Accès refusé</strong>
+      <p id="error-msg">Le lien d'accès est invalide ou a expiré.</p>
+    </div>
+    <div class="hidden" id="main-content">
+
+      <div class="tabs" id="tabs">
+        <button class="tab-btn active" data-tab="planning">📅 Planning</button>
+        <button class="tab-btn" data-tab="historique">📋 Historique</button>
+        <button class="tab-btn" data-tab="abonnement">📦 Abonnement</button>
+        <button class="tab-btn" data-tab="contact">✉ Contact</button>
+      </div>
+
+      <!-- PLANNING -->
+      <div id="tab-planning">
+        <div class="card">
+          <div class="card-title">Sessions à venir</div>
+          <div id="planning-content"><p class="empty-state">Aucune session planifiée.</p></div>
+        </div>
+      </div>
+
+      <!-- HISTORIQUE -->
+      <div id="tab-historique" class="hidden">
+        <div class="card">
+          <div class="card-title">Sessions passées</div>
+          <div id="historique-content"><p class="empty-state">Aucun historique disponible.</p></div>
+        </div>
+      </div>
+
+      <!-- ABONNEMENT -->
+      <div id="tab-abonnement" class="hidden">
+        <div class="card">
+          <div class="card-title">Vos abonnements</div>
+          <div id="abonnement-content"><p class="empty-state">Aucun abonnement actif.</p></div>
+        </div>
+      </div>
+
+      <!-- CONTACT -->
+      <div id="tab-contact" class="hidden">
+        <div class="card">
+          <div class="card-title">Contacter DST</div>
+          <p style="font-size:0.85rem;color:var(--text-muted);margin-bottom:18px;">
+            Pour toute demande (planning, devis, information), envoyez-nous un message ou appelez-nous directement.
+          </p>
+          <form id="contact-form">
+            <div class="form-group">
+              <label>Objet</label>
+              <input type="text" id="contact-objet" placeholder="Demande de session, question…" required>
+            </div>
+            <div class="form-group">
+              <label>Message</label>
+              <textarea id="contact-message" placeholder="Décrivez votre demande…" required></textarea>
+            </div>
+            <button type="submit" class="btn">Préparer l'email</button>
+          </form>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <footer>
+    &copy; DST — Drill &amp; Skills Training &nbsp;·&nbsp; Espace client sécurisé
+  </footer>
+
+  <script>
+  (function () {
+    'use strict';
+
+    /* ---- Utilitaires ---- */
+    function esc(str) {
+      return String(str || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    function fmtDate(iso) {
+      if (!iso) return '—';
+      const d = new Date(iso);
+      return d.toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' });
+    }
+
+    function statusTag(statut) {
+      const map = {
+        planifiee:    { cls: 'tag-blue',   label: 'Planifiée' },
+        en_cours:     { cls: 'tag-orange', label: 'En cours'  },
+        terminee:     { cls: 'tag-green',  label: 'Terminée'  },
+        annulee:      { cls: 'tag-gray',   label: 'Annulée'   },
+        confirmee:    { cls: 'tag-blue',   label: 'Confirmée' }
+      };
+      const s = map[statut] || { cls: 'tag-gray', label: esc(statut || '—') };
+      return '<span class="tag ' + s.cls + '">' + s.label + '</span>';
+    }
+
+    /* ---- Token depuis URL ---- */
+    const params = new URLSearchParams(window.location.search);
+    const token = params.get('token') || '';
+
+    if (!token || !token.startsWith('tok_')) {
+      document.getElementById('loading-state').classList.add('hidden');
+      document.getElementById('error-state').classList.remove('hidden');
+      return;
+    }
+
+    /* ---- Chargement des données ---- */
+    const dataUrl = '../data/portail-' + token + '.json';
+
+    fetch(dataUrl)
+      .then(function (r) {
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        return r.json();
+      })
+      .then(function (data) {
+        document.getElementById('loading-state').classList.add('hidden');
+        document.getElementById('main-content').classList.remove('hidden');
+        document.getElementById('header-client-name').textContent = data.clientNom || 'Espace client';
+        _renderPlanning(data.sessionsFutures || []);
+        _renderHistorique(data.sessionsPassees || []);
+        _renderAbonnement(data.abonnements || []);
+        _initContact(data.clientNom, data.clientContact);
+        _initTabs();
+      })
+      .catch(function (err) {
+        console.error(err);
+        document.getElementById('loading-state').classList.add('hidden');
+        document.getElementById('error-state').classList.remove('hidden');
+        document.getElementById('error-msg').textContent =
+          'Impossible de charger vos données. Vérifiez le lien ou contactez DST.';
+      });
+
+    /* ---- Rendu Planning ---- */
+    function _renderPlanning(sessions) {
+      var el = document.getElementById('planning-content');
+      if (!sessions.length) {
+        el.innerHTML = '<p style="color:var(--text-muted);font-size:0.88rem;">Aucune session planifiée pour le moment.</p>';
+        return;
+      }
+      var rows = sessions.map(function (s) {
+        return '<tr>'
+          + '<td>' + esc(fmtDate(s.date)) + '</td>'
+          + '<td>' + esc(s.titre || '—') + '</td>'
+          + '<td>' + statusTag(s.statut) + '</td>'
+          + '<td>' + esc(s.lieu || '—') + '</td>'
+          + '<td style="text-align:center;">' + esc(s.duree || 1) + ' j</td>'
+          + '</tr>';
+      }).join('');
+      el.innerHTML = '<table>'
+        + '<thead><tr><th>Date</th><th>Session</th><th>Statut</th><th>Lieu</th><th style="text-align:center;">Durée</th></tr></thead>'
+        + '<tbody>' + rows + '</tbody>'
+        + '</table>';
+    }
+
+    /* ---- Rendu Historique ---- */
+    function _renderHistorique(sessions) {
+      var el = document.getElementById('historique-content');
+      if (!sessions.length) {
+        el.innerHTML = '<p style="color:var(--text-muted);font-size:0.88rem;">Aucun historique disponible.</p>';
+        return;
+      }
+      var rows = sessions.map(function (s) {
+        return '<tr>'
+          + '<td>' + esc(fmtDate(s.date)) + '</td>'
+          + '<td>' + esc(s.titre || '—') + '</td>'
+          + '<td>' + statusTag(s.statut) + '</td>'
+          + '<td>' + esc(s.lieu || '—') + '</td>'
+          + '<td style="text-align:center;">' + esc(s.duree || 1) + ' j</td>'
+          + '</tr>';
+      }).join('');
+      el.innerHTML = '<table>'
+        + '<thead><tr><th>Date</th><th>Session</th><th>Statut</th><th>Lieu</th><th style="text-align:center;">Durée</th></tr></thead>'
+        + '<tbody>' + rows + '</tbody>'
+        + '</table>';
+    }
+
+    /* ---- Rendu Abonnement ---- */
+    function _renderAbonnement(abonnements) {
+      var el = document.getElementById('abonnement-content');
+      if (!abonnements.length) {
+        el.innerHTML = '<p style="color:var(--text-muted);font-size:0.88rem;">Aucun abonnement actif.</p>';
+        return;
+      }
+      var html = abonnements.map(function (a) {
+        var total = a.sessionsTotal || 0;
+        var conso = a.sessionsConsommees || 0;
+        var restant = Math.max(0, total - conso);
+        var pct = total > 0 ? Math.min(100, Math.round((conso / total) * 100)) : 0;
+        return '<div class="card" style="margin-bottom:12px;">'
+          + '<div style="font-weight:600;font-size:0.92rem;margin-bottom:8px;">' + esc(a.offreNom || 'Abonnement') + '</div>'
+          + '<div style="font-size:0.82rem;color:var(--text-muted);margin-bottom:10px;">'
+          + (a.dateDebut ? 'Du ' + fmtDate(a.dateDebut) : '')
+          + (a.dateFin   ? ' au ' + fmtDate(a.dateFin)   : '')
+          + '</div>'
+          + '<div style="display:flex;justify-content:space-between;font-size:0.82rem;margin-bottom:6px;">'
+          + '<span>' + conso + ' / ' + total + ' sessions consommées</span>'
+          + '<span>' + restant + ' restante' + (restant > 1 ? 's' : '') + '</span>'
+          + '</div>'
+          + '<div class="progress-wrap"><div class="progress-bar" style="width:' + pct + '%;"></div></div>'
+          + '</div>';
+      }).join('');
+      el.innerHTML = html;
+    }
+
+    /* ---- Contact ---- */
+    function _initContact(clientNom, clientContact) {
+      var form = document.getElementById('contact-form');
+      form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        var objet  = document.getElementById('contact-objet').value;
+        var msg    = document.getElementById('contact-message').value;
+        var sujet  = encodeURIComponent('[Espace client] ' + objet);
+        var corps  = encodeURIComponent(
+          'Client : ' + (clientNom || '') + '\nContact : ' + (clientContact || '') + '\n\n' + msg
+        );
+        window.location.href = 'mailto:contact@dst-system.fr?subject=' + sujet + '&body=' + corps;
+      });
+    }
+
+    /* ---- Tabs ---- */
+    function _initTabs() {
+      var tabs = ['planning', 'historique', 'abonnement', 'contact'];
+      document.querySelectorAll('.tab-btn').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var active = btn.dataset.tab;
+          document.querySelectorAll('.tab-btn').forEach(function (b) {
+            b.classList.toggle('active', b.dataset.tab === active);
+          });
+          tabs.forEach(function (t) {
+            var el = document.getElementById('tab-' + t);
+            if (el) el.classList.toggle('hidden', t !== active);
+          });
+        });
+      });
+    }
+
+  }());
+  </script>
+
+</body>
+</html>
