@@ -12,19 +12,19 @@ const App = (() => {
 
   /* --- Routes disponibles --- */
   const routes = {
-    dashboard:  { label: 'Dashboard dirigeant', icon: '◉', view: () => Views.Dashboard },
-    prospects:  { label: 'Prospects',           icon: '🎯', view: () => Views.Prospects },
-    devis:      { label: 'Devis',               icon: '📄', view: () => Views.Devis },
-    factures:   { label: 'Factures',            icon: '🧾', view: () => Views.Factures },
-    clients:    { label: 'Clients',              icon: '⊡', view: () => Views.Clients },
-    offers:     { label: 'Offres / Abonnements', icon: '⊞', view: () => Views.Offers },
-    sessions:   { label: 'Planning',              icon: '▶', view: () => Views.Sessions },
-    operators:  { label: 'Opérateurs',           icon: '⊕', view: () => Views.Operators },
-    modules:    { label: 'Modules',              icon: '⬡', view: () => Views.Modules },
-    locations:  { label: 'Lieux',                icon: '⊿', view: () => Views.Locations },
-    regions:    { label: 'Régions',              icon: '🗺', view: () => Views.Regions },
-    simulateurs:{ label: 'Simulateurs',          icon: '📡', view: () => Views.Simulateurs },
-    settings:   { label: 'Paramètres',           icon: '⚙', view: () => Views.Settings }
+    dashboard:  { label: 'Dashboard dirigeant', icon: '⬡',    view: () => Views.Dashboard },
+    prospects:  { label: 'Prospects',           icon: '🎯',   view: () => Views.Prospects },
+    devis:      { label: 'Devis',               icon: '📄',   view: () => Views.Devis },
+    factures:   { label: 'Factures',            icon: '🧾',   view: () => Views.Factures },
+    clients:    { label: 'Clients',             icon: '👥',   view: () => Views.Clients },
+    offers:     { label: 'Offres / Abonnements',icon: '📋',   view: () => Views.Offers },
+    sessions:   { label: 'Planning',            icon: '📅',   view: () => Views.Sessions },
+    operators:  { label: 'Opérateurs',          icon: '🧑‍💼', view: () => Views.Operators },
+    modules:    { label: 'Modules',             icon: '🎓',   view: () => Views.Modules },
+    locations:  { label: 'Lieux',               icon: '📍',   view: () => Views.Locations },
+    regions:    { label: 'Régions',             icon: '🗺',   view: () => Views.Regions },
+    simulateurs:{ label: 'Simulateurs',         icon: '📡',   view: () => Views.Simulateurs },
+    settings:   { label: 'Paramètres',          icon: '⚙️',   view: () => Views.Settings }
   };
 
   /* --- Initialisation des données par défaut --- */
