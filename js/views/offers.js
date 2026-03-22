@@ -169,6 +169,7 @@ Views.Offers = {
                     <th>Type</th>
                     <th>Encaissement</th>
                     <th>Prix</th>
+                    <th>Remise</th>
                     <th>Sessions</th>
                     <th>Statut</th>
                     <th class="actions-cell">Actions</th>
@@ -201,6 +202,10 @@ Views.Offers = {
             ? '<span class="tag tag-green">Active</span>'
             : '<span class="tag tag-neutral">Inactive</span>';
 
+          const discountHtml = (offer.discount > 0)
+            ? `<span class="tag tag-yellow">\u2212${offer.discount}\u00a0%</span>`
+            : '<span class="text-muted">\u2014</span>';
+
           html += `
                   <tr>
                     <td><strong>${esc(offer.label || '(sans nom)')}</strong></td>
@@ -210,6 +215,7 @@ Views.Offers = {
                       var clients = (offer.clientIds || []).map(function(cid) { return DB.clients.getById(cid); }).filter(Boolean);
                       return clients.some(function(c) { return c.clientCategory === 'B2C'; }) ? 'TTC' : 'HT';
                     })()}</small></td>
+                    <td>${discountHtml}</td>
                     <td>${sessionsHtml}</td>
                     <td>${statusHtml}</td>
                     <td class="actions-cell">
@@ -302,6 +308,8 @@ Views.Offers = {
         clientIds: [...(original.clientIds || [])],
         moduleIds: [...(original.moduleIds || [])],
         price: original.price || 0,
+        discount: original.discount || 0,
+        priceAfterDiscount: original.priceAfterDiscount || original.price || 0,
         paymentTerms: original.paymentTerms || 'comptant',
         nbSessions: original.nbSessions || 0,
         recurrence: original.recurrence || null,
@@ -342,12 +350,16 @@ Views.Offers = {
       const offer = isEdit ? DB.offers.getById(offerId) : null;
 
       /* Valeurs par défaut pour la création */
+      const settings = DB.settings.get();
+      const pc = settings.pricingCatalog || {};
+
       const data = {
         label: offer ? offer.label : '',
         type: offer ? offer.type : 'one_shot',
         clientIds: offer ? [...(offer.clientIds || [])] : [],
         moduleIds: offer ? [...(offer.moduleIds || [])] : [],
         price: offer ? (offer.price || 0) : 0,
+        discount: offer ? (offer.discount || 0) : 0,
         paymentTerms: offer ? (offer.paymentTerms || 'comptant') : 'comptant',
         nbSessions: offer ? (offer.nbSessions || 0) : 0,
         recurrence: offer ? (offer.recurrence || '') : '',
@@ -450,6 +462,7 @@ Views.Offers = {
                   <input type="number" id="offer-price" class="form-control" min="0" step="any"
                          value="${data.price}">
                   <span class="form-help" id="floor-hint"></span>
+                  <span id="catalog-hint" style="display:block;font-size:0.8rem;color:var(--text-muted);font-style:italic;margin-top:2px;"></span>
                 </div>
                 <div class="form-group">
                   <label for="offer-payment">Modalités d'encaissement</label>
@@ -467,6 +480,16 @@ Views.Offers = {
                     <option value="true" ${data.active ? 'selected' : ''}>Active</option>
                     <option value="false" ${!data.active ? 'selected' : ''}>Inactive</option>
                   </select>
+                </div>
+              </div>
+
+              <!-- Remise client -->
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="offer-discount">Remise client (%)</label>
+                  <input type="number" id="offer-discount" class="form-control" min="0" max="100" step="0.5"
+                         value="${data.discount}">
+                  <div id="discount-info" style="font-size:0.82rem;margin-top:4px;min-height:1.4em;"></div>
                 </div>
               </div>
 
@@ -586,6 +609,43 @@ Views.Offers = {
       /* Appel initial */
       checkFloorPrice();
 
+      /* --- Hint catalogue tarifaire --- */
+      function updateCatalogHint() {
+        const hintEl = overlay.querySelector('#catalog-hint');
+        if (!hintEl) return;
+        const type = overlay.querySelector('#offer-type').value;
+        if (type === 'one_shot') {
+          hintEl.textContent = 'Tarif de r\u00e9f\u00e9rence\u00a0: ' + Engine.fmt(pc.tarifJourneeUnite || 0) + ' \u00e0 ' + Engine.fmt(pc.tarifJourneeTerritorial || 0) + '\u00a0HT/jour';
+        } else if (type === 'abonnement') {
+          hintEl.textContent = 'Fourchettes annuelles\u00a0: Communal ' + Engine.fmt(pc.abonnementCommunal_min || 0) + '\u2013' + Engine.fmt(pc.abonnementCommunal_max || 0) + ' \u00b7 Intercommunal ' + Engine.fmt(pc.abonnementIntercommunal_min || 0) + '\u2013' + Engine.fmt(pc.abonnementIntercommunal_max || 0) + ' \u00b7 Territorial ' + Engine.fmt(pc.abonnementTerritorial_min || 0) + '\u2013' + Engine.fmt(pc.abonnementTerritorial_max || 0);
+        } else {
+          hintEl.textContent = 'Sur devis \u2014 r\u00e9f\u00e9rez-vous au catalogue tarifaire';
+        }
+      }
+
+      /* --- Info remise dynamique --- */
+      function updateDiscountInfo() {
+        const discountEl  = overlay.querySelector('#offer-discount');
+        const priceEl     = overlay.querySelector('#offer-price');
+        const infoEl      = overlay.querySelector('#discount-info');
+        if (!discountEl || !priceEl || !infoEl) return;
+        const price    = parseFloat(priceEl.value) || 0;
+        const discount = parseFloat(discountEl.value) || 0;
+        const maxDiscount = pc.remiseMaxAutorisee != null ? pc.remiseMaxAutorisee : 20;
+        let html = '';
+        if (discount > 0) {
+          const after = Math.round(price * (1 - discount / 100) * 100) / 100;
+          html += 'Prix apr\u00e8s remise\u00a0: <strong>' + Engine.fmt(after) + '</strong>\u00a0HT';
+        }
+        if (discount > maxDiscount) {
+          html += (html ? '<br>' : '') + '<span class="tag tag-yellow">\u26a0\ufe0f Remise sup\u00e9rieure au plafond autoris\u00e9 (' + maxDiscount + '\u00a0%)</span>';
+        }
+        infoEl.innerHTML = html;
+      }
+
+      updateCatalogHint();
+      updateDiscountInfo();
+
       /* --- Écouteurs de la modale --- */
 
       /* Afficher/masquer les champs abonnement selon le type */
@@ -598,10 +658,14 @@ Views.Offers = {
           aboFields.classList.add('hidden');
         }
         checkFloorPrice();
+        updateCatalogHint();
       });
 
       /* Re-calcul plancher quand le prix, les sessions ou les modules changent */
-      overlay.querySelector('#offer-price').addEventListener('input', checkFloorPrice);
+      overlay.querySelector('#offer-price').addEventListener('input', () => { checkFloorPrice(); updateDiscountInfo(); });
+
+      const discountInput = overlay.querySelector('#offer-discount');
+      if (discountInput) discountInput.addEventListener('input', updateDiscountInfo);
 
       const nbSessionsInput = overlay.querySelector('#offer-nb-sessions');
       if (nbSessionsInput) {
@@ -647,6 +711,8 @@ Views.Offers = {
 
         const type = overlay.querySelector('#offer-type').value;
         const price = parseFloat(overlay.querySelector('#offer-price').value) || 0;
+        const discount = parseFloat(overlay.querySelector('#offer-discount').value) || 0;
+        const priceAfterDiscount = Math.round(price * (1 - discount / 100) * 100) / 100;
         const paymentTerms = overlay.querySelector('#offer-payment').value;
         const active = overlay.querySelector('#offer-active').value === 'true';
         const startDate = overlay.querySelector('#offer-start-date').value;
@@ -689,6 +755,8 @@ Views.Offers = {
           clientIds: selectedClientIds,
           moduleIds: selectedModuleIds,
           price,
+          discount,
+          priceAfterDiscount,
           paymentTerms,
           nbSessions: type === 'abonnement' ? nbSessions : 0,
           recurrence: type === 'abonnement' ? recurrence : null,

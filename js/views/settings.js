@@ -38,7 +38,8 @@ Views.Settings = {
       floorPriceMargin:         settings.floorPriceMargin ?? 5,
       operatorDependencyRiskThreshold: settings.operatorDependencyRiskThreshold ?? 40,
       urssafRequalificationDays: settings.urssafRequalificationDays ?? 45,
-      chargesConfig:            JSON.parse(JSON.stringify(settings.chargesConfig || DB.settings.getDefaults().chargesConfig))
+      chargesConfig:            JSON.parse(JSON.stringify(settings.chargesConfig || DB.settings.getDefaults().chargesConfig)),
+      pricingCatalog:           JSON.parse(JSON.stringify(settings.pricingCatalog || DB.settings.getDefaults().pricingCatalog))
     };
 
     /* ----------------------------------------------------------
@@ -485,7 +486,95 @@ Views.Settings = {
         </div>`;
     }
 
-    /** Section 7 — Données (export / import / reset) */
+    /** Section 7 — Catalogue tarifaire */
+    function renderPricingCatalog() {
+      const pc = state.pricingCatalog;
+
+      function numField(id, val, step) {
+        return `<input type="number" id="${id}" class="form-control" value="${val}" min="0" step="${step || 'any'}" style="max-width:130px;padding:4px 8px;text-align:right;">`;
+      }
+
+      return `
+        <div class="card" id="section-pricing-catalog">
+          <div class="card-header">
+            <h2>Catalogue tarifaire</h2>
+          </div>
+
+          <!-- A. Tarifs journées -->
+          <h3 style="margin:0 0 8px;font-size:0.88rem;color:var(--text-heading);">A. Tarifs journ\u00e9es (€\u00a0HT)</h3>
+          <div class="data-table-wrap" style="margin-bottom:20px;">
+            <table class="data-table" style="font-size:0.85rem;">
+              <thead><tr><th>Prestation</th><th style="width:160px;text-align:right;">Tarif €\u00a0HT</th></tr></thead>
+              <tbody>
+                <tr><td>Journ\u00e9e Unit\u00e9 (\u2264\u00a015 agents)</td><td style="text-align:right;">${numField('pc-tarif-journee-unite', pc.tarifJourneeUnite)}</td></tr>
+                <tr><td>Journ\u00e9e Renforc\u00e9 (15\u201330 agents)</td><td style="text-align:right;">${numField('pc-tarif-journee-renforce', pc.tarifJourneeRenforce)}</td></tr>
+                <tr><td>Journ\u00e9e Territorial (30+ agents)</td><td style="text-align:right;">${numField('pc-tarif-journee-territorial', pc.tarifJourneeTerritorial)}</td></tr>
+                <tr><td>Demi-journ\u00e9e (tous niveaux)</td><td style="text-align:right;">${numField('pc-tarif-demi-journee', pc.tarifDemiJournee)}</td></tr>
+                <tr><td>Surco\u00fbt module sp\u00e9cialis\u00e9</td><td style="text-align:right;">${numField('pc-tarif-module-specialise', pc.tarifModuleSpecialise)}</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- B. Fourchettes abonnements -->
+          <h3 style="margin:0 0 8px;font-size:0.88rem;color:var(--text-heading);">B. Fourchettes abonnements (€\u00a0HT/an)</h3>
+          <div class="data-table-wrap" style="margin-bottom:20px;">
+            <table class="data-table" style="font-size:0.85rem;">
+              <thead><tr><th>Niveau</th><th style="text-align:right;">Min €\u00a0HT</th><th style="text-align:right;">Max €\u00a0HT</th></tr></thead>
+              <tbody>
+                <tr><td>Communal</td><td style="text-align:right;">${numField('pc-abo-communal-min', pc.abonnementCommunal_min)}</td><td style="text-align:right;">${numField('pc-abo-communal-max', pc.abonnementCommunal_max)}</td></tr>
+                <tr><td>Intercommunal</td><td style="text-align:right;">${numField('pc-abo-intercommunal-min', pc.abonnementIntercommunal_min)}</td><td style="text-align:right;">${numField('pc-abo-intercommunal-max', pc.abonnementIntercommunal_max)}</td></tr>
+                <tr><td>Territorial</td><td style="text-align:right;">${numField('pc-abo-territorial-min', pc.abonnementTerritorial_min)}</td><td style="text-align:right;">${numField('pc-abo-territorial-max', pc.abonnementTerritorial_max)}</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- C. Conditions commerciales -->
+          <h3 style="margin:0 0 8px;font-size:0.88rem;color:var(--text-heading);">C. Conditions commerciales</h3>
+          <div class="data-table-wrap" style="margin-bottom:4px;">
+            <table class="data-table" style="font-size:0.85rem;">
+              <thead><tr><th>Param\u00e8tre</th><th style="width:160px;text-align:right;">Valeur</th></tr></thead>
+              <tbody>
+                <tr><td>Volume \u2014 seuil (jours/an)</td><td style="text-align:right;">${numField('pc-remise-volume-seuil', pc.remiseVolumeSeuilJours, 1)}</td></tr>
+                <tr><td>Remise volume (%)</td><td style="text-align:right;">${numField('pc-remise-volume', pc.remiseVolumePourcent)}</td></tr>
+                <tr><td>Remise fid\u00e9lit\u00e9 (%)</td><td style="text-align:right;">${numField('pc-remise-fidelite', pc.remiseFidelitePourcent)}</td></tr>
+                <tr><td>Remise 1\u00e8re commande (%)</td><td style="text-align:right;">${numField('pc-remise-premiere', pc.remisePremiereCommande)}</td></tr>
+                <tr><td>Remise max autoris\u00e9e (%)</td><td style="text-align:right;">${numField('pc-remise-max', pc.remiseMaxAutorisee)}</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="form-help" style="margin-bottom:20px;">Au-del\u00e0 de la remise max, une confirmation manuelle est requise.</p>
+
+          <!-- D. Frais & majorations -->
+          <h3 style="margin:0 0 8px;font-size:0.88rem;color:var(--text-heading);">D. Frais &amp; majorations</h3>
+          <div class="data-table-wrap" style="margin-bottom:20px;">
+            <table class="data-table" style="font-size:0.85rem;">
+              <thead><tr><th>Param\u00e8tre</th><th style="width:160px;text-align:right;">Valeur</th></tr></thead>
+              <tbody>
+                <tr><td>Frais kilom\u00e9triques (€/km)</td><td style="text-align:right;">${numField('pc-frais-km', pc.fraisDeplacementKm, 0.01)}</td></tr>
+                <tr><td>Zone incluse (km)</td><td style="text-align:right;">${numField('pc-zone-incluse', pc.fraisDeplacementZoneIncluse, 1)}</td></tr>
+                <tr><td>H\u00e9bergement (€/nuit)</td><td style="text-align:right;">${numField('pc-hebergement', pc.fraisHebergement)}</td></tr>
+                <tr><td>Majoration week-end (%)</td><td style="text-align:right;">${numField('pc-majoration-weekend', pc.majorationWeekend)}</td></tr>
+                <tr><td>Majoration urgence (%)</td><td style="text-align:right;">${numField('pc-majoration-urgence', pc.majorationUrgence)}</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- E. Conditions de vente -->
+          <h3 style="margin:0 0 8px;font-size:0.88rem;color:var(--text-heading);">E. Conditions de vente</h3>
+          <div class="data-table-wrap">
+            <table class="data-table" style="font-size:0.85rem;">
+              <thead><tr><th>Param\u00e8tre</th><th style="width:160px;text-align:right;">Valeur</th></tr></thead>
+              <tbody>
+                <tr><td>Validit\u00e9 devis (jours)</td><td style="text-align:right;">${numField('pc-validite-devis', pc.validiteDevisJours, 1)}</td></tr>
+                <tr><td>Acompte \u00e0 la commande (%)</td><td style="text-align:right;">${numField('pc-acompte', pc.acomptePercent)}</td></tr>
+                <tr><td>D\u00e9lai de paiement (jours)</td><td style="text-align:right;">${numField('pc-paiement-delai', pc.paiementDelaiJours, 1)}</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>`;
+    }
+
+    /** Section 8 — Données (export / import / reset) */
     function renderData() {
       return `
         <div class="card" id="section-data">
@@ -538,6 +627,8 @@ Views.Settings = {
           ${renderTypes()}
         </div>
       </div>
+
+      ${renderPricingCatalog()}
 
       ${renderChargesSociales()}
 
@@ -707,12 +798,46 @@ Views.Settings = {
       if (elFondTNS && cc.fondateur) cc.fondateur.tauxTNS = parseFloat(elFondTNS.value) || 45;
     }
 
+    function syncPricingCatalogFromDOM() {
+      const pc = state.pricingCatalog;
+      [
+        ['pc-tarif-journee-unite',       'tarifJourneeUnite'],
+        ['pc-tarif-journee-renforce',    'tarifJourneeRenforce'],
+        ['pc-tarif-journee-territorial', 'tarifJourneeTerritorial'],
+        ['pc-tarif-demi-journee',        'tarifDemiJournee'],
+        ['pc-tarif-module-specialise',   'tarifModuleSpecialise'],
+        ['pc-abo-communal-min',          'abonnementCommunal_min'],
+        ['pc-abo-communal-max',          'abonnementCommunal_max'],
+        ['pc-abo-intercommunal-min',     'abonnementIntercommunal_min'],
+        ['pc-abo-intercommunal-max',     'abonnementIntercommunal_max'],
+        ['pc-abo-territorial-min',       'abonnementTerritorial_min'],
+        ['pc-abo-territorial-max',       'abonnementTerritorial_max'],
+        ['pc-remise-volume-seuil',       'remiseVolumeSeuilJours'],
+        ['pc-remise-volume',             'remiseVolumePourcent'],
+        ['pc-remise-fidelite',           'remiseFidelitePourcent'],
+        ['pc-remise-premiere',           'remisePremiereCommande'],
+        ['pc-remise-max',                'remiseMaxAutorisee'],
+        ['pc-frais-km',                  'fraisDeplacementKm'],
+        ['pc-zone-incluse',              'fraisDeplacementZoneIncluse'],
+        ['pc-hebergement',               'fraisHebergement'],
+        ['pc-majoration-weekend',        'majorationWeekend'],
+        ['pc-majoration-urgence',        'majorationUrgence'],
+        ['pc-validite-devis',            'validiteDevisJours'],
+        ['pc-acompte',                   'acomptePercent'],
+        ['pc-paiement-delai',            'paiementDelaiJours']
+      ].forEach(([id, key]) => {
+        const el = $('#' + id);
+        if (el) pc[key] = parseFloat(el.value) || 0;
+      });
+    }
+
     /** Synchronise l'intégralité du state depuis les valeurs DOM */
     function syncAllFromDOM() {
       syncFixedCostsFromDOM();
       syncAmortFromDOM();
       syncVariableCostsFromDOM();
       syncScalarsFromDOM();
+      syncPricingCatalogFromDOM();
     }
 
     /* ----------------------------------------------------------
@@ -919,7 +1044,8 @@ Views.Settings = {
           floorPriceMargin:            state.floorPriceMargin,
           operatorDependencyRiskThreshold: state.operatorDependencyRiskThreshold,
           urssafRequalificationDays:   state.urssafRequalificationDays,
-          chargesConfig:               state.chargesConfig
+          chargesConfig:               state.chargesConfig,
+          pricingCatalog:              state.pricingCatalog
         };
 
         DB.settings.update(update);

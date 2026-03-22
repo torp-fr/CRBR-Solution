@@ -443,7 +443,7 @@ Views.Devis = (() => {
           '<div class="section-label" style="font-size:0.72rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">En-t\u00eate du devis</div>' +
           '<div class="form-row">' +
             '<div class="form-group" style="flex:2;"><label>Titre *</label><input type="text" id="dv-titre" class="form-control" value="' + _escAttr(v('titre')) + '" placeholder="Ex\u00a0: Programme annuel Police Municipale B\u00e9ziers" /></div>' +
-            '<div class="form-group"><label>Validit\u00e9 (jours)</label><input type="number" id="dv-validite" class="form-control" min="1" value="' + _escAttr(v('validiteJours', 30)) + '" /></div>' +
+            '<div class="form-group"><label>Validit\u00e9 (jours)</label><input type="number" id="dv-validite" class="form-control" min="1" value="' + _escAttr(v('validiteJours', (settings.pricingCatalog && settings.pricingCatalog.validiteDevisJours != null ? settings.pricingCatalog.validiteDevisJours : 30))) + '" /></div>' +
           '</div>' +
           '<div class="form-group"><label>Objet</label><textarea id="dv-objet" class="form-control" rows="2" placeholder="Description g\u00e9n\u00e9rale du devis\u2026">' + _esc(v('objet')) + '</textarea></div>' +
 

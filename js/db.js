@@ -260,7 +260,34 @@ const DB = (() => {
     // Seuil risque dépendance opérateur (%)
     operatorDependencyRiskThreshold: 40,
     // Seuil requalification URSSAF (jours)
-    urssafRequalificationDays: 45
+    urssafRequalificationDays: 45,
+    // Catalogue tarifaire de référence
+    pricingCatalog: {
+      tarifJourneeUnite:           1800,
+      tarifJourneeRenforce:        2400,
+      tarifJourneeTerritorial:     3200,
+      tarifDemiJournee:            1100,
+      tarifModuleSpecialise:        400,
+      abonnementCommunal_min:     15000,
+      abonnementCommunal_max:     30000,
+      abonnementIntercommunal_min:30000,
+      abonnementIntercommunal_max:60000,
+      abonnementTerritorial_min:  60000,
+      abonnementTerritorial_max: 100000,
+      remiseVolumeSeuilJours:        10,
+      remiseVolumePourcent:           5,
+      remiseFidelitePourcent:         8,
+      remisePremiereCommande:         0,
+      remiseMaxAutorisee:            20,
+      fraisDeplacementKm:          0.45,
+      fraisDeplacementZoneIncluse:   50,
+      fraisHebergement:               0,
+      majorationWeekend:             25,
+      majorationUrgence:             30,
+      validiteDevisJours:            30,
+      acomptePercent:                30,
+      paiementDelaiJours:            30
+    }
   };
 
   const settings = {
