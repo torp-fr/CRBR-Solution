@@ -21,7 +21,7 @@ Views.Dashboard = {
     const sessions  = DB.sessions.getAll();
 
     /* Alerte sessions créées depuis un devis mais sans date planifiée */
-    const _sessionsSansDate = sessions.filter(s => s.status === 'planifiee' && s.devisRef && (!s.date || s.date === ''));
+    const _sessionsSansDate = sessions.filter(s => s.statut === 'planifiee' && s.devisRef && (!s.date || s.date === ''));
     if (_sessionsSansDate.length > 0) {
       alerts.push({
         level:   'warning',
@@ -133,8 +133,8 @@ Views.Dashboard = {
       const d = new Date(s.date);
       return d.getFullYear() === now.getFullYear()
         && d.getMonth() === now.getMonth()
-        && s.status !== 'annulee';
-    }).length;
+        && s.statut !== 'annulee';
+    }).reduce((sum, s) => sum + (Number(s.nbJours) || 1), 0);
     if (_nbJoursMois > _joursMoisMax) {
       alerts.push({
         level:   'warning',
@@ -176,7 +176,7 @@ Views.Dashboard = {
       const segClients = _allClients.filter(c => (c.segment || 'institutionnel') === sd.id);
       const segCA = segClients.reduce((sum, c) => {
         return sum + sessions
-          .filter(s => ((s.clientIds || []).includes(c.id) || s.clientId === c.id) && s.status === 'terminee')
+          .filter(s => ((s.clientIds || []).includes(c.id) || s.clientId === c.id) && s.statut === 'terminee')
           .reduce((ss, s) => ss + (s.price || 0), 0);
       }, 0);
       return `<tr>
@@ -415,7 +415,7 @@ Views.Dashboard = {
     function buildUpcomingSessionsHTML() {
       /* Filtrer les sessions futures, trier par date, limiter à 10 */
       const upcoming = sessions
-        .filter(s => new Date(s.date) >= now && s.status !== 'annulee')
+        .filter(s => new Date(s.date) >= now && s.statut !== 'annulee')
         .sort((a, b) => new Date(a.date) - new Date(b.date))
         .slice(0, 10);
 
@@ -479,7 +479,7 @@ Views.Dashboard = {
             <td>${escapeHTML(sess.label || sess.name || '—')}</td>
             <td>${getClientNames(sess)}</td>
             <td>${getLocationName(sess)}</td>
-            <td><span class="tag ${statusTagClass(sess.status)}">${Engine.sessionStatusLabel(sess.status)}</span></td>
+            <td><span class="tag ${statusTagClass(sess.statut)}">${Engine.sessionStatusLabel(sess.statut)}</span></td>
             <td class="num">${marginDisplay}</td>
           </tr>
         `;
@@ -609,7 +609,7 @@ Views.Dashboard = {
       const opPrices       = {};  // array of prices for moyenne
 
       sessions.forEach(sess => {
-        if (sess.status === 'annulee') return;
+        if (sess.statut === 'annulee') return;
         const d = new Date(sess.date);
         (sess.operatorIds || []).forEach(opId => {
           // Charge ce mois
@@ -617,7 +617,7 @@ Views.Dashboard = {
             opSessionCount[opId] = (opSessionCount[opId] || 0) + 1;
           }
           // CA sessions terminées
-          if (sess.status === 'terminee' && sess.price) {
+          if (sess.statut === 'terminee' && sess.price) {
             opCaTotal[opId] = (opCaTotal[opId] || 0) + (sess.price || 0);
             if (!opPrices[opId]) opPrices[opId] = [];
             opPrices[opId].push(sess.price);

@@ -146,6 +146,17 @@ const DB = (() => {
     return 'FAC-' + year + '-' + String(max + 1).padStart(3, '0');
   }
 
+  /* --- Token d'accès portail opérateur --- */
+  function generateOperateurToken() {
+    const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
+    const prefix = 'ops_';
+    let token = prefix;
+    for (let i = 0; i < 16; i++) {
+      token += chars[Math.floor(Math.random() * chars.length)];
+    }
+    return token;
+  }
+
   /* --- Token d'accès portail client --- */
   function generatePortailToken() {
     const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
@@ -528,7 +539,11 @@ const DB = (() => {
     // === CONTRAT ===
     typeContrat:      'freelance',
     siretFreelance:   '',
-    noteInterne:      ''
+    noteInterne:      '',
+    // === PORTAIL OPÉRATEUR ===
+    portailToken:     '',
+    portailActif:     false,
+    portailGenereeLe: ''
   };
 
   /* --- API publique --- */
@@ -553,6 +568,7 @@ const DB = (() => {
     getNextNumeroDevis,
     getNextNumeroFacture,
     generatePortailToken,
+    generateOperateurToken,
     DEFAULT_OPERATOR
   };
 })();

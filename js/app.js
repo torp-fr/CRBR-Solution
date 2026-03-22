@@ -23,7 +23,7 @@ const App = (() => {
     modules:    { label: 'Modules',              icon: '⬡', view: () => Views.Modules },
     locations:  { label: 'Lieux',                icon: '⊿', view: () => Views.Locations },
     regions:    { label: 'Régions',              icon: '🗺', view: () => Views.Regions },
-    simulateurs:{ label: 'Simulateurs',          icon: '🎯', view: () => Views.Simulateurs },
+    simulateurs:{ label: 'Simulateurs',          icon: '📡', view: () => Views.Simulateurs },
     settings:   { label: 'Paramètres',           icon: '⚙', view: () => Views.Settings }
   };
 

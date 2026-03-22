@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Connexion — DST System</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #f5f5f7;
+      color: #1a1a2e;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 16px;
+    }
+
+    .connexion-card {
+      background: #ffffff;
+      border-radius: 12px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.10);
+      padding: 48px 40px 40px;
+      width: 100%;
+      max-width: 440px;
+    }
+
+    .connexion-logo {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 32px;
+    }
+
+    .connexion-logo img {
+      height: 48px;
+      width: auto;
+    }
+
+    .connexion-logo-text {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: #1a1a2e;
+      letter-spacing: -0.02em;
+    }
+
+    .connexion-logo-text span {
+      color: #c0392b;
+    }
+
+    h1 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #1a1a2e;
+      text-align: center;
+      margin-bottom: 8px;
+    }
+
+    .connexion-subtitle {
+      font-size: 0.88rem;
+      color: #6b7280;
+      text-align: center;
+      margin-bottom: 32px;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: #374151;
+      margin-bottom: 6px;
+    }
+
+    input[type="text"] {
+      display: block;
+      width: 100%;
+      padding: 12px 14px;
+      border: 1.5px solid #d1d5db;
+      border-radius: 6px;
+      font-size: 0.95rem;
+      font-family: inherit;
+      color: #1a1a2e;
+      background: #ffffff;
+      transition: border-color 0.15s;
+      outline: none;
+    }
+
+    input[type="text"]:focus {
+      border-color: #1a1a2e;
+    }
+
+    input[type="text"].input-error {
+      border-color: #dc2626;
+    }
+
+    .btn-connexion {
+      display: block;
+      width: 100%;
+      padding: 13px 20px;
+      background: #1a1a2e;
+      color: #ffffff;
+      font-size: 0.95rem;
+      font-weight: 600;
+      font-family: inherit;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.15s, transform 0.1s;
+    }
+
+    .btn-connexion:hover {
+      background: #2d2d50;
+    }
+
+    .btn-connexion:active {
+      transform: scale(0.98);
+    }
+
+    .error-msg {
+      display: none;
+      margin-top: 12px;
+      padding: 10px 14px;
+      background: #fef2f2;
+      border: 1px solid #fca5a5;
+      border-radius: 6px;
+      font-size: 0.83rem;
+      color: #dc2626;
+    }
+
+    .error-msg.visible {
+      display: block;
+    }
+
+    .connexion-help {
+      margin-top: 28px;
+      padding-top: 24px;
+      border-top: 1px solid #e5e7eb;
+      font-size: 0.82rem;
+      color: #6b7280;
+      text-align: center;
+      line-height: 1.6;
+    }
+
+    .connexion-help a {
+      color: #1a1a2e;
+      font-weight: 600;
+      text-decoration: underline;
+    }
+
+    .admin-link {
+      display: inline-block;
+      margin-top: 16px;
+      font-size: 0.78rem;
+      color: #9ca3af;
+    }
+
+    .admin-link a {
+      color: #9ca3af;
+      text-decoration: none;
+    }
+
+    .admin-link a:hover {
+      color: #1a1a2e;
+    }
+
+    footer {
+      margin-top: 32px;
+      font-size: 0.75rem;
+      color: #9ca3af;
+      text-align: center;
+      line-height: 1.7;
+    }
+
+    footer a {
+      color: #9ca3af;
+      text-decoration: none;
+    }
+
+    footer a:hover {
+      text-decoration: underline;
+    }
+
+    @media (max-width: 480px) {
+      .connexion-card {
+        padding: 32px 24px 28px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="connexion-card">
+
+    <div class="connexion-logo">
+      <img src="img/DST-Light.png" alt="DST System" onerror="this.style.display='none'">
+      <div class="connexion-logo-text"><span>DST</span> System</div>
+    </div>
+
+    <h1>Accès à votre espace</h1>
+    <p class="connexion-subtitle">Entrez votre token d'accès pour vous connecter</p>
+
+    <div class="form-group">
+      <label for="token-input">Identifiant ou lien d'accès</label>
+      <input
+        type="text"
+        id="token-input"
+        placeholder="Votre token d'accès ou identifiant admin"
+        autocomplete="off"
+        autofocus
+      >
+    </div>
+
+    <button class="btn-connexion" id="btn-access" onclick="handleAccess()">
+      Accéder à mon espace →
+    </button>
+
+    <div class="error-msg" id="error-msg"></div>
+
+    <div class="connexion-help">
+      Vous avez reçu votre lien d'accès par email.<br>
+      Collez-le directement dans ce champ ou utilisez-le depuis votre boîte mail.<br><br>
+      <a href="mailto:dst-system@hotmail.com">Problème d'accès ? Contactez-nous</a>
+      <div class="admin-link">
+        Vous êtes DST System ? <a href="../index.html">Accès administration →</a>
+      </div>
+    </div>
+
+  </div>
+
+  <footer>
+    &copy; 2026 DST System — Accès sécurisé<br>
+    Problème d'accès ? <a href="mailto:dst-system@hotmail.com">dst-system@hotmail.com</a>
+  </footer>
+
+  <script>
+  (function () {
+    'use strict';
+
+    var input   = document.getElementById('token-input');
+    var errorEl = document.getElementById('error-msg');
+
+    function showError(msg) {
+      errorEl.textContent = msg;
+      errorEl.classList.add('visible');
+      input.classList.add('input-error');
+    }
+
+    function clearError() {
+      errorEl.classList.remove('visible');
+      input.classList.remove('input-error');
+    }
+
+    window.handleAccess = function () {
+      clearError();
+      var val = input.value.trim();
+
+      if (!val) {
+        showError('Veuillez entrer votre token d\'accès ou identifiant.');
+        input.focus();
+        return;
+      }
+
+      // 1. Token client (commence par tok_)
+      if (val.startsWith('tok_')) {
+        window.location.href = './client/?token=' + encodeURIComponent(val);
+        return;
+      }
+
+      // 2. Token opérateur (commence par ops_)
+      if (val.startsWith('ops_')) {
+        window.location.href = './operateur/?token=' + encodeURIComponent(val);
+        return;
+      }
+
+      // 3. URL complète contenant un token (copier-coller du lien complet)
+      if (val.includes('token=')) {
+        try {
+          var url = new URL(val);
+          var token = url.searchParams.get('token');
+          if (token && token.startsWith('tok_')) {
+            window.location.href = './client/?token=' + encodeURIComponent(token);
+            return;
+          }
+          if (token && token.startsWith('ops_')) {
+            window.location.href = './operateur/?token=' + encodeURIComponent(token);
+            return;
+          }
+        } catch (e) {
+          // URL invalide, on continue
+        }
+      }
+
+      // 4. Identifiant admin
+      if (val === 'admin' || val === 'dst-admin') {
+        window.location.href = '../index.html';
+        return;
+      }
+
+      // 5. Non reconnu
+      showError('Token non reconnu. Vérifiez votre email ou contactez DST System.');
+      input.focus();
+    };
+
+    // Soumission via touche Entrée
+    input.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') {
+        handleAccess();
+      }
+    });
+
+    // Effacer erreur à la saisie
+    input.addEventListener('input', clearError);
+
+  })();
+  </script>
+
+</body>
+</html>

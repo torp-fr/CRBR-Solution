@@ -9,18 +9,6 @@ window.Views = window.Views || {};
 Views.Clients = (() => {
   'use strict';
 
-  /* --- Supabase portail --- */
-  const SUPABASE_URL = 'https://uhpvshugtpmxgsztbovi.supabase.co';
-  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVocHZzaHVndHBteGdzenRib3ZpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQxNzY3NjgsImV4cCI6MjA4OTc1Mjc2OH0.5pQGfqzP4YlzciqGJeMbIn14G6D5wr4fy7tINMVp9xE';
-
-  function _sbHeaders() {
-    return {
-      'Content-Type': 'application/json',
-      'apikey': SUPABASE_ANON_KEY,
-      'Authorization': 'Bearer ' + SUPABASE_ANON_KEY
-    };
-  }
-
   /* --- État interne du module --- */
   let _container = null;
   let _searchTerm = '';
@@ -1089,7 +1077,7 @@ Views.Clients = (() => {
         SUPABASE_URL + '/rest/v1/clients_portail',
         {
           method: 'POST',
-          headers: { ..._sbHeaders(), 'Prefer': 'resolution=merge-duplicates' },
+          headers: { ...sbHeaders(), 'Prefer': 'resolution=merge-duplicates' },
           body: JSON.stringify({
             dst_client_id: client.id,
             token,
@@ -1108,7 +1096,7 @@ Views.Clients = (() => {
       await fetch(
         SUPABASE_URL + '/rest/v1/sessions_portail?dst_client_id=eq.'
           + encodeURIComponent(client.id),
-        { method: 'DELETE', headers: _sbHeaders() }
+        { method: 'DELETE', headers: sbHeaders() }
       );
 
       // 3. Insérer nouvelles sessions
@@ -1133,7 +1121,7 @@ Views.Clients = (() => {
         }));
         const r3 = await fetch(
           SUPABASE_URL + '/rest/v1/sessions_portail',
-          { method: 'POST', headers: _sbHeaders(), body: JSON.stringify(payload) }
+          { method: 'POST', headers: sbHeaders(), body: JSON.stringify(payload) }
         );
         if (!r3.ok) throw new Error('Erreur sync sessions: ' + r3.status);
       }
@@ -1142,7 +1130,7 @@ Views.Clients = (() => {
       await fetch(
         SUPABASE_URL + '/rest/v1/abonnements_portail?dst_client_id=eq.'
           + encodeURIComponent(client.id),
-        { method: 'DELETE', headers: _sbHeaders() }
+        { method: 'DELETE', headers: sbHeaders() }
       );
 
       // 5. Insérer abonnements
@@ -1165,7 +1153,7 @@ Views.Clients = (() => {
         });
         const r5 = await fetch(
           SUPABASE_URL + '/rest/v1/abonnements_portail',
-          { method: 'POST', headers: _sbHeaders(), body: JSON.stringify(abPayload) }
+          { method: 'POST', headers: sbHeaders(), body: JSON.stringify(abPayload) }
         );
         if (!r5.ok) throw new Error('Erreur sync abonnements: ' + r5.status);
       }

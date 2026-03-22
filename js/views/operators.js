@@ -1089,6 +1089,34 @@ Views.Operators = (() => {
             ` : ''}
           </div>
 
+          <!-- Accès portail opérateur -->
+          <div class="card" id="portail-op-card">
+            <div class="card-header">
+              <h3>Accès portail opérateur</h3>
+              ${op.portailActif
+                ? '<span class="tag tag-green">Actif</span>'
+                : '<span class="tag tag-neutral">Inactif</span>'}
+            </div>
+            ${op.portailActif && op.portailToken ? `
+              <div style="margin-bottom:12px;">
+                <span class="kpi-label">Token généré le</span><br/>
+                <span>${op.portailGenereeLe ? new Date(op.portailGenereeLe).toLocaleDateString('fr-FR') : '—'}</span>
+              </div>
+              <div style="background:var(--bg-secondary,#2a2a32);border-radius:6px;padding:10px 14px;font-family:monospace;font-size:0.82rem;word-break:break-all;margin-bottom:12px;" id="portail-link-display">
+                https://dst-system.fr/operateur/?token=${_escape(op.portailToken)}
+              </div>
+              <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                <button class="btn btn-sm btn-secondary" id="btn-copy-portail-op">📋 Copier le lien</button>
+                <button class="btn btn-sm btn-danger" id="btn-desactiver-portail-op">Désactiver l'accès</button>
+              </div>
+            ` : `
+              <p style="font-size:0.82rem;color:var(--text-secondary);margin-bottom:12px;">
+                Aucun accès portail configuré pour cet opérateur.
+              </p>
+              <button class="btn btn-sm btn-primary" id="btn-generer-portail-op">🔐 Générer accès portail</button>
+            `}
+          </div>
+
           <!-- Coût actuel -->
           ${currentCost ? `
           <div class="card">
@@ -1206,6 +1234,51 @@ Views.Operators = (() => {
       closeDetail();
       _openFormModal(op);
     });
+
+    // Portail opérateur — générer
+    const btnGenerer = overlay.querySelector('#btn-generer-portail-op');
+    if (btnGenerer) {
+      btnGenerer.addEventListener('click', () => {
+        const token = DB.generateOperateurToken();
+        DB.operators.update(op.id, {
+          portailToken:     token,
+          portailActif:     true,
+          portailGenereeLe: new Date().toISOString()
+        });
+        if (typeof Toast !== 'undefined') {
+          Toast.success('Accès portail généré pour ' + (op.firstName || '') + ' ' + (op.lastName || ''));
+        }
+        closeDetail();
+        _openDetailModal(DB.operators.getById(op.id));
+      });
+    }
+
+    // Portail opérateur — copier le lien
+    const btnCopier = overlay.querySelector('#btn-copy-portail-op');
+    if (btnCopier) {
+      btnCopier.addEventListener('click', () => {
+        const link = 'https://dst-system.fr/operateur/?token=' + op.portailToken;
+        navigator.clipboard.writeText(link).then(() => {
+          if (typeof Toast !== 'undefined') Toast.success('Lien copié dans le presse-papiers.');
+          btnCopier.textContent = '✓ Copié';
+          setTimeout(() => { btnCopier.textContent = '📋 Copier le lien'; }, 2000);
+        }).catch(() => {
+          prompt('Copiez ce lien :', link);
+        });
+      });
+    }
+
+    // Portail opérateur — désactiver
+    const btnDesactiver = overlay.querySelector('#btn-desactiver-portail-op');
+    if (btnDesactiver) {
+      btnDesactiver.addEventListener('click', () => {
+        if (!confirm('Désactiver l\'accès portail de ' + (op.firstName || '') + ' ' + (op.lastName || '') + ' ?')) return;
+        DB.operators.update(op.id, { portailActif: false });
+        if (typeof Toast !== 'undefined') Toast.info('Accès portail désactivé.');
+        closeDetail();
+        _openDetailModal(DB.operators.getById(op.id));
+      });
+    }
   }
 
   /* ----------------------------------------------------------

@@ -255,6 +255,7 @@
     &copy; DST — Drill &amp; Skills Training &nbsp;·&nbsp; Espace client sécurisé
   </footer>
 
+  <script src="../js/supabase-config.js"></script>
   <script>
   (function () {
     'use strict';
@@ -284,17 +285,6 @@
       };
       const s = map[statut] || { cls: 'tag-gray', label: esc(statut || '—') };
       return '<span class="tag ' + s.cls + '">' + s.label + '</span>';
-    }
-
-    /* ---- Supabase config ---- */
-    var SUPABASE_URL = 'https://uhpvshugtpmxgsztbovi.supabase.co';
-    var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVocHZzaHVndHBteGdzenRib3ZpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQxNzY3NjgsImV4cCI6MjA4OTc1Mjc2OH0.5pQGfqzP4YlzciqGJeMbIn14G6D5wr4fy7tINMVp9xE';
-
-    function sbHeaders() {
-      return {
-        'apikey': SUPABASE_ANON_KEY,
-        'Authorization': 'Bearer ' + SUPABASE_ANON_KEY
-      };
     }
 
     function showError(msg) {
