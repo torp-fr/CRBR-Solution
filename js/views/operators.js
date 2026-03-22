@@ -1499,8 +1499,6 @@ Views.Operators = (() => {
 
     const segments  = Array.from(overlay.querySelectorAll('input[name="op-segments"]:checked')).map(cb => cb.value);
     const niveauxMax = Array.from(overlay.querySelectorAll('input[name="op-niveaux"]:checked')).map(cb => cb.value);
-    const rawSpec2  = (overlay.querySelector('#op-specialites') || {}).value || '';
-    const specialites = rawSpec2.split(',').map(s => s.trim()).filter(s => s.length > 0);
     const certifications = (overlay.querySelector('#op-certifications') || {}).value?.trim() || '';
 
     const disponibiliteType  = (overlay.querySelector('#op-dispoType')      || {}).value || 'ponctuelle';

@@ -1309,7 +1309,6 @@ Views.Devis = (() => {
     const totalHT = surplusGeo !== null ? _round2(totalApresRemise + surplusGeo) : null;
 
     // 7. TVA et TTC
-    const vatRate = s.vatRate || 20;
     const tva      = totalHT !== null ? _round2(totalHT * (vatRate / 100)) : null;
     const totalTTC = totalHT !== null ? _round2(totalHT + tva) : null;
 
