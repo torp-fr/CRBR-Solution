@@ -21,6 +21,19 @@ Views.Dashboard = {
     const sessions  = DB.sessions.getAll();
     const now       = new Date();
 
+    /* Devis KPI */
+    const _allDevis = DB.devis.getAll();
+    const _devisEnvoyes = _allDevis.filter(d => d.statut === 'envoye');
+    const _sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+    const _devisSansReponse = _devisEnvoyes.filter(d => d.dateEnvoi && new Date(d.dateEnvoi) < _sevenDaysAgo).length;
+    const _devisAccetesMois = _allDevis.filter(d => {
+      if (d.statut !== 'accepte') return false;
+      const ref = d.updatedAt || d.createdAt;
+      if (!ref) return false;
+      const u = new Date(ref);
+      return u.getFullYear() === now.getFullYear() && u.getMonth() === now.getMonth();
+    }).length;
+
     /* Prospects KPI */
     const _allProspects = DB.prospects.getAll();
     const _prospectsActifs  = _allProspects.filter(p => p.statut !== 'converti' && p.statut !== 'perdu').length;
@@ -130,6 +143,11 @@ Views.Dashboard = {
           <div class="kpi-label">Prospects actifs <span class="tag tag-blue" style="margin-left:4px;font-size:0.6rem;">CRM</span></div>
           <div class="kpi-value">${_prospectsActifs}</div>
           <div class="kpi-detail">${_prospectsNouveaux > 0 ? _prospectsNouveaux + ' \u00e0 traiter' : 'Aucun nouveau'}</div>
+        </div>
+        <div class="kpi-card ${_devisSansReponse > 0 ? 'kpi-warning' : ''}" style="cursor:pointer;" onclick="App.navigate('devis')">
+          <div class="kpi-label">Devis en attente <span class="tag tag-blue" style="margin-left:4px;font-size:0.6rem;">CRM</span></div>
+          <div class="kpi-value">${_devisEnvoyes.length}</div>
+          <div class="kpi-detail">${_devisSansReponse > 0 ? _devisSansReponse + ' sans r\u00e9ponse > 7j' : _devisAccetesMois + ' accept\u00e9(s) ce mois'}</div>
         </div>
       </div>
     `;

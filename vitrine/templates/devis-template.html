@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Devis DST System</title>
+  <style>
+    /* ===================================================
+       DEVIS TEMPLATE — DST System
+       Format A4, sobre, institutionnel
+       =================================================== */
+
+    @page {
+      size: A4;
+      margin: 15mm 15mm 20mm 15mm;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 10pt;
+      color: #111;
+      background: #fff;
+      line-height: 1.4;
+    }
+
+    /* ---- Bouton impression (masqué à l'impression) ---- */
+    #btn-print {
+      position: fixed;
+      top: 16px;
+      right: 16px;
+      padding: 10px 20px;
+      background: #1a1a2e;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      font-size: 13px;
+      cursor: pointer;
+      z-index: 1000;
+    }
+    #btn-print:hover { background: #2d2d4e; }
+
+    @media print {
+      #btn-print { display: none; }
+      body { margin: 0; }
+    }
+
+    /* ---- Conteneur principal ---- */
+    .page {
+      max-width: 780px;
+      margin: 0 auto;
+      padding: 0 0 40px;
+    }
+
+    /* ---- EN-TÊTE ---- */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      padding-bottom: 16px;
+      border-bottom: 3px solid #1a1a2e;
+      margin-bottom: 24px;
+    }
+
+    .header-left .company-name {
+      font-size: 14pt;
+      font-weight: 700;
+      color: #1a1a2e;
+      margin-bottom: 2px;
+    }
+
+    .header-left .company-sub {
+      font-size: 9pt;
+      color: #555;
+    }
+
+    .header-left img.logo {
+      height: 48px;
+      margin-bottom: 6px;
+      display: block;
+    }
+
+    .header-right { text-align: right; }
+
+    .header-right .devis-title {
+      font-size: 22pt;
+      font-weight: 700;
+      color: #1a1a2e;
+      letter-spacing: 2px;
+      margin-bottom: 8px;
+    }
+
+    .header-right table { font-size: 9pt; }
+    .header-right td { padding: 2px 0 2px 12px; }
+    .header-right td:first-child { color: #555; }
+
+    /* ---- DESTINATAIRE ---- */
+    .recipient-section {
+      display: flex;
+      justify-content: flex-end;
+      margin-bottom: 24px;
+    }
+
+    .recipient-box {
+      width: 280px;
+      border: 1px solid #ccc;
+      border-radius: 2px;
+      padding: 12px 14px;
+    }
+
+    .recipient-label {
+      font-size: 8pt;
+      font-weight: 700;
+      color: #555;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 6px;
+    }
+
+    .recipient-org  { font-size: 11pt; font-weight: 700; color: #1a1a2e; }
+    .recipient-contact { font-size: 9pt; color: #333; margin-top: 3px; }
+    .recipient-type    { font-size: 8.5pt; color: #777; margin-top: 2px; }
+    .recipient-contact-info { font-size: 8.5pt; color: #555; margin-top: 4px; }
+
+    /* ---- TITRE / OBJET ---- */
+    .devis-subject {
+      margin-bottom: 20px;
+      padding: 12px 14px;
+      background: #f5f5f7;
+      border-left: 3px solid #1a1a2e;
+      border-radius: 0 2px 2px 0;
+    }
+
+    .devis-subject-title {
+      font-size: 13pt;
+      font-weight: 700;
+      color: #1a1a2e;
+      margin-bottom: 4px;
+    }
+
+    .devis-subject-objet {
+      font-size: 9.5pt;
+      color: #555;
+    }
+
+    /* ---- TABLEAU DES LIGNES ---- */
+    .lines-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 16px;
+      font-size: 9pt;
+    }
+
+    .lines-table thead tr {
+      background: #1a1a2e;
+      color: #fff;
+    }
+
+    .lines-table thead th {
+      padding: 7px 10px;
+      text-align: left;
+      font-weight: 600;
+      font-size: 8.5pt;
+      letter-spacing: 0.5px;
+    }
+
+    .lines-table thead th:last-child,
+    .lines-table thead th:nth-child(3),
+    .lines-table thead th:nth-child(4) {
+      text-align: right;
+    }
+
+    .lines-table tbody tr:nth-child(even) { background: #f8f8fa; }
+    .lines-table tbody tr:nth-child(odd)  { background: #fff; }
+
+    .lines-table tbody td {
+      padding: 7px 10px;
+      border-bottom: 1px solid #e8e8ec;
+      vertical-align: top;
+    }
+
+    .lines-table tbody td:last-child,
+    .lines-table tbody td:nth-child(3),
+    .lines-table tbody td:nth-child(4) {
+      text-align: right;
+    }
+
+    .lines-table .type-badge {
+      display: inline-block;
+      font-size: 7.5pt;
+      color: #555;
+      background: #ebebed;
+      border-radius: 3px;
+      padding: 1px 5px;
+      margin-top: 2px;
+    }
+
+    /* ---- TOTAUX ---- */
+    .totaux-section {
+      display: flex;
+      justify-content: flex-end;
+      margin-bottom: 24px;
+    }
+
+    .totaux-box {
+      width: 280px;
+    }
+
+    .totaux-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 5px 0;
+      font-size: 9.5pt;
+      border-bottom: 1px solid #e8e8ec;
+    }
+
+    .totaux-row.total-ttc {
+      font-size: 12pt;
+      font-weight: 700;
+      color: #1a1a2e;
+      border-bottom: none;
+      border-top: 2px solid #1a1a2e;
+      padding-top: 8px;
+      margin-top: 4px;
+    }
+
+    .totaux-label { color: #555; }
+    .totaux-val   { font-weight: 500; }
+
+    /* ---- PIED DE PAGE ---- */
+    .footer {
+      margin-top: 32px;
+      padding-top: 12px;
+      border-top: 1px solid #ccc;
+      font-size: 8pt;
+      color: #777;
+    }
+
+    .footer-mentions { margin-bottom: 6px; }
+
+    .footer-legal {
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .footer-legal span { color: #999; }
+
+    /* ---- SEPARATEUR ---- */
+    .section-sep {
+      border: none;
+      border-top: 1px solid #e8e8ec;
+      margin: 20px 0;
+    }
+
+    /* ---- Numéro ligne ---- */
+    .line-num {
+      color: #aaa;
+      font-size: 8pt;
+    }
+  </style>
+</head>
+<body>
+
+  <button id="btn-print" onclick="window.print()">&#128424; Imprimer / T&eacute;l&eacute;charger PDF</button>
+
+  <div class="page">
+
+    <!-- EN-TÊTE -->
+    <header class="header">
+      <div class="header-left">
+        <img class="logo" src="../img/DST-Light-transparent.png" alt="DST System" onerror="this.style.display='none'" />
+        <div class="company-name">DST System</div>
+        <div class="company-sub">Drill &amp; Skills Training</div>
+        <div style="margin-top:6px;font-size:8.5pt;color:#555;">
+          <div id="hdr-email">dst-system@hotmail.com</div>
+          <div id="hdr-phone">06 65 44 52 26</div>
+        </div>
+      </div>
+      <div class="header-right">
+        <div class="devis-title">DEVIS</div>
+        <table>
+          <tr><td>Num&eacute;ro</td><td><strong id="hdr-numero">&mdash;</strong></td></tr>
+          <tr><td>Date</td><td id="hdr-date">&mdash;</td></tr>
+          <tr><td>Valid&eacute; jusqu&apos;au</td><td id="hdr-expiration">&mdash;</td></tr>
+          <tr><td>Dur&eacute;e de validit&eacute;</td><td><span id="hdr-validite">&mdash;</span> jours</td></tr>
+        </table>
+      </div>
+    </header>
+
+    <!-- DESTINATAIRE -->
+    <div class="recipient-section">
+      <div class="recipient-box">
+        <div class="recipient-label">Adress&eacute; &agrave;</div>
+        <div class="recipient-org"     id="dest-org">&mdash;</div>
+        <div class="recipient-contact" id="dest-contact"></div>
+        <div class="recipient-type"    id="dest-type"></div>
+        <div class="recipient-contact-info">
+          <div id="dest-email"></div>
+          <div id="dest-phone"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TITRE / OBJET -->
+    <div class="devis-subject">
+      <div class="devis-subject-title" id="dv-titre">&mdash;</div>
+      <div class="devis-subject-objet" id="dv-objet"></div>
+    </div>
+
+    <!-- TABLEAU DES LIGNES -->
+    <table class="lines-table">
+      <thead>
+        <tr>
+          <th style="width:24px;">#</th>
+          <th>Description</th>
+          <th style="width:60px;">Qt&eacute;</th>
+          <th style="width:110px;">Prix HT</th>
+          <th style="width:110px;">Total HT</th>
+        </tr>
+      </thead>
+      <tbody id="lignes-tbody">
+        <tr><td colspan="5" style="text-align:center;color:#aaa;padding:16px;">Aucune ligne.</td></tr>
+      </tbody>
+    </table>
+
+    <!-- TOTAUX -->
+    <div class="totaux-section">
+      <div class="totaux-box">
+        <div class="totaux-row">
+          <span class="totaux-label">Total HT</span>
+          <span class="totaux-val" id="tot-ht">&mdash;</span>
+        </div>
+        <div class="totaux-row">
+          <span class="totaux-label">TVA (<span id="taux-tva">20</span>&nbsp;%)</span>
+          <span class="totaux-val" id="tot-tva">&mdash;</span>
+        </div>
+        <div class="totaux-row total-ttc">
+          <span>Total TTC</span>
+          <span id="tot-ttc">&mdash;</span>
+        </div>
+      </div>
+    </div>
+
+    <hr class="section-sep" />
+
+    <!-- PIED DE PAGE -->
+    <footer class="footer">
+      <div class="footer-mentions">
+        Devis valable <strong id="ftr-validite">30</strong> jours &agrave; compter de la date d&apos;&eacute;mission.<br>
+        En cas d&apos;acceptation, retourner le devis sign&eacute; avec la mention <em>&laquo;&nbsp;Bon pour accord&nbsp;&raquo;</em>.
+      </div>
+      <div class="footer-legal">
+        <span>DST System &mdash; SASU &mdash; SIRET&nbsp;: [&agrave; compl&eacute;ter]</span>
+        <span id="ftr-page">Page 1/1</span>
+      </div>
+    </footer>
+
+  </div><!-- /.page -->
+
+  <script>
+    /* ============================================================
+       Injection des données depuis le paramètre URL `data`
+       Format JSON encodé via encodeURIComponent(JSON.stringify(...))
+       ============================================================ */
+
+    document.addEventListener('DOMContentLoaded', function() {
+
+      var raw = new URLSearchParams(window.location.search).get('data');
+      if (!raw) { console.warn('Aucune donnée transmise (paramètre ?data= absent).'); return; }
+
+      var d;
+      try { d = JSON.parse(decodeURIComponent(raw)); }
+      catch (e) { console.error('Erreur parsing JSON devis :', e); return; }
+
+      /* ---- Titre de l'onglet ---- */
+      if (d.numero) document.title = 'Devis ' + d.numero + ' — DST System';
+
+      /* ---- En-tête ---- */
+      setText('hdr-numero', d.numero);
+      setText('hdr-date',       fmtDate(d.dateCreation));
+      setText('hdr-expiration', fmtDate(d.dateExpiration));
+      setText('hdr-validite',   d.validiteJours != null ? d.validiteJours : '30');
+      setText('ftr-validite',   d.validiteJours != null ? d.validiteJours : '30');
+
+      /* ---- Destinataire ---- */
+      var dest = d.destinataire || {};
+      setText('dest-org',     dest.organisation || '\u2014');
+      setText('dest-contact', dest.contact      || '');
+      setText('dest-type',    dest.type_structure || '');
+      if (dest.email) {
+        var em = document.getElementById('dest-email');
+        if (em) em.textContent = dest.email;
+      }
+      if (dest.telephone) {
+        var ph = document.getElementById('dest-phone');
+        if (ph) ph.textContent = dest.telephone;
+      }
+
+      /* ---- Titre / objet ---- */
+      setText('dv-titre', d.titre || 'Devis sans titre');
+      setText('dv-objet', d.objet || '');
+
+      /* ---- Lignes ---- */
+      var tbody = document.getElementById('lignes-tbody');
+      if (tbody && d.lignes && d.lignes.length) {
+        var rows = '';
+        d.lignes.forEach(function(l, i) {
+          rows +=
+            '<tr>' +
+              '<td class="line-num">' + (i + 1) + '</td>' +
+              '<td>' +
+                esc(l.description || '\u2014') +
+                '<br><span class="type-badge">' + esc(labelType(l.type)) + '</span>' +
+              '</td>' +
+              '<td>' + (l.quantite || 1) + '</td>' +
+              '<td>' + fmtEur(l.prixUnitaireHT) + '</td>' +
+              '<td><strong>' + fmtEur(l.totalHT) + '</strong></td>' +
+            '</tr>';
+        });
+        tbody.innerHTML = rows;
+      }
+
+      /* ---- Totaux ---- */
+      setText('tot-ht',  fmtEur(d.totalHT));
+      setText('tot-tva', fmtEur(d.totalTVA));
+      setText('tot-ttc', fmtEur(d.totalTTC));
+      setText('taux-tva', d.tauxTVA != null ? d.tauxTVA : '20');
+
+      /* ---- Helpers ---- */
+      function setText(id, val) {
+        var el = document.getElementById(id);
+        if (el) el.textContent = val != null ? val : '';
+      }
+
+      function fmtDate(iso) {
+        if (!iso) return '\u2014';
+        var p = String(iso).split('T')[0].split('-');
+        if (p.length < 3) return iso;
+        return p[2] + '/' + p[1] + '/' + p[0];
+      }
+
+      function fmtEur(n) {
+        var val = parseFloat(n) || 0;
+        return val.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + '\u00a0\u20ac';
+      }
+
+      function esc(str) {
+        if (str == null) return '';
+        return String(str)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;');
+      }
+
+      function labelType(t) {
+        var m = { session: 'Session', abonnement: 'Abonnement', module: 'Module', forfait: 'Forfait', autre: 'Autre' };
+        return m[t] || t || 'Autre';
+      }
+    });
+  </script>
+
+</body>
+</html>

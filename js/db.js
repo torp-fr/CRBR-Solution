@@ -107,6 +107,24 @@ const DB = (() => {
   const locations           = createCRUD('locations');
   const clientSubscriptions = createCRUD('clientSubscriptions');
   const prospects           = createCRUD('prospects');
+  const devis               = createCRUD('devis');
+
+  /* --- Numérotation automatique des devis --- */
+  function getNextNumeroDevis() {
+    const year = new Date().getFullYear();
+    const all  = getStore('devis');
+    let max = 0;
+    all.forEach(function(d) {
+      if (d.numero) {
+        const m = d.numero.match(/^DEV-(\d{4})-(\d+)$/);
+        if (m && parseInt(m[1]) === year) {
+          const n = parseInt(m[2]);
+          if (n > max) max = n;
+        }
+      }
+    });
+    return 'DEV-' + year + '-' + String(max + 1).padStart(3, '0');
+  }
 
   /* --- Paramètres économiques --- */
   const DEFAULT_SETTINGS = {
@@ -281,6 +299,7 @@ const DB = (() => {
         locations: locations.getAll(),
         clientSubscriptions: clientSubscriptions.getAll(),
         prospects: prospects.getAll(),
+        devis: devis.getAll(),
         settings: settings.get()
       }
     };
@@ -297,11 +316,12 @@ const DB = (() => {
     if (d.locations) setStore('locations', d.locations);
     if (d.clientSubscriptions) setStore('clientSubscriptions', d.clientSubscriptions);
     if (d.prospects) setStore('prospects', d.prospects);
+    if (d.devis) setStore('devis', d.devis);
     if (d.settings) settings.set(d.settings);
   }
 
   function clearAll() {
-    ['operators','modules','clients','offers','sessions','locations','clientSubscriptions','prospects'].forEach(k => setStore(k, []));
+    ['operators','modules','clients','offers','sessions','locations','clientSubscriptions','prospects','devis'].forEach(k => setStore(k, []));
     settings.reset();
   }
 
@@ -315,10 +335,12 @@ const DB = (() => {
     locations,
     clientSubscriptions,
     prospects,
+    devis,
     settings,
     exportAll,
     importAll,
     clearAll,
-    generateId
+    generateId,
+    getNextNumeroDevis
   };
 })();
