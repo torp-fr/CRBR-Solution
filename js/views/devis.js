@@ -491,42 +491,114 @@ Views.Devis = (() => {
               'Assistant de tarification' +
             '</summary>' +
             '<div style="padding:12px 14px 14px;border-top:1px solid var(--border-color);">' +
-              '<div class="form-row">' +
-                '<div class="form-group"><label>Format</label>' +
-                  '<select id="dv-assist-format" class="form-control">' +
-                    '<option value="journee">Journ\u00e9e compl\u00e8te</option>' +
-                    '<option value="demi">Demi-journ\u00e9e</option>' +
-                  '</select></div>' +
-                '<div class="form-group"><label>Nombre de jours</label>' +
-                  '<input type="number" id="dv-assist-nb-jours" class="form-control" min="1" step="1" value="1" />' +
-                  '<div id="dv-assist-palier-hint" style="margin-top:4px;min-height:20px;"></div>' +
-                '</div>' +
+
+              /* Étape 0 — Segment */
+              '<div class="form-group" style="margin-bottom:12px;">' +
+                '<label>Type de prestation</label>' +
+                '<select id="dv-assist-segment" class="form-control">' +
+                  '<option value="institutionnel">Institutionnel \u2014 Programme annuel</option>' +
+                  '<option value="grand_compte">Grand Compte Itin\u00e9rant</option>' +
+                  '<option value="b2b">B2B \u2014 Entreprise / Team Building</option>' +
+                  '<option value="b2c">B2C / \u00c9v\u00e9nementiel</option>' +
+                '</select>' +
               '</div>' +
-              '<div class="form-row">' +
-                '<div class="form-group"><label>Zone g\u00e9ographique</label>' +
-                  '<select id="dv-assist-zone" class="form-control">' + _buildZoneOptions(settings.pricingCatalog || {}) + '</select>' +
+
+              /* Institutionnel */
+              '<div id="dv-fields-institutionnel">' +
+                '<div class="form-row">' +
+                  '<div class="form-group"><label>Format</label>' +
+                    '<select id="dv-assist-format" class="form-control">' +
+                      '<option value="journee">Journ\u00e9e compl\u00e8te</option>' +
+                      '<option value="demi">Demi-journ\u00e9e</option>' +
+                    '</select></div>' +
+                  '<div class="form-group"><label>Nombre de jours</label>' +
+                    '<input type="number" id="dv-assist-nb-jours" class="form-control" min="1" step="1" value="1" />' +
+                    '<div id="dv-assist-palier-hint" style="margin-top:4px;min-height:20px;"></div>' +
+                  '</div>' +
                 '</div>' +
-                '<div class="form-group" style="align-self:flex-end;padding-bottom:4px;">' +
+                '<div class="form-row">' +
+                  '<div class="form-group"><label>Zone g\u00e9ographique</label>' +
+                    '<select id="dv-assist-zone" class="form-control">' + _buildZoneOptions(settings.pricingCatalog || {}) + '</select>' +
+                  '</div>' +
+                  '<div class="form-group" style="align-self:flex-end;padding-bottom:4px;">' +
+                    '<label class="form-check" style="font-size:0.85rem;cursor:pointer;">' +
+                      '<input type="checkbox" id="dv-assist-reconduction" style="margin-right:6px;">' +
+                      '<span>Reconduction client (remise fid\u00e9lit\u00e9)</span>' +
+                    '</label>' +
+                  '</div>' +
+                '</div>' +
+                '<div class="form-group" style="margin-top:4px;">' +
                   '<label class="form-check" style="font-size:0.85rem;cursor:pointer;">' +
-                    '<input type="checkbox" id="dv-assist-reconduction" style="margin-right:6px;">' +
-                    '<span>Reconduction client (remise fid\u00e9lit\u00e9)</span>' +
+                    '<input type="checkbox" id="dv-assist-mode-libre" style="margin-right:6px;">' +
+                    '<span>Mode personnalis\u00e9 \u2014 ignorer les paliers</span>' +
                   '</label>' +
+                  '<div id="dv-assist-tarif-libre-wrap" style="display:none;margin-top:6px;">' +
+                    '<input type="number" id="dv-assist-tarif-libre" class="form-control" min="0" step="10" placeholder="Tarif jour HT personnalis\u00e9 (\u20ac)" />' +
+                  '</div>' +
                 '</div>' +
               '</div>' +
-              '<div class="form-group" style="margin-top:4px;">' +
-                '<label class="form-check" style="font-size:0.85rem;cursor:pointer;">' +
-                  '<input type="checkbox" id="dv-assist-mode-libre" style="margin-right:6px;">' +
-                  '<span>Mode personnalis\u00e9 \u2014 ignorer les paliers</span>' +
-                '</label>' +
-                '<div id="dv-assist-tarif-libre-wrap" style="display:none;margin-top:6px;">' +
-                  '<input type="number" id="dv-assist-tarif-libre" class="form-control" min="0" step="10" placeholder="Tarif jour HT personnalis\u00e9 (\u20ac)" />' +
+
+              /* Grand Compte */
+              '<div id="dv-fields-grand-compte" style="display:none;">' +
+                '<div class="form-row">' +
+                  '<div class="form-group"><label>Nombre de jours</label>' +
+                    '<input type="number" id="dv-gc-nb-jours" class="form-control" min="50" step="1" value="50" />' +
+                    '<div id="dv-gc-palier-hint" style="margin-top:4px;min-height:20px;font-size:0.82rem;color:var(--text-muted);"></div>' +
+                  '</div>' +
+                  '<div class="form-group"><label>Zone g\u00e9ographique</label>' +
+                    '<select id="dv-gc-zone" class="form-control">' + _buildZoneOptions(settings.pricingCatalog || {}) + '</select>' +
+                  '</div>' +
+                '</div>' +
+                '<div class="form-group">' +
+                  '<label class="form-check" style="font-size:0.85rem;cursor:pointer;">' +
+                    '<input type="checkbox" id="dv-gc-operateur-dedie" style="margin-right:6px;">' +
+                    '<span>Op\u00e9rateur d\u00e9di\u00e9 pr\u00e9vu</span>' +
+                  '</label>' +
+                  '<div style="font-size:0.78rem;color:var(--text-muted);margin-top:2px;">Information seulement \u2014 sans impact sur le calcul</div>' +
                 '</div>' +
               '</div>' +
-              '<button type="button" class="btn btn-sm" id="dv-assist-calculer">Calculer</button>' +
+
+              /* B2B */
+              '<div id="dv-fields-b2b" style="display:none;">' +
+                '<div class="form-row">' +
+                  '<div class="form-group"><label>Format</label>' +
+                    '<select id="dv-b2b-format" class="form-control">' +
+                      '<option value="journee">Journ\u00e9e compl\u00e8te</option>' +
+                      '<option value="demi">Demi-journ\u00e9e</option>' +
+                    '</select>' +
+                  '</div>' +
+                  '<div class="form-group"><label>Nombre de jours</label>' +
+                    '<input type="number" id="dv-b2b-nb-jours" class="form-control" min="1" step="1" value="1" />' +
+                  '</div>' +
+                '</div>' +
+                '<div class="form-group"><label>Zone g\u00e9ographique</label>' +
+                  '<select id="dv-b2b-zone" class="form-control">' + _buildZoneOptions(settings.pricingCatalog || {}) + '</select>' +
+                '</div>' +
+              '</div>' +
+
+              /* B2C */
+              '<div id="dv-fields-b2c" style="display:none;">' +
+                '<div class="form-row">' +
+                  '<div class="form-group"><label>Dur\u00e9e de la session</label>' +
+                    '<select id="dv-b2c-duree" class="form-control">' +
+                      '<option value="2h">2 heures</option>' +
+                      '<option value="3h">3 heures</option>' +
+                      '<option value="4h">4 heures</option>' +
+                    '</select>' +
+                  '</div>' +
+                  '<div class="form-group"><label>Nombre de sessions</label>' +
+                    '<input type="number" id="dv-b2c-nb-sessions" class="form-control" min="1" step="1" value="1" />' +
+                  '</div>' +
+                '</div>' +
+                '<div id="dv-b2c-capacite-hint" style="font-size:0.82rem;color:var(--text-muted);margin-bottom:6px;"></div>' +
+              '</div>' +
+
+              '<button type="button" class="btn btn-sm" id="dv-assist-calculer" style="margin-top:8px;">Calculer</button>' +
               '<div id="dv-assist-resultat" style="display:none;margin-top:12px;padding:10px;background:var(--bg-tertiary);border-radius:4px;font-size:0.85rem;"></div>' +
             '</div>' +
           '</details>' +
           '<input type="hidden" id="dv-palier-id" value="" />' +
+          '<input type="hidden" id="dv-segment" value="institutionnel" />' +
 
           /* --- Section 2 : Lignes --- */
           '<div class="section-label" style="font-size:0.72rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;margin:16px 0 8px;">Lignes du devis</div>' +
@@ -574,7 +646,28 @@ Views.Devis = (() => {
       _renderLignes(overlay, lignes, vatRate);
     });
 
-    /* Assistant de tarification — live hint palier */
+    /* Assistant — Segment : afficher/masquer sections */
+    const assistSegment = overlay.querySelector('#dv-assist-segment');
+    function _refreshAssistSegment() {
+      const seg = assistSegment ? assistSegment.value : 'institutionnel';
+      const segHidden = overlay.querySelector('#dv-segment');
+      if (segHidden) segHidden.value = seg;
+      ['institutionnel', 'grand-compte', 'b2b', 'b2c'].forEach(s => {
+        const el = overlay.querySelector('#dv-fields-' + s);
+        if (el) el.style.display = (s === seg.replace('_', '-')) ? '' : 'none';
+      });
+      // Hint capacité B2C
+      const b2cHint = overlay.querySelector('#dv-b2c-capacite-hint');
+      if (b2cHint && seg === 'b2c') {
+        const pc = DB.settings.get().pricingCatalog || {};
+        b2cHint.textContent = 'Capacit\u00e9\u00a0: jusqu\u2019\u00e0 ' + (pc.b2c ? pc.b2c.capaciteGroupe : 10) + '\u00a0personnes/session';
+      }
+    }
+    if (assistSegment) {
+      assistSegment.addEventListener('change', _refreshAssistSegment);
+    }
+
+    /* Assistant — Institutionnel : live hint palier */
     const assistNbJours = overlay.querySelector('#dv-assist-nb-jours');
     if (assistNbJours) {
       assistNbJours.addEventListener('input', () => {
@@ -591,6 +684,22 @@ Views.Devis = (() => {
       });
     }
 
+    /* Assistant — Grand Compte : live hint palier GC */
+    const gcNbJours = overlay.querySelector('#dv-gc-nb-jours');
+    if (gcNbJours) {
+      gcNbJours.addEventListener('input', () => {
+        const pc  = DB.settings.get().pricingCatalog || {};
+        const gcP = Array.isArray(pc.paliersGrandCompte) ? pc.paliersGrandCompte : [];
+        const n   = parseInt(gcNbJours.value) || 0;
+        const hint = overlay.querySelector('#dv-gc-palier-hint');
+        if (!hint) return;
+        const palier = gcP.find(p => n >= p.volumeMin && n <= p.volumeMax);
+        hint.textContent = palier
+          ? 'Palier\u00a0: ' + palier.label + ' \u2014 ' + Engine.fmt(palier.tarifJour) + '\u00a0/jour'
+          : (n < 50 ? 'Volume minimum\u00a0: 50\u00a0jours/an' : '');
+      });
+    }
+
     /* Assistant de tarification — Mode libre toggle */
     const assistModeLibre = overlay.querySelector('#dv-assist-mode-libre');
     if (assistModeLibre) {
@@ -604,14 +713,21 @@ Views.Devis = (() => {
     const btnCalculer = overlay.querySelector('#dv-assist-calculer');
     if (btnCalculer) {
       btnCalculer.addEventListener('click', () => {
+        const segment        = (overlay.querySelector('#dv-assist-segment')               || {}).value || 'institutionnel';
         const nbJours        = parseInt((overlay.querySelector('#dv-assist-nb-jours')    || {}).value) || 1;
         const formatJournee  = (overlay.querySelector('#dv-assist-format')               || {}).value || 'journee';
         const zoneId         = (overlay.querySelector('#dv-assist-zone')                 || {}).value || 'zone1';
         const estReconduction = !!(overlay.querySelector('#dv-assist-reconduction')       || {}).checked;
-
         const modeLibre  = !!(overlay.querySelector('#dv-assist-mode-libre')  || {}).checked;
         const tarifLibre = modeLibre ? (parseFloat((overlay.querySelector('#dv-assist-tarif-libre') || {}).value) || null) : null;
-        const result = _computeDevisSuggestion({ nbJours, formatJournee, zoneId, estReconduction, tarifLibre });
+        const gcNbJ        = parseInt((overlay.querySelector('#dv-gc-nb-jours')    || {}).value) || 50;
+        const gcZone       = (overlay.querySelector('#dv-gc-zone')                   || {}).value || 'zone1';
+        const b2bFormat    = (overlay.querySelector('#dv-b2b-format')                || {}).value || 'journee';
+        const b2bNbJ       = parseInt((overlay.querySelector('#dv-b2b-nb-jours')   || {}).value) || 1;
+        const b2bZone      = (overlay.querySelector('#dv-b2b-zone')                  || {}).value || 'zone1';
+        const b2cDuree     = (overlay.querySelector('#dv-b2c-duree')                 || {}).value || '2h';
+        const b2cNbSessions = parseInt((overlay.querySelector('#dv-b2c-nb-sessions') || {}).value) || 1;
+        const result = _computeDevisSuggestion({ segment, nbJours, formatJournee, zoneId, estReconduction, tarifLibre, gcNbJ, gcZone, b2bFormat, b2bNbJ, b2bZone, b2cDuree, b2cNbSessions });
 
         const resultatDiv = overlay.querySelector('#dv-assist-resultat');
         if (!resultatDiv) return;
@@ -627,17 +743,20 @@ Views.Devis = (() => {
           return;
         }
 
-        const labelFormat = formatJournee === 'demi' ? 'demi-journ\u00e9e(s)' : 'journ\u00e9e(s)';
+        const _seg = result.segment || 'institutionnel';
+        const labelFormat = result.formatJournee === 'b2c' ? 'session(s)' : (result.formatJournee === 'demi' ? 'demi-journ\u00e9e(s)' : 'journ\u00e9e(s)');
+        const segLabel = { institutionnel: 'Institutionnel', grand_compte: 'Grand Compte', b2b: 'B2B', b2c: 'B2C / \u00c9v\u00e9nementiel' }[_seg] || _seg;
         resultatDiv.style.display = '';
         resultatDiv.innerHTML =
+          '<div style="margin-bottom:6px;"><span class="tag tag-blue" style="font-size:0.75rem;">' + segLabel + '</span></div>' +
           '<table style="width:100%;border-collapse:collapse;">' +
             '<tr><td class="text-muted">' + result.nbJours + '\u00a0' + labelFormat + ' \u00d7 ' + Engine.fmt(result.tarifUnitaire) + '</td>' +
               '<td style="text-align:right;" class="text-mono">' + Engine.fmt(result.baseHT) + '</td></tr>' +
-            (result.remiseTotale > 0
+            (result.remiseTotale > 0 && result.palier
               ? '<tr><td class="text-muted">Remise ' + result.palier.label + ' (\u2212' + result.remiseTotale + '\u00a0%)</td>' +
                 '<td style="text-align:right;color:var(--color-success);" class="text-mono">&minus;\u00a0' + Engine.fmt(_round2(result.baseHT - result.totalApresRemise)) + '</td></tr>'
               : '') +
-            (result.surplusGeo > 0
+            (result.surplusGeo > 0 && result.zone
               ? '<tr><td class="text-muted">Suppl\u00e9ment zone (' + result.zone.label + ')</td>' +
                 '<td style="text-align:right;" class="text-mono">+\u00a0' + Engine.fmt(result.surplusGeo) + '</td></tr>'
               : '') +
@@ -655,35 +774,45 @@ Views.Devis = (() => {
             : '');
 
         overlay.querySelector('#dv-assist-utiliser').addEventListener('click', () => {
-          /* Ligne 1 — formation */
-          const typeLigne1 = (result.palier && result.palier.id === 'ponctuel') ? 'one_shot' : 'abonnement';
-          const descLigne1 = 'Formation DST\u00a0\u2014\u00a0' + result.palier.label +
-            '\u00a0\u2014\u00a0' + result.nbJours + '\u00a0' + labelFormat +
-            (result.remiseTotale > 0 ? ' (remise\u00a0' + result.remiseTotale + '\u00a0%)' : '');
-          lignes.push({
-            id: DB.generateId(),
-            description:     descLigne1,
-            type:            typeLigne1,
-            quantite:        result.nbJours,
-            prixUnitaireHT:  result.tarifUnitaire,
-            totalHT:         result.totalApresRemise
-          });
+          lignes.length = 0;
+          const seg = result.segment || 'institutionnel';
 
-          /* Ligne 2 — supplément géographique (si zone2/3) */
-          if (result.surplusGeo > 0) {
-            lignes.push({
-              id: DB.generateId(),
-              description:    'Suppl\u00e9ment d\u00e9placement\u00a0\u2014\u00a0' + result.zone.label,
-              type:           'forfait',
-              quantite:       result.nbJours,
-              prixUnitaireHT: _round2(result.zone.surplusParJour),
-              totalHT:        result.surplusGeo
-            });
+          if (seg === 'b2c') {
+            /* B2C — forfait sessionnel */
+            lignes.push({ id: DB.generateId(), description: result.b2cNbSessions + ' session(s) ' + (result.b2cDuree || '2h') + ' \u2014 B2C / \u00c9v\u00e9nementiel', type: 'one_shot', quantite: result.b2cNbSessions, prixUnitaireHT: result.tarifUnitaire, totalHT: result.baseHT });
+          } else if (seg === 'b2b') {
+            /* B2B */
+            const fmtB2B = result.formatJournee === 'demi' ? 'demi-journ\u00e9e(s)' : 'journ\u00e9e(s)';
+            lignes.push({ id: DB.generateId(), description: 'Formation B2B \u2014 ' + result.nbJours + '\u00a0' + fmtB2B, type: 'one_shot', quantite: result.nbJours, prixUnitaireHT: result.tarifUnitaire, totalHT: result.baseHT });
+            if (result.surplusGeo > 0 && result.zone) {
+              lignes.push({ id: DB.generateId(), description: 'Suppl\u00e9ment d\u00e9placement \u2014 ' + result.zone.label, type: 'forfait', quantite: result.nbJours, prixUnitaireHT: _round2(result.zone.surplusParJour), totalHT: result.surplusGeo });
+            }
+          } else if (seg === 'grand_compte') {
+            /* Grand Compte */
+            lignes.push({ id: DB.generateId(), description: 'Formation Grand Compte \u2014 ' + result.palier.label + ' \u2014 ' + result.nbJours + '\u00a0jours', type: 'abonnement', quantite: result.nbJours, prixUnitaireHT: result.tarifUnitaire, totalHT: result.baseHT });
+            if (result.surplusGeo > 0 && result.zone) {
+              lignes.push({ id: DB.generateId(), description: 'Suppl\u00e9ment d\u00e9placement \u2014 ' + result.zone.label, type: 'forfait', quantite: result.nbJours, prixUnitaireHT: _round2(result.zone.surplusParJour), totalHT: result.surplusGeo });
+            }
+            /* Livrables GC */
+            const palierInput = overlay.querySelector('#dv-palier-id');
+            if (palierInput) palierInput.value = result.palier.id;
+          } else {
+            /* Institutionnel */
+            const typeLigne1 = (result.palier && result.palier.id === 'ponctuel') ? 'one_shot' : 'abonnement';
+            const descLigne1 = 'Formation DST\u00a0\u2014\u00a0' + (result.palier ? result.palier.label : 'Personnalis\u00e9') +
+              '\u00a0\u2014\u00a0' + result.nbJours + '\u00a0' + labelFormat +
+              (result.remiseTotale > 0 ? ' (remise\u00a0' + result.remiseTotale + '\u00a0%)' : '');
+            lignes.push({ id: DB.generateId(), description: descLigne1, type: typeLigne1, quantite: result.nbJours, prixUnitaireHT: result.tarifUnitaire, totalHT: result.totalApresRemise });
+            if (result.surplusGeo > 0 && result.zone) {
+              lignes.push({ id: DB.generateId(), description: 'Suppl\u00e9ment d\u00e9placement\u00a0\u2014\u00a0' + result.zone.label, type: 'forfait', quantite: result.nbJours, prixUnitaireHT: _round2(result.zone.surplusParJour), totalHT: result.surplusGeo });
+            }
+            const palierInput = overlay.querySelector('#dv-palier-id');
+            if (palierInput && result.palier) palierInput.value = result.palier.id;
           }
 
-          /* Stocker le palier pour les livrables */
-          const palierInput = overlay.querySelector('#dv-palier-id');
-          if (palierInput) palierInput.value = result.palier.id;
+          /* Stocker le segment */
+          const segHidden = overlay.querySelector('#dv-segment');
+          if (segHidden) segHidden.value = seg;
 
           _renderLignes(overlay, lignes, vatRate);
           resultatDiv.style.display = 'none';
@@ -729,6 +858,7 @@ Views.Devis = (() => {
         totalTTC:      totaux.totalTTC,
         seuilPlancher: seuil,
         margeEstimee:  _round2(totaux.totalHT - seuil),
+        segment:       ((overlay.querySelector('#dv-segment') || {}).value || 'institutionnel'),
         notes:         ((overlay.querySelector('#dv-notes') || {}).value || '').trim(),
         statut:        isEdit ? (existing.statut || 'brouillon') : 'brouillon'
       };
@@ -1061,10 +1191,75 @@ Views.Devis = (() => {
      ASSISTANT DE TARIFICATION — Moteur de suggestion devis
      ---------------------------------------------------------- */
 
-  function _computeDevisSuggestion({ nbJours, formatJournee, zoneId, estReconduction, palierId, tarifLibre }) {
+  function _computeDevisSuggestion({ segment, nbJours, formatJournee, zoneId, estReconduction, palierId, tarifLibre, gcNbJ, gcZone, b2bFormat, b2bNbJ, b2bZone, b2cDuree, b2cNbSessions }) {
     const s  = DB.settings.get();
     const pc = s.pricingCatalog || {};
+    const vatRate = s.vatRate || 20;
 
+    // Helper zone
+    function _resolveZone(zId) {
+      const zl = Array.isArray(pc.zones) ? pc.zones : [];
+      return zl.find(z => z.id === (zId || 'zone1')) || zl[0] || { id: 'zone1', label: 'Zone incluse', surplusParJour: 0 };
+    }
+
+    // ---- GRAND COMPTE ----
+    if (segment === 'grand_compte') {
+      const gcPaliers = Array.isArray(pc.paliersGrandCompte) ? pc.paliersGrandCompte : [];
+      const gcPalier  = gcPaliers.find(p => gcNbJ >= p.volumeMin && gcNbJ <= p.volumeMax);
+      if (!gcPalier) return { palier: null, segment };
+      const tarifUnitaire = gcPalier.tarifJour;
+      const baseHT = _round2(tarifUnitaire * gcNbJ);
+      const zone   = _resolveZone(gcZone);
+      const surplusGeo = zone.surplusParJour !== null ? _round2(zone.surplusParJour * gcNbJ) : null;
+      const totalHT = surplusGeo !== null ? _round2(baseHT + surplusGeo) : null;
+      const tva     = totalHT !== null ? _round2(totalHT * (vatRate / 100)) : null;
+      const totalTTC = totalHT !== null ? _round2(totalHT + tva) : null;
+      const detail = [
+        gcNbJ + ' jours \u00d7 ' + Engine.fmt(tarifUnitaire) + ' = ' + Engine.fmt(baseHT) + ' HT',
+        surplusGeo !== null && surplusGeo > 0 ? 'Surco\u00fbt zone (' + zone.label + ')\u00a0: +' + Engine.fmt(surplusGeo) : null,
+        surplusGeo === null ? 'Zone\u00a04\u00a0: surco\u00fbt \u00e0 pr\u00e9ciser' : null,
+        'Palier\u00a0: ' + gcPalier.label + ' (' + gcPalier.volumeMin + '\u2013' + (gcPalier.volumeMax === 9999 ? '150+' : gcPalier.volumeMax) + ' j/an)'
+      ].filter(Boolean).join('\n');
+      return { segment, palier: gcPalier, tarifUnitaire, nbJours: gcNbJ, formatJournee: 'journee', baseHT, remiseTotale: 0, totalApresRemise: baseHT, surplusGeo, zone, totalHT, tva, totalTTC, detail };
+    }
+
+    // ---- B2B ----
+    if (segment === 'b2b') {
+      const b2bCfg = pc.b2b || { tarifJourneeComplete: 2400, tarifDemiJournee: 1500 };
+      const tarifUnitaire = b2bFormat === 'demi' ? (b2bCfg.tarifDemiJournee || 1500) : (b2bCfg.tarifJourneeComplete || 2400);
+      const baseHT = _round2(tarifUnitaire * b2bNbJ);
+      const zone   = _resolveZone(b2bZone);
+      const surplusGeo = zone.surplusParJour !== null ? _round2(zone.surplusParJour * b2bNbJ) : null;
+      const totalHT = surplusGeo !== null ? _round2(baseHT + surplusGeo) : null;
+      const tva     = totalHT !== null ? _round2(totalHT * (vatRate / 100)) : null;
+      const totalTTC = totalHT !== null ? _round2(totalHT + tva) : null;
+      const fmtJ    = b2bFormat === 'demi' ? 'demi-journ\u00e9e(s)' : 'journ\u00e9e(s)';
+      const detail = [
+        b2bNbJ + ' ' + fmtJ + ' B2B \u00d7 ' + Engine.fmt(tarifUnitaire) + ' = ' + Engine.fmt(baseHT) + ' HT',
+        surplusGeo !== null && surplusGeo > 0 ? 'Surco\u00fbt zone (' + zone.label + ')\u00a0: +' + Engine.fmt(surplusGeo) : null,
+        surplusGeo === null ? 'Zone\u00a04\u00a0: surco\u00fbt \u00e0 pr\u00e9ciser' : null,
+        'Tarif B2B \u2014 pas de d\u00e9gressivit\u00e9'
+      ].filter(Boolean).join('\n');
+      return { segment, palier: null, tarifUnitaire, nbJours: b2bNbJ, formatJournee: b2bFormat, baseHT, remiseTotale: 0, totalApresRemise: baseHT, surplusGeo, zone, totalHT, tva, totalTTC, detail };
+    }
+
+    // ---- B2C ----
+    if (segment === 'b2c') {
+      const b2cCfg = pc.b2c || { forfait2h: 800, forfait3h: 1100, forfait4h: 1400, capaciteGroupe: 10 };
+      const forfaitKey = 'forfait' + (b2cDuree || '2h');
+      const tarifUnitaire = _round2(b2cCfg[forfaitKey] || 800);
+      const nb = b2cNbSessions || 1;
+      const totalHT  = _round2(tarifUnitaire * nb);
+      const tva      = _round2(totalHT * (vatRate / 100));
+      const totalTTC = _round2(totalHT + tva);
+      const detail = [
+        nb + ' session(s) ' + (b2cDuree || '2h') + ' \u00d7 ' + Engine.fmt(tarifUnitaire) + ' = ' + Engine.fmt(totalHT) + ' HT',
+        'Forfait groupe jusqu\u2019\u00e0 ' + (b2cCfg.capaciteGroupe || 10) + '\u00a0pers. \u2014 pas de zone'
+      ].join('\n');
+      return { segment, palier: null, tarifUnitaire, nbJours: nb, formatJournee: 'b2c', baseHT: totalHT, remiseTotale: 0, totalApresRemise: totalHT, surplusGeo: 0, zone: null, totalHT, tva, totalTTC, detail, b2cDuree, b2cNbSessions: nb };
+    }
+
+    // ---- INSTITUTIONNEL (défaut) ----
     // 1. Trouver le palier
     const paliersList = Array.isArray(pc.paliers) ? pc.paliers : [];
     const palier = palierId

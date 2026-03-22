@@ -163,7 +163,7 @@ Views.Prospects = (() => {
           '<td><strong>' + _esc(fullName) + '</strong>' +
             (p.email ? '<br><small class="text-muted">' + _esc(p.email) + '</small>' : '') +
           '</td>' +
-          '<td>' + _esc(p.organisation || '\u2014') + '</td>' +
+          '<td>' + _esc(p.organisation || '\u2014') + ((() => { const _sm = { institutionnel: ['tag-blue','Institutionnel'], grand_compte: ['tag-purple','Grand Compte'], b2b: ['tag-green','B2B'], b2c: ['tag-yellow','B2C'] }; const _s = _sm[p.segment || 'institutionnel']; return _s ? ' <span class="tag ' + _s[0] + '" style="font-size:0.65rem;">' + _s[1] + '</span>' : ''; })()) + '</td>' +
           '<td><small>' + _esc(p.type_structure || '\u2014') + '</small></td>' +
           '<td><span class="tag ' + statut.tag + '">' + statut.label + '</span></td>' +
           '<td><small class="text-muted">' + (source ? _esc(source.label) : _esc(p.source || '\u2014')) + '</small></td>' +
@@ -255,6 +255,7 @@ Views.Prospects = (() => {
       contactPhone:   p.telephone || '',
       type:           p.type_structure || '',
       clientCategory: 'B2B',
+      segment:        p.segment || 'institutionnel',
       active:         true
     });
 
@@ -351,6 +352,14 @@ Views.Prospects = (() => {
             '<div class="form-group"><label>Statut</label><select id="p-statut" class="form-control">' + statutOpts(v('statut', 'nouveau')) + '</select></div>' +
             '<div class="form-group"><label>Source</label><select id="p-source" class="form-control">' + sourceOpts(v('source', 'manuel')) + '</select></div>' +
           '</div>' +
+          '<div class="form-group"><label>Segment commercial</label>' +
+            '<select id="p-segment" class="form-control">' +
+              '<option value="institutionnel"' + ((!v('segment') || v('segment') === 'institutionnel') ? ' selected' : '') + '>Institutionnel \u2014 Service public arm\u00e9</option>' +
+              '<option value="grand_compte"'   + (v('segment') === 'grand_compte'   ? ' selected' : '') + '>Grand Compte \u2014 Structure nationale/r\u00e9gionale</option>' +
+              '<option value="b2b"'            + (v('segment') === 'b2b'            ? ' selected' : '') + '>B2B \u2014 Entreprise</option>' +
+              '<option value="b2c"'            + (v('segment') === 'b2c'            ? ' selected' : '') + '>B2C \u2014 Particulier / \u00c9v\u00e9nementiel</option>' +
+            '</select>' +
+          '</div>' +
           '<div class="form-group"><label>Notes internes</label><textarea id="p-notes" class="form-control" rows="3" placeholder="Notes de suivi, relances, contexte\u2026">' + _esc(v('notes')) + '</textarea></div>' +
           '<div class="form-group"><label>Message initial <span class="text-muted" style="font-size:0.75rem;">(message d\u2019origine)</span></label><textarea id="p-message" class="form-control" rows="3" placeholder="Copier ici le message re\u00e7u via le formulaire web\u2026">' + _esc(v('message')) + '</textarea></div>' +
 
@@ -384,6 +393,7 @@ Views.Prospects = (() => {
         message:        get('message').trim(),
         statut:         get('statut') || 'nouveau',
         source:         get('source') || 'manuel',
+        segment:        get('segment') || 'institutionnel',
         notes:          get('notes').trim()
       };
 

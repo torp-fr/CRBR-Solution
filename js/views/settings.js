@@ -42,8 +42,13 @@ Views.Settings = {
       pricingCatalog: (() => {
         const _stored  = settings.pricingCatalog || {};
         const _default = DB.settings.getDefaults().pricingCatalog;
-        // Migration : si l'ancien catalogue (sans degressivite[]) est détecté, basculer sur les défauts
-        return JSON.parse(JSON.stringify(Array.isArray(_stored.paliers) ? _stored : _default));
+        const _base    = Array.isArray(_stored.paliers) ? _stored : _default;
+        // Fusionner les nouveaux segments (GC/B2B/B2C) depuis les défauts si absents
+        const _merged  = Object.assign({}, _base);
+        if (!Array.isArray(_merged.paliersGrandCompte)) _merged.paliersGrandCompte = _default.paliersGrandCompte;
+        if (!_merged.b2b) _merged.b2b = Object.assign({}, _default.b2b);
+        if (!_merged.b2c) _merged.b2c = Object.assign({}, _default.b2c);
+        return JSON.parse(JSON.stringify(_merged));
       })(),
       coutJournee: JSON.parse(JSON.stringify(
         settings.coutJournee || DB.settings.getDefaults().coutJournee || {}
@@ -694,6 +699,9 @@ Views.Settings = {
         ? pc.paliers : DB.settings.getDefaults().pricingCatalog.paliers;
       const zones = (Array.isArray(pc.zones) && pc.zones.length >= 4)
         ? pc.zones : DB.settings.getDefaults().pricingCatalog.zones;
+      const gcPaliers = Array.isArray(pc.paliersGrandCompte) ? pc.paliersGrandCompte : DB.settings.getDefaults().pricingCatalog.paliersGrandCompte;
+      const b2bCfg    = pc.b2b || DB.settings.getDefaults().pricingCatalog.b2b;
+      const b2cCfg    = pc.b2c || DB.settings.getDefaults().pricingCatalog.b2c;
 
       const palierRows = paliers.map((p, i) => {
         const prixJour = Engine.round2(tarifBase * p.coeff);
@@ -803,6 +811,65 @@ Views.Settings = {
                 <tr><td>D\u00e9lai de paiement (jours)</td><td style="text-align:right;">${numFieldD('pc-paiement-delai', pc.paiementDelaiJours || 30, 1)}</td></tr>
               </tbody>
             </table>
+          </div>
+
+          <!-- F. Segments complémentaires -->
+          <h3 style="margin:20px 0 8px;font-size:0.88rem;color:var(--text-heading);">F. Segments compl\u00e9mentaires</h3>
+
+          <!-- F1. Grand Compte Itinérant -->
+          <h4 style="margin:0 0 6px;font-size:0.83rem;color:var(--text-muted);font-weight:600;">F1. Grand Compte Itin\u00e9rant</h4>
+          <div class="data-table-wrap" style="margin-bottom:8px;">
+            <table class="data-table" style="font-size:0.85rem;">
+              <thead><tr><th>Palier</th><th>Volume (jours/an)</th><th style="text-align:right;">Tarif/jour&nbsp;\u20ac</th></tr></thead>
+              <tbody>${gcPaliers.map((p, i) => `<tr>
+                <td style="font-weight:600;">${escapeHTML(p.label)}</td>
+                <td style="color:var(--text-muted);">${p.volumeMin}\u2013${p.volumeMax === 9999 ? '150+' : p.volumeMax}</td>
+                <td style="text-align:right;"><input type="number" class="form-control gc-tarif-jour" data-index="${i}" value="${p.tarifJour}" min="0" step="any" style="max-width:110px;padding:4px 6px;text-align:right;display:inline-block;">&nbsp;\u20ac</td>
+              </tr>`).join('')}</tbody>
+            </table>
+          </div>
+          <div style="margin-bottom:16px;font-size:0.82rem;">
+            <div style="color:var(--text-muted);margin-bottom:4px;">\u00c0 titre indicatif \u2014 marge estim\u00e9e par palier (vs seuil plancher\u00a0: ${Engine.fmt(seuilPlancher)})\u00a0:</div>
+            ${gcPaliers.map(p => {
+              const mg  = Engine.round2(p.tarifJour - seuilPlancher);
+              const pct = p.tarifJour > 0 ? Engine.round2((mg / p.tarifJour) * 100) : 0;
+              const col = mg < 0 ? '#d32f2f' : (pct < (state.targetMarginPercent || 30) ? '#f57c00' : '#2e7d32');
+              return `<div style="color:${col};">${escapeHTML(p.label)}\u00a0: ${Engine.fmt(p.tarifJour)} &minus; ${Engine.fmt(seuilPlancher)} = <strong>${Engine.fmt(mg)}</strong> (${pct}\u00a0%)</div>`;
+            }).join('')}
+          </div>
+
+          <!-- F2. B2B -->
+          <h4 style="margin:0 0 8px;font-size:0.83rem;color:var(--text-muted);font-weight:600;">F2. B2B \u2014 Entreprise / Team Building</h4>
+          <div class="form-row" style="margin-bottom:16px;">
+            <div class="form-group">
+              <label for="pc-b2b-journee">Journ\u00e9e compl\u00e8te B2B (\u20ac&nbsp;HT)</label>
+              <input type="number" id="pc-b2b-journee" class="form-control" value="${b2bCfg.tarifJourneeComplete || 2400}" min="0" step="any" style="max-width:160px;">
+            </div>
+            <div class="form-group">
+              <label for="pc-b2b-demi">Demi-journ\u00e9e B2B (\u20ac&nbsp;HT)</label>
+              <input type="number" id="pc-b2b-demi" class="form-control" value="${b2bCfg.tarifDemiJournee || 1500}" min="0" step="any" style="max-width:160px;">
+            </div>
+          </div>
+
+          <!-- F3. B2C / Événementiel -->
+          <h4 style="margin:0 0 8px;font-size:0.83rem;color:var(--text-muted);font-weight:600;">F3. B2C / \u00c9v\u00e9nementiel</h4>
+          <div class="form-row" style="flex-wrap:wrap;margin-bottom:8px;">
+            <div class="form-group">
+              <label for="pc-b2c-2h">Forfait 2h \u2014 groupe (\u20ac&nbsp;HT)</label>
+              <input type="number" id="pc-b2c-2h" class="form-control" value="${b2cCfg.forfait2h || 800}" min="0" step="any" style="max-width:140px;">
+            </div>
+            <div class="form-group">
+              <label for="pc-b2c-3h">Forfait 3h \u2014 groupe (\u20ac&nbsp;HT)</label>
+              <input type="number" id="pc-b2c-3h" class="form-control" value="${b2cCfg.forfait3h || 1100}" min="0" step="any" style="max-width:140px;">
+            </div>
+            <div class="form-group">
+              <label for="pc-b2c-4h">Forfait 4h \u2014 groupe (\u20ac&nbsp;HT)</label>
+              <input type="number" id="pc-b2c-4h" class="form-control" value="${b2cCfg.forfait4h || 1400}" min="0" step="any" style="max-width:140px;">
+            </div>
+            <div class="form-group">
+              <label for="pc-b2c-groupe">Capacit\u00e9 groupe max (pers.)</label>
+              <input type="number" id="pc-b2c-groupe" class="form-control" value="${b2cCfg.capaciteGroupe || 10}" min="1" step="1" style="max-width:120px;">
+            </div>
           </div>
         </div>`;
     }
@@ -1073,6 +1140,23 @@ Views.Settings = {
         const el = $('#' + id);
         if (el) pc[key] = parseFloat(el.value) || 0;
       });
+
+      // GC paliers tarif/jour
+      if (Array.isArray(pc.paliersGrandCompte)) {
+        $$('.gc-tarif-jour').forEach(input => {
+          const i = parseInt(input.dataset.index, 10);
+          if (pc.paliersGrandCompte[i]) pc.paliersGrandCompte[i].tarifJour = parseFloat(input.value) || 0;
+        });
+      }
+      // B2B
+      if (!pc.b2b) pc.b2b = {};
+      const _b2bJ = $('#pc-b2b-journee'); if (_b2bJ) pc.b2b.tarifJourneeComplete = parseFloat(_b2bJ.value) || 0;
+      const _b2bD = $('#pc-b2b-demi');    if (_b2bD) pc.b2b.tarifDemiJournee     = parseFloat(_b2bD.value) || 0;
+      // B2C
+      if (!pc.b2c) pc.b2c = {};
+      [['pc-b2c-2h','forfait2h'],['pc-b2c-3h','forfait3h'],['pc-b2c-4h','forfait4h'],['pc-b2c-groupe','capaciteGroupe']].forEach(([id, key]) => {
+        const el = $('#' + id); if (el) pc.b2c[key] = parseFloat(el.value) || 0;
+      });
     }
 
     function syncCoutJourneeFromDOM() {
@@ -1269,6 +1353,11 @@ Views.Settings = {
       if (pcBaseEl) pcBaseEl.addEventListener('input', refreshPricingCatalogCalcs);
       if (pcDemiEl) pcDemiEl.addEventListener('input', refreshPricingCatalogCalcs);
       $$('.palier-coeff').forEach(inp => inp.addEventListener('input', refreshPricingCatalogCalcs));
+
+      // Segment F : GC / B2B / B2C
+      $$('.gc-tarif-jour, #pc-b2b-journee, #pc-b2b-demi, #pc-b2c-2h, #pc-b2c-3h, #pc-b2c-4h, #pc-b2c-groupe').forEach(inp => {
+        if (inp) inp.addEventListener('input', () => syncPricingCatalogFromDOM());
+      });
 
       /* --- Coût journée réel : recalcul en temps réel --- */
       $$('.cj-field').forEach(inp => {

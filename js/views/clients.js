@@ -180,6 +180,7 @@ Views.Clients = (() => {
           <td>
             <strong>${_escapeHtml(client.name || '—')}</strong>
             ${client.clientCategory ? '<span class="tag ' + (client.clientCategory === 'B2B' ? 'tag-blue' : 'tag-yellow') + '" style="margin-left:6px;font-size:0.6rem;">' + client.clientCategory + '</span>' : ''}
+            ${(() => { const _sm = { institutionnel: ['tag-blue','Institutionnel'], grand_compte: ['tag-purple','Grand Compte'], b2b: ['tag-green','B2B'], b2c: ['tag-yellow','B2C'] }; const _s = _sm[client.segment || 'institutionnel']; return _s ? '<span class="tag ' + _s[0] + '" style="margin-left:4px;font-size:0.6rem;">' + _s[1] + '</span>' : ''; })()}
             ${client.sector ? '<br><span class="text-muted" style="font-size:0.75rem;">' + _escapeHtml(client.sector) + '</span>' : ''}
           </td>
           <td><span class="tag ${tagClass}">${_escapeHtml(client.type || 'N/C')}</span></td>
@@ -699,6 +700,17 @@ Views.Clients = (() => {
                    value="${isCustomType ? _escapeAttr(c.type) : ''}" placeholder="Saisissez un type..." />
           </div>
 
+          <!-- Segment commercial -->
+          <div class="form-group">
+            <label for="client-segment">Segment commercial</label>
+            <select id="client-segment" class="form-control" style="max-width:360px;">
+              <option value="institutionnel" ${(c.segment || 'institutionnel') === 'institutionnel' ? 'selected' : ''}>Institutionnel \u2014 Service public arm\u00e9</option>
+              <option value="grand_compte"   ${c.segment === 'grand_compte'   ? 'selected' : ''}>Grand Compte \u2014 Structure nationale/r\u00e9gionale</option>
+              <option value="b2b"            ${c.segment === 'b2b'            ? 'selected' : ''}>B2B \u2014 Entreprise</option>
+              <option value="b2c"            ${c.segment === 'b2c'            ? 'selected' : ''}>B2C \u2014 Particulier / \u00c9v\u00e9nementiel</option>
+            </select>
+          </div>
+
           <!-- Catégorie et secteur -->
           <div class="form-row">
             <div class="form-group">
@@ -869,11 +881,13 @@ Views.Clients = (() => {
       }
 
       const clientCategory = (overlay.querySelector('input[name="clientCategory"]:checked') || {}).value || 'B2B';
+      const segment = (overlay.querySelector('#client-segment') || {}).value || 'institutionnel';
 
       const data = {
         name,
         type,
         clientCategory,
+        segment,
         sector: overlay.querySelector('#client-sector').value.trim(),
         contactName: overlay.querySelector('#client-contact-name').value.trim(),
         contactEmail: overlay.querySelector('#client-contact-email').value.trim(),

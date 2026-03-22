@@ -326,7 +326,30 @@ const DB = (() => {
       // === CONDITIONS DE VENTE ===
       validiteDevisJours: 30,
       acomptePercent: 30,
-      paiementDelaiJours: 30
+      paiementDelaiJours: 30,
+
+      // === PALIERS GRAND COMPTE ITINÉRANT ===
+      paliersGrandCompte: [
+        { id: 'gc_standard',  label: 'Grand Compte Standard',  volumeMin: 50,  volumeMax: 99,   tarifJour: 1300, livrables: ['rapport_unite', 'synthese_territoriale'] },
+        { id: 'gc_volume',    label: 'Grand Compte Volume',    volumeMin: 100, volumeMax: 149,  tarifJour: 1150, livrables: ['rapport_unite', 'synthese_territoriale'] },
+        { id: 'gc_partenaire',label: 'Grand Compte Partenaire',volumeMin: 150, volumeMax: 9999, tarifJour: 1050, livrables: ['rapport_unite', 'synthese_territoriale', 'rapport_annuel_national'] }
+      ],
+
+      // === TARIFS B2B ===
+      b2b: {
+        tarifJourneeComplete: 2400,
+        tarifDemiJournee:     1500,
+        livrables: []
+      },
+
+      // === TARIFS B2C / ÉVÉNEMENTIEL ===
+      b2c: {
+        forfait2h:      800,
+        forfait3h:      1100,
+        forfait4h:      1400,
+        capaciteGroupe: 10,
+        livrables: []
+      }
     },
 
     // Coûts journée réels — alimentent calculateSeuilPlancher
