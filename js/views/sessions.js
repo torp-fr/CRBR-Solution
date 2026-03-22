@@ -51,9 +51,9 @@ Views.Sessions = (() => {
       const d = new Date(s.date);
       return d.getFullYear() === _viewYear && d.getMonth() === _viewMonth;
     });
-    const upcoming = sessions.filter(s => s.date >= todayStr && s.status !== 'annulee')
+    const upcoming = sessions.filter(s => s.date >= todayStr && s.statut !== 'annulee')
       .sort((a, b) => a.date.localeCompare(b.date));
-    const confirmedThisMonth = thisMonth.filter(s => s.status === 'confirmee' || s.status === 'en_cours').length;
+    const confirmedThisMonth = thisMonth.filter(s => s.statut === 'confirmee' || s.statut === 'en_cours').length;
 
     _container.innerHTML = `
       <div class="page-header">
@@ -159,7 +159,7 @@ Views.Sessions = (() => {
         dots = '<div class="cal-dots">';
         for (let i = 0; i < maxDots; i++) {
           const s = daySessions[i];
-          const dotColor = _statusColor(s.status);
+          const dotColor = _statusColor(s.statut);
           dots += `<span class="cal-dot" style="background:${dotColor};"></span>`;
         }
         if (daySessions.length > 4) {
@@ -209,7 +209,7 @@ Views.Sessions = (() => {
       });
 
       const monthCount = monthSessions.length;
-      const confirmedCount = monthSessions.filter(s => s.status === 'confirmee' || s.status === 'en_cours').length;
+      const confirmedCount = monthSessions.filter(s => s.statut === 'confirmee' || s.statut === 'en_cours').length;
 
       html += _renderMiniCalendar(m, _viewYear, byDate, monthCount, confirmedCount);
     }
@@ -253,7 +253,7 @@ Views.Sessions = (() => {
 
       let content = `<span class="mini-cal-day-num">${day}</span>`;
       if (hasItems) {
-        const dot = `<span class="mini-cal-dot" style="background:${_statusColor(daySessions[0].status)};"></span>`;
+        const dot = `<span class="mini-cal-dot" style="background:${_statusColor(daySessions[0].statut)};"></span>`;
         content += dot;
       }
 
@@ -273,7 +273,7 @@ Views.Sessions = (() => {
     });
 
     if (_filterStatus) {
-      filtered = filtered.filter(s => s.status === _filterStatus);
+      filtered = filtered.filter(s => s.statut === _filterStatus);
     }
 
     filtered.sort((a, b) => (a.date || '').localeCompare(b.date || '') || (a.time || '').localeCompare(b.time || ''));
@@ -320,7 +320,7 @@ Views.Sessions = (() => {
                   <td><small>${_moduleNames(s.moduleIds)}</small></td>
                   <td><small>${_operatorNames(s.operatorIds)}</small></td>
                   <td class="num">${Engine.fmt(s.price || 0)}${s.encaissement ? ' <span style="color:var(--color-success);font-weight:600;">✓</span>' : ' <span style="color:var(--text-muted);">○</span>'}</td>
-                  <td><span class="tag ${_statusTag(s.status)}">${_statusLabel(s.status)}</span></td>
+                  <td><span class="tag ${_statusTag(s.statut)}">${_statusLabel(s.statut)}</span></td>
                   <td class="actions-cell">
                     <button class="btn btn-sm btn-edit-sess" data-id="${s.id}" title="Modifier">&#9998;</button>
                     <button class="btn btn-sm btn-del-sess" data-id="${s.id}" title="Supprimer">&#128465;</button>
@@ -360,10 +360,10 @@ Views.Sessions = (() => {
       html += '<div class="empty-state" style="padding:20px;"><p class="text-muted">Aucune session planifi\u00e9e ce jour.</p></div>';
     } else {
       html += daySessions.map(s => {
-        const statusOpt = STATUS_OPTIONS.find(so => so.value === s.status) || STATUS_OPTIONS[0];
+        const statusOpt = STATUS_OPTIONS.find(so => so.value === s.statut) || STATUS_OPTIONS[0];
         const client = DB.clients.getById((s.clientIds && s.clientIds[0]) || s.clientId);
         return `
-          <div class="planning-card" style="border-left:4px solid ${_statusColor(s.status)};">
+          <div class="planning-card" style="border-left:4px solid ${_statusColor(s.statut)};">
             <div class="flex-between" style="align-items:flex-start;">
               <div style="flex:1;">
                 <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
@@ -539,7 +539,7 @@ Views.Sessions = (() => {
             <div class="form-group">
               <label for="fm-status">Statut</label>
               <select class="form-control" id="fm-status">
-                ${STATUS_OPTIONS.map(so => `<option value="${so.value}" ${(s.status || 'planifiee') === so.value ? 'selected' : ''}>${so.label}</option>`).join('')}
+                ${STATUS_OPTIONS.map(so => `<option value="${so.value}" ${(s.statut || 'planifiee') === so.value ? 'selected' : ''}>${so.label}</option>`).join('')}
               </select>
             </div>
           </div>
@@ -765,7 +765,7 @@ Views.Sessions = (() => {
 
       if (!isValid) return;
 
-      const previousStatus = session ? session.status : null;
+      const previousStatus = session ? session.statut : null;
       const newStatus = overlay.querySelector('#fm-status').value;
 
       const data = {
@@ -773,7 +773,7 @@ Views.Sessions = (() => {
         time:        overlay.querySelector('#fm-time').value || '',
         label:       overlay.querySelector('#fm-label').value.trim(),
         segment:     (overlay.querySelector('#fm-segment') || {}).value || 'institutionnel',
-        status:      newStatus,
+        statut:      newStatus,
         clientIds:   [clientId],
         moduleIds:   moduleCheckboxes.map(cb => cb.value),
         operatorIds: operatorCheckboxes.map(cb => cb.value),

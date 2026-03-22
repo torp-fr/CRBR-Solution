@@ -521,6 +521,21 @@ const DB = (() => {
 
   /* --- Modèle par défaut opérateur (migration douce des enregistrements existants) --- */
   const DEFAULT_OPERATOR = {
+    // === IDENTITÉ ===
+    firstName:        '',
+    lastName:         '',
+    email:            '',
+    phone:            '',
+    // === STATUT / ACTIVITÉ ===
+    status:           'freelance',
+    active:           true,
+    // === TARIFICATION ===
+    netDaily:         0,
+    companyCostDaily: 0,
+    costMode:         'daily_rate',
+    dailyRate:        0,
+    // === NOTES ===
+    notes:            '',
     // === ZONE GÉOGRAPHIQUE ===
     zoneLabel:        '',
     departements:     [],
@@ -547,6 +562,52 @@ const DB = (() => {
     portailDerniereSync: ''
   };
 
+  /* --- Modèle par défaut client --- */
+  const DEFAULT_CLIENT = {
+    name:               '',
+    contactName:        '',
+    contactEmail:       '',
+    contactPhone:       '',
+    type:               '',
+    clientCategory:     'B2B',
+    segment:            'institutionnel',
+    sector:             '',
+    website:            '',
+    address:            '',
+    city:               '',
+    postalCode:         '',
+    siret:              '',
+    paymentTerms:       'net30',
+    priority:           'normal',
+    active:             true,
+    notes:              '',
+    portailToken:       '',
+    portailActif:       false,
+    portailGenereeLe:   '',
+    portailDerniereSync: ''
+  };
+
+  /* --- Modèle par défaut session --- */
+  const DEFAULT_SESSION = {
+    label:        '',
+    date:         '',
+    time:         '',
+    statut:       'planifiee',
+    clientIds:    [],
+    moduleIds:    [],
+    operatorIds:  [],
+    locationId:   '',
+    offerId:      '',
+    segment:      '',
+    price:        0,
+    nbJours:      1,
+    notes:        '',
+    devisRef:     '',
+    variableCosts: [],
+    encaissement: false,
+    prixFactureHT: 0
+  };
+
   /* --- API publique --- */
   return {
     operators,
@@ -570,6 +631,8 @@ const DB = (() => {
     getNextNumeroFacture,
     generatePortailToken,
     generateOperateurToken,
-    DEFAULT_OPERATOR
+    DEFAULT_OPERATOR,
+    DEFAULT_CLIENT,
+    DEFAULT_SESSION
   };
 })();

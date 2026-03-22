@@ -335,29 +335,11 @@ Views.Clients = (() => {
 
     panel.querySelector('#btn-close-detail').addEventListener('click', () => _toggleDetail(clientId));
 
-    /* Bouton ajouter lieu */
-    const btnAddLoc = panel.querySelector('#btn-add-location');
-    if (btnAddLoc) {
-      btnAddLoc.addEventListener('click', () => _openLocationModal(null, clientId));
+    /* Navigation vers le module Lieux */
+    const btnGotoLoc = panel.querySelector('#btn-goto-locations');
+    if (btnGotoLoc) {
+      btnGotoLoc.addEventListener('click', () => App.navigate('locations'));
     }
-
-    /* Actions lieux */
-    panel.querySelectorAll('.btn-edit-loc').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const loc = DB.locations.getById(btn.dataset.id);
-        if (loc) _openLocationModal(loc, clientId);
-      });
-    });
-    panel.querySelectorAll('.btn-delete-loc').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const loc = DB.locations.getById(btn.dataset.id);
-        if (loc && confirm('Supprimer le lieu "' + (loc.name || '') + '" ?')) {
-          DB.locations.delete(loc.id);
-          _renderDetail(clientId);
-          Toast.show('Lieu supprimé.', 'warning');
-        }
-      });
-    });
 
     /* --- Portail client --- */
     const btnGenerer = panel.querySelector('.btn-portail-generer');
@@ -670,17 +652,17 @@ Views.Clients = (() => {
     return html;
   }
 
-  /* --- Lieux --- */
+  /* --- Lieux (lecture seule — gestion dans le module Lieux) --- */
   function _renderDetailLocations(client, locations) {
     let html = `
       <div class="flex-between mb-16">
         <span class="text-muted">${locations.length} lieu(x) associé(s)</span>
-        <button class="btn btn-sm btn-primary" id="btn-add-location">+ Ajouter un lieu</button>
+        <button class="btn btn-sm btn-primary" id="btn-goto-locations">&#128197; Gérer les lieux d'entraînement</button>
       </div>
     `;
 
     if (locations.length === 0) {
-      html += '<div class="empty-state" style="padding:24px;"><p class="text-muted">Aucun lieu enregistré pour ce client. Ajoutez un lieu d\'entraînement.</p></div>';
+      html += '<div class="empty-state" style="padding:24px;"><p class="text-muted">Aucun lieu enregistré. Utilisez le module <strong>Lieux</strong> pour en ajouter.</p></div>';
       return html;
     }
 
@@ -694,7 +676,6 @@ Views.Clients = (() => {
               <th>Type</th>
               <th>Capacité</th>
               <th class="text-right">Coût / session</th>
-              <th>Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -708,10 +689,6 @@ Views.Clients = (() => {
                 <td>${l.type ? '<span class="tag tag-neutral">' + _escapeHtml(l.type) + '</span>' : '—'}</td>
                 <td class="num">${l.capacity || '—'}</td>
                 <td class="num">${l.costPerSession ? Engine.fmt(l.costPerSession) : '—'}</td>
-                <td class="actions-cell">
-                  <button class="btn btn-sm btn-edit-loc" data-id="${l.id}" title="Modifier">&#9998;</button>
-                  <button class="btn btn-sm btn-delete-loc" data-id="${l.id}" title="Supprimer">&#128465;</button>
-                </td>
               </tr>
             `).join('')}
           </tbody>
@@ -1180,164 +1157,6 @@ Views.Clients = (() => {
         btn.textContent = '☁ Synchroniser le portail';
       }
     }
-  }
-
-  /* -----------------------------------------------------------
-     MODAL LIEU D'ENTRAÎNEMENT (CRÉER / MODIFIER)
-     ----------------------------------------------------------- */
-
-  function _openLocationModal(location, clientId) {
-    const isEdit = !!location;
-    const l = location || {};
-    const allModules = DB.modules.getAll();
-    const compatibleIds = l.compatibleModuleIds || [];
-
-    const overlay = document.createElement('div');
-    overlay.className = 'modal-overlay';
-    overlay.id = 'location-modal-overlay';
-
-    overlay.innerHTML = `
-      <div class="modal">
-        <div class="modal-header">
-          <h2>${isEdit ? 'Modifier le lieu' : 'Nouveau lieu d\'entra\u00eenement'}</h2>
-          <button class="btn btn-sm btn-ghost" id="btn-loc-close">&times;</button>
-        </div>
-        <div class="modal-body">
-          <div class="form-row">
-            <div class="form-group">
-              <label for="loc-name">Nom du lieu *</label>
-              <input type="text" class="form-control" id="loc-name"
-                     value="${_escapeAttr(l.name || '')}" placeholder="Ex : Stand Alpha" required />
-            </div>
-            <div class="form-group">
-              <label for="loc-type">Type</label>
-              <select class="form-control" id="loc-type">
-                <option value="" ${!l.type ? 'selected' : ''}>Non d\u00e9fini</option>
-                <option value="stand_tir" ${l.type === 'stand_tir' ? 'selected' : ''}>Stand de tir</option>
-                <option value="terrain" ${l.type === 'terrain' ? 'selected' : ''}>Terrain ext\u00e9rieur</option>
-                <option value="salle" ${l.type === 'salle' ? 'selected' : ''}>Salle</option>
-                <option value="site_urbain" ${l.type === 'site_urbain' ? 'selected' : ''}>Site urbain</option>
-                <option value="autre" ${l.type === 'autre' ? 'selected' : ''}>Autre</option>
-              </select>
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label for="loc-address">Adresse</label>
-            <input type="text" class="form-control" id="loc-address"
-                   value="${_escapeAttr(l.address || '')}" placeholder="Adresse compl\u00e8te" />
-          </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label for="loc-city">Ville</label>
-              <input type="text" class="form-control" id="loc-city"
-                     value="${_escapeAttr(l.city || '')}" placeholder="Ville" />
-            </div>
-            <div class="form-group">
-              <label for="loc-capacity">Capacit\u00e9 (personnes)</label>
-              <input type="number" class="form-control" id="loc-capacity"
-                     value="${l.capacity || ''}" min="0" step="1" placeholder="Ex : 20" />
-            </div>
-            <div class="form-group">
-              <label for="loc-cost">Co\u00fbt / session (\u20ac)</label>
-              <input type="number" class="form-control" id="loc-cost"
-                     value="${l.costPerSession || ''}" min="0" step="any" placeholder="0" />
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label for="loc-contact">Contact sur place</label>
-            <input type="text" class="form-control" id="loc-contact"
-                   value="${_escapeAttr(l.contactName || '')}" placeholder="Nom + t\u00e9l\u00e9phone" />
-          </div>
-
-          <div class="form-group">
-            <label for="loc-equipment">\u00c9quipements disponibles</label>
-            <textarea class="form-control" id="loc-equipment" rows="2"
-                      placeholder="Cibles, simulateurs, protections...">${_escapeHtml(l.equipmentAvailable || '')}</textarea>
-          </div>
-
-          ${allModules.length > 0 ? `
-          <div class="form-group">
-            <label>Modules compatibles</label>
-            <div style="max-height:140px;overflow-y:auto;border:1px solid var(--border-color);border-radius:6px;padding:8px;">
-              ${allModules.map(m => `
-                <label class="form-check" style="margin-bottom:4px;">
-                  <input type="checkbox" name="loc-modules" value="${m.id}" ${compatibleIds.includes(m.id) ? 'checked' : ''} />
-                  <span>${_escapeHtml(m.name || m.id)}</span>
-                </label>
-              `).join('')}
-            </div>
-          </div>` : ''}
-
-          <div class="form-group">
-            <label for="loc-notes">Notes</label>
-            <textarea class="form-control" id="loc-notes" rows="2"
-                      placeholder="Acc\u00e8s, restrictions, horaires...">${_escapeHtml(l.notes || '')}</textarea>
-          </div>
-
-          <div class="form-group">
-            <label class="form-check">
-              <input type="checkbox" id="loc-active" ${l.active !== false ? 'checked' : ''} />
-              Lieu actif
-            </label>
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button class="btn" id="btn-loc-cancel">Annuler</button>
-          <button class="btn btn-primary" id="btn-loc-save">${isEdit ? 'Enregistrer' : 'Cr\u00e9er'}</button>
-        </div>
-      </div>
-    `;
-
-    document.body.appendChild(overlay);
-
-    const closeModal = () => overlay.remove();
-    overlay.querySelector('#btn-loc-close').addEventListener('click', closeModal);
-    overlay.querySelector('#btn-loc-cancel').addEventListener('click', closeModal);
-    overlay.addEventListener('click', (e) => { if (e.target === overlay) closeModal(); });
-
-    overlay.querySelector('#btn-loc-save').addEventListener('click', () => {
-      const name = overlay.querySelector('#loc-name').value.trim();
-      if (!name) {
-        overlay.querySelector('#loc-name').style.borderColor = 'var(--accent-red)';
-        overlay.querySelector('#loc-name').focus();
-        return;
-      }
-
-      const compatibleModuleIds = [];
-      overlay.querySelectorAll('input[name="loc-modules"]:checked').forEach(cb => {
-        compatibleModuleIds.push(cb.value);
-      });
-
-      const data = {
-        name,
-        clientId: clientId,
-        type: overlay.querySelector('#loc-type').value,
-        address: overlay.querySelector('#loc-address').value.trim(),
-        city: overlay.querySelector('#loc-city').value.trim(),
-        capacity: parseInt(overlay.querySelector('#loc-capacity').value, 10) || 0,
-        costPerSession: parseFloat(overlay.querySelector('#loc-cost').value) || 0,
-        contactName: overlay.querySelector('#loc-contact').value.trim(),
-        equipmentAvailable: overlay.querySelector('#loc-equipment').value.trim(),
-        compatibleModuleIds,
-        notes: overlay.querySelector('#loc-notes').value.trim(),
-        active: overlay.querySelector('#loc-active').checked
-      };
-
-      if (isEdit) {
-        DB.locations.update(location.id, data);
-        Toast.show('Lieu \u00ab ' + name + ' \u00bb mis \u00e0 jour.', 'success');
-      } else {
-        DB.locations.create(data);
-        Toast.show('Lieu \u00ab ' + name + ' \u00bb cr\u00e9\u00e9.', 'success');
-      }
-
-      closeModal();
-      _renderDetail(clientId);
-    });
-
-    overlay.querySelector('#loc-name').focus();
   }
 
   /* --- Modal Abonnement Client --- */
