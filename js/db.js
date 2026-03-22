@@ -335,7 +335,7 @@ const DB = (() => {
       coutOperateurJour:          500,   // € coût total opérateur/jour (TJM ou coût chargé)
 
       // === MATÉRIEL ===
-      prixSimulateur:             60000, // € HT prix d'achat simulateur
+      prixSimulateur:             40000, // € HT prix d'achat simulateur
       dureeAmortissementAns:      7,     // années d'amortissement
       consommablesJour:           15,    // € consommables par jour
 
