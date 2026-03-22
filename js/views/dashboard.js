@@ -608,6 +608,11 @@ Views.Dashboard = {
           <h1>Tableau de bord</h1>
           <span class="text-muted" style="font-size:0.82rem;">${escapeHTML(today)} — Poste de commandement stratégique</span>
         </div>
+        <div class="actions">
+          <button class="btn btn-primary" onclick="if(window.DST_Wizard) DST_Wizard(); else alert('Wizard non disponible');">
+            ＋ Parcours guidé — Nouveau client
+          </button>
+        </div>
       </div>
 
       <!-- Indicateurs clés -->
