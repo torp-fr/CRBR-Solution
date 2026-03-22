@@ -286,9 +286,26 @@
       return '<span class="tag ' + s.cls + '">' + s.label + '</span>';
     }
 
+    /* ---- Supabase config ---- */
+    var SUPABASE_URL = 'https://uhpvshugtpmxgsztbovi.supabase.co';
+    var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVocHZzaHVndHBteGdzenRib3ZpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQxNzY3NjgsImV4cCI6MjA4OTc1Mjc2OH0.5pQGfqzP4YlzciqGJeMbIn14G6D5wr4fy7tINMVp9xE';
+
+    function sbHeaders() {
+      return {
+        'apikey': SUPABASE_ANON_KEY,
+        'Authorization': 'Bearer ' + SUPABASE_ANON_KEY
+      };
+    }
+
+    function showError(msg) {
+      document.getElementById('loading-state').classList.add('hidden');
+      document.getElementById('error-state').classList.remove('hidden');
+      document.getElementById('error-msg').textContent = msg;
+    }
+
     /* ---- Token depuis URL ---- */
-    const params = new URLSearchParams(window.location.search);
-    const token = params.get('token') || '';
+    var params = new URLSearchParams(window.location.search);
+    var token = params.get('token') || '';
 
     if (!token || !token.startsWith('tok_')) {
       document.getElementById('loading-state').classList.add('hidden');
@@ -296,31 +313,61 @@
       return;
     }
 
-    /* ---- Chargement des données ---- */
-    const dataUrl = '../data/portail-' + token + '.json';
+    /* ---- Chargement des données via Supabase ---- */
+    loadClientData(token);
 
-    fetch(dataUrl)
-      .then(function (r) {
-        if (!r.ok) throw new Error('HTTP ' + r.status);
-        return r.json();
-      })
-      .then(function (data) {
+    async function loadClientData(token) {
+      try {
+        // 1. Profil client
+        var r1 = await fetch(
+          SUPABASE_URL
+            + '/rest/v1/clients_portail'
+            + '?token=eq.' + encodeURIComponent(token)
+            + '&portail_actif=eq.true&select=*',
+          { headers: sbHeaders() }
+        );
+        var clients = await r1.json();
+        if (!clients || clients.length === 0) {
+          showError('Lien d\'accès invalide ou désactivé. Contactez DST System pour obtenir votre lien.');
+          return;
+        }
+        var client = clients[0];
+
+        // 2. Sessions
+        var r2 = await fetch(
+          SUPABASE_URL
+            + '/rest/v1/sessions_portail'
+            + '?token_client=eq.' + encodeURIComponent(token)
+            + '&select=*&order=date.asc',
+          { headers: sbHeaders() }
+        );
+        var sessions = await r2.json() || [];
+
+        // 3. Abonnements
+        var r3 = await fetch(
+          SUPABASE_URL
+            + '/rest/v1/abonnements_portail'
+            + '?token_client=eq.' + encodeURIComponent(token)
+            + '&actif=eq.true&select=*',
+          { headers: sbHeaders() }
+        );
+        var abonnements = await r3.json() || [];
+
+        // 4. Injecter dans le DOM
         document.getElementById('loading-state').classList.add('hidden');
         document.getElementById('main-content').classList.remove('hidden');
-        document.getElementById('header-client-name').textContent = data.clientNom || 'Espace client';
-        _renderPlanning(data.sessionsFutures || []);
-        _renderHistorique(data.sessionsPassees || []);
-        _renderAbonnement(data.abonnements || []);
-        _initContact(data.clientNom, data.clientContact);
+        document.getElementById('header-client-name').textContent = client.organisation || 'Espace client';
+        _renderPlanning(sessions.filter(function(s) { return s.est_future && s.statut !== 'annulee'; }));
+        _renderHistorique(sessions.filter(function(s) { return !s.est_future; }));
+        _renderAbonnement(abonnements);
+        _initContact(client.organisation, client.contact_name);
         _initTabs();
-      })
-      .catch(function (err) {
+
+      } catch (err) {
         console.error(err);
-        document.getElementById('loading-state').classList.add('hidden');
-        document.getElementById('error-state').classList.remove('hidden');
-        document.getElementById('error-msg').textContent =
-          'Impossible de charger vos données. Vérifiez le lien ou contactez DST.';
-      });
+        showError('Erreur de connexion. Veuillez réessayer.');
+      }
+    }
 
     /* ---- Rendu Planning ---- */
     function _renderPlanning(sessions) {
@@ -330,16 +377,16 @@
         return;
       }
       var rows = sessions.map(function (s) {
+        var heureLabel = s.heure ? ' ' + esc(s.heure) : '';
         return '<tr>'
-          + '<td>' + esc(fmtDate(s.date)) + '</td>'
-          + '<td>' + esc(s.titre || '—') + '</td>'
+          + '<td>' + esc(fmtDate(s.date)) + heureLabel + '</td>'
+          + '<td>' + esc(s.label || '—') + '</td>'
           + '<td>' + statusTag(s.statut) + '</td>'
           + '<td>' + esc(s.lieu || '—') + '</td>'
-          + '<td style="text-align:center;">' + esc(s.duree || 1) + ' j</td>'
           + '</tr>';
       }).join('');
       el.innerHTML = '<table>'
-        + '<thead><tr><th>Date</th><th>Session</th><th>Statut</th><th>Lieu</th><th style="text-align:center;">Durée</th></tr></thead>'
+        + '<thead><tr><th>Date</th><th>Session</th><th>Statut</th><th>Lieu</th></tr></thead>'
         + '<tbody>' + rows + '</tbody>'
         + '</table>';
     }
@@ -354,14 +401,14 @@
       var rows = sessions.map(function (s) {
         return '<tr>'
           + '<td>' + esc(fmtDate(s.date)) + '</td>'
-          + '<td>' + esc(s.titre || '—') + '</td>'
+          + '<td>' + esc(s.label || '—') + '</td>'
           + '<td>' + statusTag(s.statut) + '</td>'
           + '<td>' + esc(s.lieu || '—') + '</td>'
-          + '<td style="text-align:center;">' + esc(s.duree || 1) + ' j</td>'
+          + (s.compte_rendu ? '<td style="font-size:0.78rem;color:var(--text-muted);">' + esc(s.compte_rendu) + '</td>' : '<td>—</td>')
           + '</tr>';
       }).join('');
       el.innerHTML = '<table>'
-        + '<thead><tr><th>Date</th><th>Session</th><th>Statut</th><th>Lieu</th><th style="text-align:center;">Durée</th></tr></thead>'
+        + '<thead><tr><th>Date</th><th>Session</th><th>Statut</th><th>Lieu</th><th>Compte rendu</th></tr></thead>'
         + '<tbody>' + rows + '</tbody>'
         + '</table>';
     }
@@ -374,19 +421,16 @@
         return;
       }
       var html = abonnements.map(function (a) {
-        var total = a.sessionsTotal || 0;
-        var conso = a.sessionsConsommees || 0;
+        var total = a.volume_jours || 0;
+        var conso = a.sessions_realisees || 0;
         var restant = Math.max(0, total - conso);
         var pct = total > 0 ? Math.min(100, Math.round((conso / total) * 100)) : 0;
         return '<div class="card" style="margin-bottom:12px;">'
-          + '<div style="font-weight:600;font-size:0.92rem;margin-bottom:8px;">' + esc(a.offreNom || 'Abonnement') + '</div>'
-          + '<div style="font-size:0.82rem;color:var(--text-muted);margin-bottom:10px;">'
-          + (a.dateDebut ? 'Du ' + fmtDate(a.dateDebut) : '')
-          + (a.dateFin   ? ' au ' + fmtDate(a.dateFin)   : '')
-          + '</div>'
+          + '<div style="font-weight:600;font-size:0.92rem;margin-bottom:8px;">' + esc(a.offre_label || 'Abonnement') + '</div>'
+          + (a.rythme ? '<div style="font-size:0.82rem;color:var(--text-muted);margin-bottom:10px;">' + esc(a.rythme) + '</div>' : '')
           + '<div style="display:flex;justify-content:space-between;font-size:0.82rem;margin-bottom:6px;">'
-          + '<span>' + conso + ' / ' + total + ' sessions consommées</span>'
-          + '<span>' + restant + ' restante' + (restant > 1 ? 's' : '') + '</span>'
+          + '<span>' + conso + ' / ' + total + ' jours réalisés</span>'
+          + '<span>' + restant + ' restant' + (restant > 1 ? 's' : '') + '</span>'
           + '</div>'
           + '<div class="progress-wrap"><div class="progress-bar" style="width:' + pct + '%;"></div></div>'
           + '</div>';

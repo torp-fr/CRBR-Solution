@@ -9,6 +9,18 @@ window.Views = window.Views || {};
 Views.Clients = (() => {
   'use strict';
 
+  /* --- Supabase portail --- */
+  const SUPABASE_URL = 'https://uhpvshugtpmxgsztbovi.supabase.co';
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVocHZzaHVndHBteGdzenRib3ZpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQxNzY3NjgsImV4cCI6MjA4OTc1Mjc2OH0.5pQGfqzP4YlzciqGJeMbIn14G6D5wr4fy7tINMVp9xE';
+
+  function _sbHeaders() {
+    return {
+      'Content-Type': 'application/json',
+      'apikey': SUPABASE_ANON_KEY,
+      'Authorization': 'Bearer ' + SUPABASE_ANON_KEY
+    };
+  }
+
   /* --- État interne du module --- */
   let _container = null;
   let _searchTerm = '';
@@ -397,7 +409,7 @@ Views.Clients = (() => {
 
     const btnExporter = panel.querySelector('.btn-portail-exporter');
     if (btnExporter) {
-      btnExporter.addEventListener('click', () => _exportPortailData(btnExporter.dataset.id));
+      btnExporter.addEventListener('click', () => _syncPortailData(btnExporter.dataset.id));
     }
 
     const btnDesactiver = panel.querySelector('#btn-portail-desactiver');
@@ -478,7 +490,8 @@ Views.Clients = (() => {
             <div style="display:flex;gap:8px;flex-wrap:wrap;">
               <button class="btn btn-sm btn-portail-copier" data-url="${_escapeAttr(portailUrl)}">📋 Copier le lien</button>
               <button class="btn btn-sm btn-portail-inviter" data-id="${_escapeAttr(client.id)}">✉ Envoyer l'invitation</button>
-              <button class="btn btn-sm btn-portail-exporter" data-id="${_escapeAttr(client.id)}">⬇ Exporter données</button>
+              <button id="btn-sync-portail" class="btn btn-sm btn-primary btn-portail-exporter" data-id="${_escapeAttr(client.id)}">☁ Synchroniser le portail</button>
+              ${client.portailDerniereSync ? `<small style="color:var(--text-muted);align-self:center;">Sync : ${_formatDate(client.portailDerniereSync)}</small>` : ''}
               <button class="btn btn-sm" style="color:#d32f2f;" id="btn-portail-desactiver" data-id="${_escapeAttr(client.id)}">⊘ Désactiver</button>
             </div>
           </div>
@@ -1056,78 +1069,129 @@ Views.Clients = (() => {
   }
 
   /* -----------------------------------------------------------
-     EXPORT DONNÉES PORTAIL (JSON)
+     SYNC DONNÉES PORTAIL → SUPABASE
      ----------------------------------------------------------- */
 
-  function _exportPortailData(clientId) {
+  async function _syncPortailData(clientId) {
     const client = DB.clients.getById(clientId);
     if (!client || !client.portailToken) {
-      Toast.show('Aucun token portail actif pour ce client.', 'warning');
+      Toast.show('Générez d\'abord un accès portail', 'error');
       return;
     }
 
-    const allSessions = DB.sessions.filter(s =>
-      (s.clientIds || []).includes(clientId) || s.clientId === clientId
-    );
-    const abonnements = DB.clientSubscriptions.filter(s => s.clientId === clientId);
-    const now = new Date().toISOString();
-    const today = now.slice(0, 10);
+    const token = client.portailToken;
+    const btn = document.querySelector('#btn-sync-portail');
+    if (btn) { btn.disabled = true; btn.textContent = 'Sync...'; }
 
-    const sessionsFutures = allSessions
-      .filter(s => s.date >= today && s.status !== 'annulee')
-      .map(s => ({
-        id: s.id,
-        date: s.date,
-        titre: s.name || s.titre || '',
-        statut: s.status,
-        lieu: s.locationId ? (DB.locations.getById(s.locationId) || {}).name || '' : '',
-        duree: s.durationDays || 1
-      }));
+    try {
+      // 1. Upsert clients_portail
+      const r1 = await fetch(
+        SUPABASE_URL + '/rest/v1/clients_portail',
+        {
+          method: 'POST',
+          headers: { ..._sbHeaders(), 'Prefer': 'resolution=merge-duplicates' },
+          body: JSON.stringify({
+            dst_client_id: client.id,
+            token,
+            organisation: client.name || '',
+            contact_name: client.contactName || '',
+            email: client.contactEmail || '',
+            segment: client.segment || 'institutionnel',
+            portail_actif: client.portailActif !== false,
+            updated_at: new Date().toISOString()
+          })
+        }
+      );
+      if (!r1.ok) throw new Error('Erreur sync client: ' + r1.status);
 
-    const sessionsPassees = allSessions
-      .filter(s => s.date < today || s.status === 'terminee')
-      .slice(0, 50)
-      .map(s => ({
-        id: s.id,
-        date: s.date,
-        titre: s.name || s.titre || '',
-        statut: s.status,
-        lieu: s.locationId ? (DB.locations.getById(s.locationId) || {}).name || '' : '',
-        duree: s.durationDays || 1
-      }));
+      // 2. Supprimer anciennes sessions
+      await fetch(
+        SUPABASE_URL + '/rest/v1/sessions_portail?dst_client_id=eq.'
+          + encodeURIComponent(client.id),
+        { method: 'DELETE', headers: _sbHeaders() }
+      );
 
-    const payload = {
-      clientNom: client.name,
-      clientContact: client.contactName || '',
-      generatedAt: now,
-      sessionsFutures,
-      sessionsPassees,
-      abonnements: abonnements.map(a => {
-        const offer = DB.offers.getById(a.offerId);
-        return {
-          id: a.id,
-          offreNom: offer ? offer.name : (a.offerId || ''),
-          sessionsTotal: a.sessionsTotal || 0,
-          sessionsConsommees: a.sessionsConsumed || 0,
-          dateDebut: a.startDate || '',
-          dateFin: a.endDate || ''
-        };
-      })
-    };
+      // 3. Insérer nouvelles sessions
+      const allSessions = DB.sessions.getAll().filter(s =>
+        (s.clientIds || []).includes(clientId) || s.clientId === clientId
+      );
+      const now = new Date();
 
-    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'portail-' + client.portailToken + '.json';
-    a.click();
-    URL.revokeObjectURL(url);
+      if (allSessions.length > 0) {
+        const payload = allSessions.map(s => ({
+          dst_session_id: s.id,
+          dst_client_id: client.id,
+          token_client: token,
+          label: s.name || s.label || '',
+          date: s.date || null,
+          heure: s.time || '',
+          lieu: s.locationId
+            ? (DB.locations.getById(s.locationId) || {}).name || '' : '',
+          statut: s.status || 'planifiee',
+          est_future: s.date ? new Date(s.date) >= now : true,
+          compte_rendu: s.notes || ''
+        }));
+        const r3 = await fetch(
+          SUPABASE_URL + '/rest/v1/sessions_portail',
+          { method: 'POST', headers: _sbHeaders(), body: JSON.stringify(payload) }
+        );
+        if (!r3.ok) throw new Error('Erreur sync sessions: ' + r3.status);
+      }
 
-    Toast.show(
-      'Fichier exporté. Déposez-le dans vitrine/data/ pour activer l\'espace client.',
-      'info',
-      6000
-    );
+      // 4. Supprimer anciens abonnements
+      await fetch(
+        SUPABASE_URL + '/rest/v1/abonnements_portail?dst_client_id=eq.'
+          + encodeURIComponent(client.id),
+        { method: 'DELETE', headers: _sbHeaders() }
+      );
+
+      // 5. Insérer abonnements
+      const abonnements = DB.clientSubscriptions.getAll()
+        .filter(a => a.clientId === clientId);
+      const offers = DB.offers.getAll();
+
+      if (abonnements.length > 0) {
+        const abPayload = abonnements.map(ab => {
+          const offer = offers.find(o => o.id === ab.offerId);
+          return {
+            dst_client_id: client.id,
+            token_client: token,
+            offre_label: offer ? (offer.label || offer.name || 'Programme') : 'Programme',
+            volume_jours: ab.volumeJours || ab.sessionsTotal || 0,
+            sessions_realisees: ab.sessionsConsumed || 0,
+            rythme: ab.rythme || '',
+            actif: true
+          };
+        });
+        const r5 = await fetch(
+          SUPABASE_URL + '/rest/v1/abonnements_portail',
+          { method: 'POST', headers: _sbHeaders(), body: JSON.stringify(abPayload) }
+        );
+        if (!r5.ok) throw new Error('Erreur sync abonnements: ' + r5.status);
+      }
+
+      // 6. Mettre à jour date de sync locale
+      DB.clients.update(clientId, {
+        portailDerniereSync: new Date().toISOString()
+      });
+
+      Toast.show(
+        '✓ Portail synchronisé — '
+          + allSessions.length + ' séance(s), '
+          + abonnements.length + ' abonnement(s)',
+        'success'
+      );
+      _renderDetail(clientId);
+
+    } catch (err) {
+      console.error('[Sync portail]', err);
+      Toast.show('Erreur : ' + err.message, 'error');
+    } finally {
+      if (btn) {
+        btn.disabled = false;
+        btn.textContent = '☁ Synchroniser le portail';
+      }
+    }
   }
 
   /* -----------------------------------------------------------
