@@ -391,7 +391,8 @@ Views.Devis = (() => {
       totalHT:       d.totalHT,
       tauxTVA:       d.tauxTVA,
       totalTVA:      d.totalTVA,
-      totalTTC:      d.totalTTC
+      totalTTC:      d.totalTTC,
+      livrables:     d.livrables || []
     };
 
     const encoded = encodeURIComponent(JSON.stringify(payload));
@@ -474,29 +475,32 @@ Views.Devis = (() => {
             '</summary>' +
             '<div style="padding:12px 14px 14px;border-top:1px solid var(--border-color);">' +
               '<div class="form-row">' +
+                '<div class="form-group"><label>Format</label>' +
+                  '<select id="dv-assist-format" class="form-control">' +
+                    '<option value="journee">Journ\u00e9e compl\u00e8te</option>' +
+                    '<option value="demi">Demi-journ\u00e9e \u2014 Palier Ponctuel uniquement</option>' +
+                  '</select></div>' +
                 '<div class="form-group"><label>Nombre de jours</label>' +
-                  '<input type="number" id="dv-assist-nb-jours" class="form-control" min="1" step="1" value="1" /></div>' +
-                '<div class="form-group"><label>Tarif base (\u20ac\u00a0HT/jour)</label>' +
-                  '<input type="number" id="dv-assist-tarif-base" class="form-control" min="0" step="any" value="0" placeholder="0\u00a0= auto catalogue" /></div>' +
-                '<div class="form-group"><label>Jours week-end</label>' +
-                  '<input type="number" id="dv-assist-weekends" class="form-control" min="0" step="1" value="0" /></div>' +
+                  '<input type="number" id="dv-assist-nb-jours" class="form-control" min="1" step="1" value="1" />' +
+                  '<div id="dv-assist-palier-hint" style="margin-top:4px;min-height:20px;"></div>' +
+                '</div>' +
               '</div>' +
               '<div class="form-row">' +
-                '<div class="form-group"><label>D\u00e9lai commande (jours)</label>' +
-                  '<input type="number" id="dv-assist-delai" class="form-control" min="0" step="1" value="30" title="Jours entre la commande et la prestation\u00a0\u2014 en dessous du seuil d\u2019urgence, la majoration s\u2019applique" /></div>' +
-                '<div class="form-group"><label>Distance (km)</label>' +
-                  '<input type="number" id="dv-assist-distance" class="form-control" min="0" step="1" value="0" /></div>' +
-                '<div class="form-group" style="justify-content:flex-end;align-self:flex-end;padding-bottom:4px;">' +
+                '<div class="form-group"><label>Zone g\u00e9ographique</label>' +
+                  '<select id="dv-assist-zone" class="form-control">' + _buildZoneOptions(settings.pricingCatalog || {}) + '</select>' +
+                '</div>' +
+                '<div class="form-group" style="align-self:flex-end;padding-bottom:4px;">' +
                   '<label class="form-check" style="font-size:0.85rem;cursor:pointer;">' +
                     '<input type="checkbox" id="dv-assist-reconduction" style="margin-right:6px;">' +
-                    '<span>Renouvellement (fid\u00e9lit\u00e9)</span>' +
+                    '<span>Reconduction client (remise fid\u00e9lit\u00e9)</span>' +
                   '</label>' +
                 '</div>' +
               '</div>' +
-              '<button type="button" class="btn btn-sm" id="dv-assist-calculer">Calculer le tarif</button>' +
+              '<button type="button" class="btn btn-sm" id="dv-assist-calculer">Calculer</button>' +
               '<div id="dv-assist-resultat" style="display:none;margin-top:12px;padding:10px;background:var(--bg-tertiary);border-radius:4px;font-size:0.85rem;"></div>' +
             '</div>' +
           '</details>' +
+          '<input type="hidden" id="dv-palier-id" value="" />' +
 
           /* --- Section 2 : Lignes --- */
           '<div class="section-label" style="font-size:0.72rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;margin:16px 0 8px;">Lignes du devis</div>' +
@@ -544,46 +548,102 @@ Views.Devis = (() => {
       _renderLignes(overlay, lignes, vatRate);
     });
 
-    /* Assistant de tarification */
+    /* Assistant de tarification — live hint palier */
+    const assistNbJours = overlay.querySelector('#dv-assist-nb-jours');
+    if (assistNbJours) {
+      assistNbJours.addEventListener('input', () => {
+        const s      = DB.settings.get();
+        const pc     = s.pricingCatalog || {};
+        const paliers = Array.isArray(pc.paliers) ? pc.paliers : [];
+        const n      = parseInt(assistNbJours.value) || 0;
+        const hint   = overlay.querySelector('#dv-assist-palier-hint');
+        if (!hint) return;
+        const palier = paliers.find(p => n >= p.volumeMin && n <= p.volumeMax);
+        hint.textContent = palier
+          ? 'Palier\u00a0: ' + palier.label + ' (' + Math.round((1 - palier.coeff) * 100) + '\u00a0% de remise)'
+          : '';
+      });
+    }
+
+    /* Assistant de tarification — Calculer */
     const btnCalculer = overlay.querySelector('#dv-assist-calculer');
     if (btnCalculer) {
       btnCalculer.addEventListener('click', () => {
-        const s  = DB.settings.get();
-        const pc = s.pricingCatalog || {};
+        const nbJours        = parseInt((overlay.querySelector('#dv-assist-nb-jours')    || {}).value) || 1;
+        const formatJournee  = (overlay.querySelector('#dv-assist-format')               || {}).value || 'journee';
+        const zoneId         = (overlay.querySelector('#dv-assist-zone')                 || {}).value || 'zone1';
+        const estReconduction = !!(overlay.querySelector('#dv-assist-reconduction')       || {}).checked;
 
-        const nbJours       = parseInt((overlay.querySelector('#dv-assist-nb-jours')  || {}).value) || 1;
-        const tarifBase     = parseFloat((overlay.querySelector('#dv-assist-tarif-base') || {}).value) || 0;
-        const nbWeekends    = parseInt((overlay.querySelector('#dv-assist-weekends')   || {}).value) || 0;
-        const delai         = parseInt((overlay.querySelector('#dv-assist-delai')      || {}).value);
-        const distanceKm    = parseInt((overlay.querySelector('#dv-assist-distance')   || {}).value) || 0;
-        const estReconduction = !!(overlay.querySelector('#dv-assist-reconduction') || {}).checked;
-
-        const seuilUrgence = pc.majorationUrgenceSeuilJours || 14;
-        const nbUrgence    = (!isNaN(delai) && delai < seuilUrgence) ? nbJours : 0;
-
-        const result = _computeDevisSuggestion({ nbJours, estReconduction, nbWeekends, nbUrgence, distanceKm, tarifBase });
+        const result = _computeDevisSuggestion({ nbJours, formatJournee, zoneId, estReconduction });
 
         const resultatDiv = overlay.querySelector('#dv-assist-resultat');
         if (!resultatDiv) return;
 
+        /* Zone 4 = sur devis : pas de chiffrage automatique */
+        if (result.surplusGeo === null) {
+          resultatDiv.style.display = '';
+          resultatDiv.innerHTML =
+            '<p style="color:var(--color-warning);margin:0;">' +
+            '\u26a0\ufe0f Zone\u00a04 (500\u00a0km+)\u00a0\u2014 d\u00e9placement sur devis uniquement.<br>' +
+            'Les frais de d\u00e9placement ne peuvent pas \u00eatre calcul\u00e9s automatiquement.' +
+            '</p>';
+          return;
+        }
+
+        const labelFormat = formatJournee === 'demi' ? 'demi-journ\u00e9e(s)' : 'journ\u00e9e(s)';
         resultatDiv.style.display = '';
         resultatDiv.innerHTML =
           '<table style="width:100%;border-collapse:collapse;">' +
-            '<tr><td class="text-muted">Tarif base</td><td style="text-align:right;" class="text-mono">' + Engine.fmt(result.tarifBase) + ' \u00d7 ' + result.nbJours + '\u00a0j</td></tr>' +
-            (result.remiseTotale > 0 ? '<tr><td class="text-muted">Remise (' + result.remiseTotale + '\u00a0%)</td><td style="text-align:right;color:var(--color-success);" class="text-mono">&minus;\u00a0' + Engine.fmt(_round2(result.baseHT - result.totalApresRemise)) + '</td></tr>' : '') +
-            (result.majorationWeekend > 0 ? '<tr><td class="text-muted">Majoration week-end</td><td style="text-align:right;" class="text-mono">+\u00a0' + Engine.fmt(result.majorationWeekend) + '</td></tr>' : '') +
-            (result.majorationUrgence > 0 ? '<tr><td class="text-muted">Majoration urgence</td><td style="text-align:right;" class="text-mono">+\u00a0' + Engine.fmt(result.majorationUrgence) + '</td></tr>' : '') +
-            (result.fraisDeplacement > 0  ? '<tr><td class="text-muted">Frais d\u00e9placement</td><td style="text-align:right;" class="text-mono">+\u00a0' + Engine.fmt(result.fraisDeplacement) + '</td></tr>' : '') +
+            '<tr><td class="text-muted">' + result.nbJours + '\u00a0' + labelFormat + ' \u00d7 ' + Engine.fmt(result.tarifUnitaire) + '</td>' +
+              '<td style="text-align:right;" class="text-mono">' + Engine.fmt(result.baseHT) + '</td></tr>' +
+            (result.remiseTotale > 0
+              ? '<tr><td class="text-muted">Remise ' + result.palier.label + ' (\u2212' + result.remiseTotale + '\u00a0%)</td>' +
+                '<td style="text-align:right;color:var(--color-success);" class="text-mono">&minus;\u00a0' + Engine.fmt(_round2(result.baseHT - result.totalApresRemise)) + '</td></tr>'
+              : '') +
+            (result.surplusGeo > 0
+              ? '<tr><td class="text-muted">Suppl\u00e9ment zone (' + result.zone.label + ')</td>' +
+                '<td style="text-align:right;" class="text-mono">+\u00a0' + Engine.fmt(result.surplusGeo) + '</td></tr>'
+              : '') +
             '<tr style="border-top:1px solid var(--border-color);"><td style="padding-top:6px;font-weight:700;">Total HT</td>' +
               '<td style="text-align:right;font-weight:700;padding-top:6px;" class="text-mono">' + Engine.fmt(result.totalHT) + '</td></tr>' +
+            '<tr><td class="text-muted" style="font-size:0.78rem;">TVA\u00a020\u00a0%</td>' +
+              '<td style="text-align:right;font-size:0.78rem;" class="text-mono">' + Engine.fmt(result.tva) + '</td></tr>' +
+            '<tr><td style="font-weight:700;">Total TTC</td>' +
+              '<td style="text-align:right;font-weight:700;" class="text-mono">' + Engine.fmt(result.totalTTC) + '</td></tr>' +
           '</table>' +
           '<button type="button" class="btn btn-sm btn-primary" id="dv-assist-utiliser" style="margin-top:10px;">Utiliser ce tarif</button>';
 
         overlay.querySelector('#dv-assist-utiliser').addEventListener('click', () => {
-          const desc = 'Formation DST\u00a0\u2014\u00a0' + result.nbJours + ' jour(s)' +
-            (result.remiseTotale > 0 ? ', remise\u00a0' + result.remiseTotale + '\u00a0%' : '') +
-            (result.fraisDeplacement > 0 ? ', frais\u00a0d\u00e9pl.' : '');
-          lignes.push({ id: DB.generateId(), description: desc, type: 'session', quantite: 1, prixUnitaireHT: result.totalHT, totalHT: result.totalHT });
+          /* Ligne 1 — formation */
+          const typeLigne1 = (result.palier && result.palier.id === 'ponctuel') ? 'one_shot' : 'abonnement';
+          const descLigne1 = 'Formation DST\u00a0\u2014\u00a0' + result.palier.label +
+            '\u00a0\u2014\u00a0' + result.nbJours + '\u00a0' + labelFormat +
+            (result.remiseTotale > 0 ? ' (remise\u00a0' + result.remiseTotale + '\u00a0%)' : '');
+          lignes.push({
+            id: DB.generateId(),
+            description:     descLigne1,
+            type:            typeLigne1,
+            quantite:        result.nbJours,
+            prixUnitaireHT:  result.tarifUnitaire,
+            totalHT:         result.totalApresRemise
+          });
+
+          /* Ligne 2 — supplément géographique (si zone2/3) */
+          if (result.surplusGeo > 0) {
+            lignes.push({
+              id: DB.generateId(),
+              description:    'Suppl\u00e9ment d\u00e9placement\u00a0\u2014\u00a0' + result.zone.label,
+              type:           'forfait',
+              quantite:       result.nbJours,
+              prixUnitaireHT: _round2(result.zone.surplusParJour),
+              totalHT:        result.surplusGeo
+            });
+          }
+
+          /* Stocker le palier pour les livrables */
+          const palierInput = overlay.querySelector('#dv-palier-id');
+          if (palierInput) palierInput.value = result.palier.id;
+
           _renderLignes(overlay, lignes, vatRate);
           resultatDiv.style.display = 'none';
           const details = overlay.querySelector('#dv-assistant-wrapper');
@@ -631,6 +691,16 @@ Views.Devis = (() => {
         notes:         ((overlay.querySelector('#dv-notes') || {}).value || '').trim(),
         statut:        isEdit ? (existing.statut || 'brouillon') : 'brouillon'
       };
+
+      /* Livrables liés au palier sélectionné via l'assistant */
+      const palierIdVal = ((overlay.querySelector('#dv-palier-id') || {}).value || '').trim();
+      if (palierIdVal) {
+        const s2      = DB.settings.get();
+        const paliers = Array.isArray((s2.pricingCatalog || {}).paliers) ? s2.pricingCatalog.paliers : [];
+        const p       = paliers.find(x => x.id === palierIdVal);
+        data.palierId  = palierIdVal;
+        data.livrables = p ? (p.livrables || []) : [];
+      }
 
       if (!isEdit) {
         data.numero       = DB.getNextNumeroDevis();
@@ -800,6 +870,16 @@ Views.Devis = (() => {
     ).join('');
   }
 
+  function _buildZoneOptions(pc) {
+    const zones = Array.isArray(pc.zones) ? pc.zones : [];
+    return zones.map(z => {
+      let suffix = z.surplusParJour === null
+        ? '\u00a0\u2014 sur devis'
+        : (z.surplusParJour > 0 ? '\u00a0\u2014 +' + z.surplusParJour + '\u00a0\u20ac/jour' : '\u00a0\u2014 inclus');
+      return '<option value="' + _escAttr(z.id) + '">' + _esc(z.label + suffix) + '</option>';
+    }).join('');
+  }
+
   /* ----------------------------------------------------------
      CONVERSION DEVIS → SESSIONS
      ---------------------------------------------------------- */
@@ -930,51 +1010,61 @@ Views.Devis = (() => {
      ASSISTANT DE TARIFICATION — Moteur de suggestion devis
      ---------------------------------------------------------- */
 
-  function _computeDevisSuggestion({ nbJours, estReconduction, nbWeekends, nbUrgence, distanceKm, tarifBase }) {
+  function _computeDevisSuggestion({ nbJours, formatJournee, zoneId, estReconduction, palierId }) {
     const s  = DB.settings.get();
     const pc = s.pricingCatalog || {};
 
-    // 1. Tarif de base : si non fourni ou 0, auto-calculé depuis le seuil plancher + marge cible
-    if (!tarifBase || tarifBase === 0) {
-      const seuil = Engine.calculateSeuilPlancher(s);
-      tarifBase = Math.round(seuil * (1 + (s.targetMarginPercent || 30) / 100));
-    }
+    // 1. Trouver le palier
+    const paliersList = Array.isArray(pc.paliers) ? pc.paliers : [];
+    const palier = palierId
+      ? paliersList.find(p => p.id === palierId)
+      : paliersList.find(p => nbJours >= p.volumeMin && nbJours <= p.volumeMax);
+    if (!palier) return { palier: null };
 
-    // 2. Dégressivité volume
-    const degrList = (Array.isArray(pc.degressivite) ? pc.degressivite : []).slice().sort((a, b) => b.seuilJours - a.seuilJours);
-    const degrItem = degrList.find(d => nbJours >= d.seuilJours) || { remisePourcent: 0 };
-    const remiseVolume = degrItem.remisePourcent || 0;
+    // 2. Tarif unitaire selon format
+    const tarifJourBase = _round2((pc.tarifJourneeBase || 0) * palier.coeff);
+    const tarifUnitaire = (formatJournee === 'demi' && palier.demiJourneeDisponible)
+      ? _round2(tarifJourBase * (pc.tarifDemiJourneeCoeff || 0.70))
+      : tarifJourBase;
 
-    // 3. Remise fidélité
+    // 3. Total avant remise
+    const baseHT = _round2(tarifUnitaire * nbJours);
+
+    // 4. Remise fidélité
     const remiseFidelite = estReconduction ? (pc.remiseFidelitePourcent || 0) : 0;
-
-    // 4. Base HT avant majorations
-    const baseHT = _round2(nbJours * tarifBase);
-    const remiseTotale = Math.min(remiseVolume + remiseFidelite, pc.remiseMaxAutorisee || 20);
+    const remiseTotale   = Math.min(remiseFidelite, pc.remiseMaxAutorisee || 20);
     const totalApresRemise = _round2(baseHT * (1 - remiseTotale / 100));
 
-    // 5. Majorations
-    const majorationWeekend = _round2(nbWeekends * tarifBase * ((pc.majorationWeekendPourcent || 0) / 100));
-    const majorationUrgence = _round2(nbUrgence  * tarifBase * ((pc.majorationUrgencePourcent  || 0) / 100));
+    // 5. Surcoût géographique
+    const zonesList = Array.isArray(pc.zones) ? pc.zones : [];
+    const zone = zonesList.find(z => z.id === (zoneId || 'zone1')) || zonesList[0] || { id: 'zone1', label: 'Zone incluse', surplusParJour: 0 };
+    const surplusGeo = zone.surplusParJour !== null
+      ? _round2(zone.surplusParJour * nbJours)
+      : null; // null = sur devis
 
-    // 6. Frais déplacement aller-retour au-delà de la zone incluse
-    const zoneIncluse    = pc.fraisDeplacementZoneIncluse || 100;
-    const tauxKm         = pc.fraisDeplacementKm          || 0.45;
-    const fraisDeplacement = distanceKm > zoneIncluse ? _round2((distanceKm - zoneIncluse) * tauxKm * 2) : 0;
+    // 6. Total HT (null si zone sur devis)
+    const totalHT = surplusGeo !== null ? _round2(totalApresRemise + surplusGeo) : null;
 
-    // 7. Total HT
-    const totalHT = _round2(totalApresRemise + majorationWeekend + majorationUrgence + fraisDeplacement);
+    // 7. TVA et TTC
+    const vatRate = s.vatRate || 20;
+    const tva      = totalHT !== null ? _round2(totalHT * (vatRate / 100)) : null;
+    const totalTTC = totalHT !== null ? _round2(totalHT + tva) : null;
+
+    // 8. Texte détaillé
+    const maxLabel = palier.volumeMax === 9999 ? '25+' : palier.volumeMax;
+    const fmtJour  = formatJournee === 'demi' ? 'demi-journ\u00e9e(s)' : 'journ\u00e9e(s)';
+    const detail = [
+      `${nbJours} ${fmtJour} \u00d7 ${Engine.fmt(tarifUnitaire)} = ${Engine.fmt(baseHT)} HT`,
+      remiseTotale > 0 ? `Remise fid\u00e9lit\u00e9 (${remiseTotale}\u00a0%) : \u2212${Engine.fmt(_round2(baseHT * remiseTotale / 100))}` : null,
+      surplusGeo !== null && surplusGeo > 0 ? `Surco\u00fbt g\u00e9ographique ${zone.label} : +${Engine.fmt(surplusGeo)}` : null,
+      surplusGeo === null ? 'Zone\u00a04 : surco\u00fbt \u00e0 pr\u00e9ciser manuellement (sur devis)' : null,
+      `Palier : ${palier.label} (${palier.volumeMin}\u2013${maxLabel} jours/an)`
+    ].filter(Boolean).join('\n');
 
     return {
-      tarifBase, nbJours, baseHT,
-      remiseVolumePourcent:   remiseVolume,
-      remiseFidelitePourcent: remiseFidelite,
-      remiseTotale,
-      totalApresRemise,
-      majorationWeekend,
-      majorationUrgence,
-      fraisDeplacement,
-      totalHT
+      palier, tarifUnitaire, nbJours, formatJournee,
+      baseHT, remiseTotale, totalApresRemise,
+      surplusGeo, zone, totalHT, tva, totalTTC, detail
     };
   }
 

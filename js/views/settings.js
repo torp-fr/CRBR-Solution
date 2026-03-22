@@ -43,7 +43,7 @@ Views.Settings = {
         const _stored  = settings.pricingCatalog || {};
         const _default = DB.settings.getDefaults().pricingCatalog;
         // Migration : si l'ancien catalogue (sans degressivite[]) est détecté, basculer sur les défauts
-        return JSON.parse(JSON.stringify(Array.isArray(_stored.degressivite) ? _stored : _default));
+        return JSON.parse(JSON.stringify(Array.isArray(_stored.paliers) ? _stored : _default));
       })()
     };
 
@@ -494,34 +494,51 @@ Views.Settings = {
     /** Section 7 — Catalogue tarifaire */
     function renderPricingCatalog() {
       const pc = state.pricingCatalog;
-
-      function numField(id, val, step) {
-        return `<input type="number" id="${id}" class="form-control" value="${val}" min="0" step="${step || 'any'}" style="max-width:130px;padding:4px 8px;text-align:right;">`;
-      }
-
       const seuilPlancher = Engine.calculateSeuilPlancher(state);
-      const tarifSuggere  = Math.round(seuilPlancher * (1 + (state.targetMarginPercent || 30) / 100));
+      const tarifBase     = pc.tarifJourneeBase || 0;
+      const demiCoeff     = pc.tarifDemiJourneeCoeff || 0.70;
+      const seuilOk       = tarifBase > 0 && tarifBase >= seuilPlancher;
 
-      // Tableau dégressivité — toujours 3 lignes, row 0 non éditable
-      const degr = (Array.isArray(pc.degressivite) && pc.degressivite.length >= 3)
-        ? pc.degressivite
-        : [{ seuilJours: 0, remisePourcent: 0 }, { seuilJours: 10, remisePourcent: 5 }, { seuilJours: 20, remisePourcent: 10 }];
+      const paliers = (Array.isArray(pc.paliers) && pc.paliers.length === 4)
+        ? pc.paliers : DB.settings.getDefaults().pricingCatalog.paliers;
+      const zones = (Array.isArray(pc.zones) && pc.zones.length >= 4)
+        ? pc.zones : DB.settings.getDefaults().pricingCatalog.zones;
 
-      const degrRows = degr.map((d, i) => {
-        if (i === 0) {
-          return `<tr>
-            <td style="color:var(--text-muted);">&ge;&nbsp;${d.seuilJours}&nbsp;jour(s)</td>
-            <td style="text-align:right;color:var(--text-muted);">— (tarif de r\u00e9f\u00e9rence)</td>
-          </tr>`;
-        }
+      const palierRows = paliers.map((p, i) => {
+        const prixJour = Engine.round2(tarifBase * p.coeff);
+        const remPct   = Math.round((1 - p.coeff) * 100);
         return `<tr>
-          <td>
-            &ge;&nbsp;<input type="number" class="form-control degr-seuil" data-index="${i}" value="${d.seuilJours}" min="1" step="1"
-              style="max-width:70px;padding:4px 6px;text-align:right;display:inline-block;">&nbsp;jours
+          <td style="font-weight:600;">${escapeHTML(p.label)}</td>
+          <td style="text-align:center;">${p.volumeMin}</td>
+          <td style="text-align:center;">${p.volumeMax === 9999 ? '25+' : p.volumeMax}</td>
+          <td style="text-align:right;">
+            <input type="number" class="form-control palier-coeff" data-index="${i}"
+              value="${Math.round(p.coeff * 100)}" min="0" max="100" step="1"
+              style="max-width:75px;padding:4px 6px;text-align:right;display:inline-block;">&nbsp;%
           </td>
-          <td style="text-align:right;">${numField('pc-degr-remise-' + i, d.remisePourcent)}&nbsp;%</td>
+          <td style="text-align:right;font-weight:600;" class="palier-prix-jour" data-idx="${i}">${Engine.fmt(prixJour)}</td>
         </tr>`;
       }).join('');
+
+      const ponctuelCoeff  = paliers[0] ? paliers[0].coeff : 1;
+      const demiPrixPonctuel = Engine.round2(tarifBase * ponctuelCoeff * demiCoeff);
+
+      const zoneRows = zones.map((z, i) => `<tr>
+        <td style="color:var(--text-muted);font-size:0.82rem;font-weight:600;">${escapeHTML(z.id.toUpperCase())}</td>
+        <td>${escapeHTML(z.label)}</td>
+        <td style="text-align:right;">
+          ${z.surplusParJour === null
+            ? '<span class="tag tag-neutral" style="font-size:0.75rem;">Sur devis</span>'
+            : `<input type="number" class="form-control zone-surplus" data-index="${i}"
+                 value="${z.surplusParJour}" min="0" step="any"
+                 style="max-width:110px;padding:4px 6px;text-align:right;display:inline-block;">&nbsp;\u20ac/j`
+          }
+        </td>
+      </tr>`).join('');
+
+      function numFieldD(id, val, step) {
+        return `<input type="number" id="${id}" class="form-control" value="${val}" min="0" step="${step || 'any'}" style="max-width:130px;padding:4px 8px;text-align:right;">`;
+      }
 
       return `
         <div class="card" id="section-pricing-catalog">
@@ -529,66 +546,70 @@ Views.Settings = {
             <h2>Catalogue tarifaire</h2>
           </div>
 
-          <!-- A. Tarif journée de référence -->
-          <h3 style="margin:0 0 8px;font-size:0.88rem;color:var(--text-heading);">A. Tarif journ\u00e9e de r\u00e9f\u00e9rence</h3>
-          <div class="form-row" style="margin-bottom:16px;">
+          <!-- A. Tarif de référence -->
+          <h3 style="margin:0 0 10px;font-size:0.88rem;color:var(--text-heading);">A. Tarif de r\u00e9f\u00e9rence</h3>
+          <div class="form-row" style="margin-bottom:8px;">
             <div class="form-group">
-              <label for="pc-tarif-journee-base">Tarif journ\u00e9e (\u20ac&nbsp;HT)</label>
-              <input type="number" id="pc-tarif-journee-base" class="form-control" value="${pc.tarifJourneeBase || 0}" min="0" step="any" style="max-width:200px;">
-              <span class="form-help">
-                Seuil plancher calcul\u00e9&nbsp;: <strong>${Engine.fmt(seuilPlancher)}</strong>
-                &nbsp;\u2014&nbsp;Tarif sugg\u00e9r\u00e9 (marge&nbsp;${state.targetMarginPercent}&nbsp;%)&nbsp;:
-                <strong class="text-mono" style="color:var(--color-success);">${Engine.fmt(tarifSuggere)}</strong>
-              </span>
+              <label for="pc-tarif-journee-base">Tarif journ\u00e9e plein tarif (\u20ac\u00a0HT)</label>
+              <input type="number" id="pc-tarif-journee-base" class="form-control" value="${tarifBase}" min="0" step="any" style="max-width:180px;">
+            </div>
+            <div class="form-group">
+              <label for="pc-demi-coeff">Coefficient demi-journ\u00e9e</label>
+              <input type="number" id="pc-demi-coeff" class="form-control" value="${demiCoeff}" min="0" max="1" step="0.01" style="max-width:120px;">
+              <span class="form-help">Ex\u00a0: 0.70 = 70\u00a0% du tarif journ\u00e9e</span>
             </div>
           </div>
+          <div class="flex gap-12 mb-16" style="flex-wrap:wrap;align-items:center;">
+            <span class="text-muted" style="font-size:0.83rem;">
+              Demi-journ\u00e9e\u00a0=\u00a0<strong id="pc-demi-journee-display">${Engine.fmt(Engine.round2(tarifBase * demiCoeff))}</strong>\u00a0\u20ac\u00a0HT
+            </span>
+            <span class="tag ${seuilOk ? 'tag-green' : 'tag-red'}" id="pc-seuil-tag" style="font-size:0.77rem;">
+              Seuil plancher\u00a0: ${Engine.fmt(seuilPlancher)}\u00a0\u2014\u00a0${seuilOk ? 'Couvert' : '\u26a0\u00a0Insuffisant'}
+            </span>
+          </div>
 
-          <!-- B. Dégressivité volume -->
-          <h3 style="margin:0 0 8px;font-size:0.88rem;color:var(--text-heading);">B. D\u00e9gressivit\u00e9 volume</h3>
-          <p class="form-help" style="margin-bottom:8px;">Remise automatique selon le nombre de jours command\u00e9s.</p>
-          <div class="data-table-wrap" style="margin-bottom:12px;">
+          <!-- B. Paliers tarifaires -->
+          <h3 style="margin:0 0 8px;font-size:0.88rem;color:var(--text-heading);">B. Paliers tarifaires</h3>
+          <div class="data-table-wrap" style="margin-bottom:8px;">
             <table class="data-table" style="font-size:0.85rem;">
-              <thead><tr><th>Seuil</th><th style="text-align:right;">Remise (%)</th></tr></thead>
-              <tbody>${degrRows}</tbody>
+              <thead>
+                <tr>
+                  <th>Palier</th>
+                  <th style="text-align:center;">Min\u00a0j</th>
+                  <th style="text-align:center;">Max\u00a0j</th>
+                  <th style="text-align:right;">Coeff\u00a0(%)</th>
+                  <th style="text-align:right;">Prix/jour\u00a0\u20ac</th>
+                </tr>
+              </thead>
+              <tbody>${palierRows}</tbody>
             </table>
           </div>
-          <div class="form-row" style="margin-bottom:20px;">
-            <div class="form-group">
-              <label for="pc-remise-fidelite">Remise fid\u00e9lit\u00e9 (%)</label>
-              <input type="number" id="pc-remise-fidelite" class="form-control" value="${pc.remiseFidelitePourcent || 0}" min="0" max="100" step="any" style="max-width:130px;">
-              <span class="form-help">Appliqu\u00e9e en cas de renouvellement</span>
-            </div>
-            <div class="form-group">
-              <label for="pc-remise-max">Remise max autoris\u00e9e (%)</label>
-              <input type="number" id="pc-remise-max" class="form-control" value="${pc.remiseMaxAutorisee || 0}" min="0" max="100" step="any" style="max-width:130px;">
-              <span class="form-help">Cumul volume + fid\u00e9lit\u00e9 plafonn\u00e9</span>
-            </div>
-          </div>
+          <p class="form-help" style="margin-bottom:20px;">
+            Prix demi-journ\u00e9e Ponctuel\u00a0:
+            <strong id="pc-ponctuel-demi-prix">${Engine.fmt(demiPrixPonctuel)}</strong>\u00a0\u20ac\u00a0HT
+          </p>
 
-          <!-- C. Majorations & déplacements -->
-          <h3 style="margin:0 0 8px;font-size:0.88rem;color:var(--text-heading);">C. Majorations &amp; d\u00e9placements</h3>
+          <!-- C. Zones géographiques -->
+          <h3 style="margin:0 0 8px;font-size:0.88rem;color:var(--text-heading);">C. Zones g\u00e9ographiques</h3>
+          <p class="form-help" style="margin-bottom:8px;">Surco\u00fbt fixe par jour d\u2019intervention au-del\u00e0 de la zone incluse.</p>
           <div class="data-table-wrap" style="margin-bottom:20px;">
             <table class="data-table" style="font-size:0.85rem;">
-              <thead><tr><th>Param\u00e8tre</th><th style="width:160px;text-align:right;">Valeur</th></tr></thead>
-              <tbody>
-                <tr><td>Majoration week-end (%)</td><td style="text-align:right;">${numField('pc-majoration-weekend', pc.majorationWeekendPourcent || 0)}</td></tr>
-                <tr><td>Majoration urgence (%)</td><td style="text-align:right;">${numField('pc-majoration-urgence', pc.majorationUrgencePourcent || 0)}</td></tr>
-                <tr><td>D\u00e9lai urgence (jours)</td><td style="text-align:right;">${numField('pc-majoration-urgence-seuil', pc.majorationUrgenceSeuilJours || 14, 1)}</td></tr>
-                <tr><td>Frais kilom\u00e9triques (\u20ac/km)</td><td style="text-align:right;">${numField('pc-frais-km', pc.fraisDeplacementKm || 0, 0.01)}</td></tr>
-                <tr><td>Zone incluse (km)</td><td style="text-align:right;">${numField('pc-zone-incluse', pc.fraisDeplacementZoneIncluse || 0, 1)}</td></tr>
-              </tbody>
+              <thead><tr><th>Zone</th><th>Libell\u00e9</th><th style="text-align:right;">Surco\u00fbt/jour</th></tr></thead>
+              <tbody>${zoneRows}</tbody>
             </table>
           </div>
 
-          <!-- D. Conditions de vente -->
-          <h3 style="margin:0 0 8px;font-size:0.88rem;color:var(--text-heading);">D. Conditions de vente</h3>
+          <!-- D. Conditions commerciales -->
+          <h3 style="margin:0 0 8px;font-size:0.88rem;color:var(--text-heading);">D. Conditions commerciales</h3>
           <div class="data-table-wrap">
             <table class="data-table" style="font-size:0.85rem;">
               <thead><tr><th>Param\u00e8tre</th><th style="width:160px;text-align:right;">Valeur</th></tr></thead>
               <tbody>
-                <tr><td>Validit\u00e9 devis (jours)</td><td style="text-align:right;">${numField('pc-validite-devis', pc.validiteDevisJours || 30, 1)}</td></tr>
-                <tr><td>Acompte \u00e0 la commande (%)</td><td style="text-align:right;">${numField('pc-acompte', pc.acomptePercent || 30)}</td></tr>
-                <tr><td>D\u00e9lai de paiement (jours)</td><td style="text-align:right;">${numField('pc-paiement-delai', pc.paiementDelaiJours || 30, 1)}</td></tr>
+                <tr><td>Remise fid\u00e9lit\u00e9 reconduction (%)</td><td style="text-align:right;">${numFieldD('pc-remise-fidelite', pc.remiseFidelitePourcent || 5)}</td></tr>
+                <tr><td>Remise max autoris\u00e9e (%)</td><td style="text-align:right;">${numFieldD('pc-remise-max', pc.remiseMaxAutorisee || 20)}</td></tr>
+                <tr><td>Validit\u00e9 devis (jours)</td><td style="text-align:right;">${numFieldD('pc-validite-devis', pc.validiteDevisJours || 30, 1)}</td></tr>
+                <tr><td>Acompte \u00e0 la commande (%)</td><td style="text-align:right;">${numFieldD('pc-acompte', pc.acomptePercent || 30)}</td></tr>
+                <tr><td>D\u00e9lai de paiement (jours)</td><td style="text-align:right;">${numFieldD('pc-paiement-delai', pc.paiementDelaiJours || 30, 1)}</td></tr>
               </tbody>
             </table>
           </div>
@@ -822,36 +843,43 @@ Views.Settings = {
     function syncPricingCatalogFromDOM() {
       const pc = state.pricingCatalog;
 
-      // Champs scalaires
+      // Scalaires
+      const elBase = $('#pc-tarif-journee-base');
+      if (elBase) pc.tarifJourneeBase = parseFloat(elBase.value) || 0;
+      const elDemiCoeff = $('#pc-demi-coeff');
+      if (elDemiCoeff) pc.tarifDemiJourneeCoeff = parseFloat(elDemiCoeff.value) || 0.70;
+
+      // Paliers : coeff (en % → ratio)
+      if (Array.isArray(pc.paliers)) {
+        $$('.palier-coeff').forEach(input => {
+          const i = parseInt(input.dataset.index, 10);
+          if (pc.paliers[i] !== undefined) {
+            pc.paliers[i].coeff = (parseFloat(input.value) || 0) / 100;
+          }
+        });
+      }
+
+      // Zones : surplusParJour (zone4 reste null — pas d'input)
+      if (Array.isArray(pc.zones)) {
+        $$('.zone-surplus').forEach(input => {
+          const i = parseInt(input.dataset.index, 10);
+          if (pc.zones[i] !== undefined) {
+            pc.zones[i].surplusParJour = parseFloat(input.value) || 0;
+          }
+        });
+      }
+
+      // Conditions commerciales
       [
-        ['pc-tarif-journee-base',        'tarifJourneeBase'],
-        ['pc-remise-fidelite',           'remiseFidelitePourcent'],
-        ['pc-remise-max',                'remiseMaxAutorisee'],
-        ['pc-majoration-weekend',        'majorationWeekendPourcent'],
-        ['pc-majoration-urgence',        'majorationUrgencePourcent'],
-        ['pc-majoration-urgence-seuil',  'majorationUrgenceSeuilJours'],
-        ['pc-frais-km',                  'fraisDeplacementKm'],
-        ['pc-zone-incluse',              'fraisDeplacementZoneIncluse'],
-        ['pc-validite-devis',            'validiteDevisJours'],
-        ['pc-acompte',                   'acomptePercent'],
-        ['pc-paiement-delai',            'paiementDelaiJours']
+        ['pc-remise-fidelite', 'remiseFidelitePourcent'],
+        ['pc-remise-max',      'remiseMaxAutorisee'],
+        ['pc-validite-devis',  'validiteDevisJours'],
+        ['pc-acompte',         'acomptePercent'],
+        ['pc-paiement-delai',  'paiementDelaiJours']
       ].forEach(([id, key]) => {
         const el = $('#' + id);
         if (el) pc[key] = parseFloat(el.value) || 0;
       });
-
-      // Dégressivité — 3 lignes fixes, index 0 non éditable
-      if (!Array.isArray(pc.degressivite)) {
-        pc.degressivite = [{ seuilJours: 0, remisePourcent: 0 }, { seuilJours: 10, remisePourcent: 5 }, { seuilJours: 20, remisePourcent: 10 }];
-      }
-      $$('.degr-seuil').forEach(input => {
-        const i = parseInt(input.dataset.index, 10);
-        if (i > 0 && pc.degressivite[i]) pc.degressivite[i].seuilJours = parseInt(input.value, 10) || 0;
-      });
-      for (let i = 1; i < pc.degressivite.length; i++) {
-        const el = $('#pc-degr-remise-' + i);
-        if (el) pc.degressivite[i].remisePourcent = parseFloat(el.value) || 0;
-      }
     }
 
     /** Synchronise l'intégralité du state depuis les valeurs DOM */
@@ -937,6 +965,48 @@ Views.Settings = {
           reRenderSection('types', renderTypes);
         });
       });
+
+      /* --- Catalogue tarifaire : recalcul en temps réel --- */
+      function refreshPricingCatalogCalcs() {
+        const elBase     = $('#pc-tarif-journee-base');
+        const elDemiCoeff = $('#pc-demi-coeff');
+        if (!elBase) return;
+        const tarifBase = parseFloat(elBase.value) || 0;
+        const demiCoeff = elDemiCoeff ? (parseFloat(elDemiCoeff.value) || 0.70) : 0.70;
+        const seuilPlancher = Engine.calculateSeuilPlancher(state);
+
+        // Demi-journée display
+        const demiEl = $('#pc-demi-journee-display');
+        if (demiEl) demiEl.textContent = Engine.fmt(Engine.round2(tarifBase * demiCoeff));
+
+        // Seuil tag
+        const seuilTag = $('#pc-seuil-tag');
+        if (seuilTag) {
+          const ok = tarifBase > 0 && tarifBase >= seuilPlancher;
+          seuilTag.className = 'tag ' + (ok ? 'tag-green' : 'tag-red');
+          seuilTag.textContent = 'Seuil plancher\u00a0: ' + Engine.fmt(seuilPlancher) + '\u00a0\u2014\u00a0' + (ok ? 'Couvert' : '\u26a0\u00a0Insuffisant');
+        }
+
+        // Prix/jour par palier
+        $$('.palier-coeff').forEach(input => {
+          const i = parseInt(input.dataset.index, 10);
+          const coeff = (parseFloat(input.value) || 0) / 100;
+          const prixEl = container.querySelector('.palier-prix-jour[data-idx="' + i + '"]');
+          if (prixEl) prixEl.textContent = Engine.fmt(Engine.round2(tarifBase * coeff));
+        });
+
+        // Prix demi ponctuel
+        const firstCoeffEl = container.querySelector('.palier-coeff[data-index="0"]');
+        const firstCoeff   = firstCoeffEl ? ((parseFloat(firstCoeffEl.value) || 100) / 100) : 1;
+        const demiPoncEl   = $('#pc-ponctuel-demi-prix');
+        if (demiPoncEl) demiPoncEl.textContent = Engine.fmt(Engine.round2(tarifBase * firstCoeff * demiCoeff));
+      }
+
+      const pcBaseEl = $('#pc-tarif-journee-base');
+      const pcDemiEl = $('#pc-demi-coeff');
+      if (pcBaseEl) pcBaseEl.addEventListener('input', refreshPricingCatalogCalcs);
+      if (pcDemiEl) pcDemiEl.addEventListener('input', refreshPricingCatalogCalcs);
+      $$('.palier-coeff').forEach(inp => inp.addEventListener('input', refreshPricingCatalogCalcs));
     }
 
     /* ----------------------------------------------------------

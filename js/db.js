@@ -263,22 +263,70 @@ const DB = (() => {
     urssafRequalificationDays: 45,
     // Catalogue tarifaire de référence
     pricingCatalog: {
-      tarifJourneeBase:            0,
-      degressivite: [
-        { seuilJours: 0,  remisePourcent: 0  },
-        { seuilJours: 10, remisePourcent: 5  },
-        { seuilJours: 20, remisePourcent: 10 }
+
+      // === TARIF DE BASE (plein tarif journée, palier Ponctuel) ===
+      tarifJourneeBase: 2000,         // € HT tout inclus, zone ≤ 150 km
+      tarifDemiJourneeCoeff: 0.70,    // demi-journée = 70% du tarif journée
+                                      // (disponible uniquement palier Ponctuel)
+
+      // === PALIERS TARIFAIRES ===
+      paliers: [
+        {
+          id: 'ponctuel',
+          label: 'Ponctuel',
+          volumeMin: 1,
+          volumeMax: 5,
+          coeff: 1.00,
+          demiJourneeDisponible: true,
+          livrables: []
+        },
+        {
+          id: 'essentiel',
+          label: 'Essentiel',
+          volumeMin: 6,
+          volumeMax: 14,
+          coeff: 0.90,
+          demiJourneeDisponible: false,
+          livrables: ['bilan_trimestriel', 'rapport_annuel']
+        },
+        {
+          id: 'renforce',
+          label: 'Renforcé',
+          volumeMin: 15,
+          volumeMax: 24,
+          coeff: 0.82,
+          demiJourneeDisponible: false,
+          livrables: ['bilan_trimestriel', 'rapport_annuel']
+        },
+        {
+          id: 'territorial',
+          label: 'Territorial',
+          volumeMin: 25,
+          volumeMax: 9999,
+          coeff: 0.75,
+          demiJourneeDisponible: false,
+          livrables: ['bilan_trimestriel', 'rapport_annuel', 'rapport_territorial']
+        }
       ],
-      remiseFidelitePourcent:      5,
-      majorationWeekendPourcent:  20,
-      majorationUrgencePourcent:  15,
-      majorationUrgenceSeuilJours: 14,
-      fraisDeplacementKm:        0.45,
-      fraisDeplacementZoneIncluse: 100,
-      validiteDevisJours:          30,
-      acomptePercent:              30,
-      paiementDelaiJours:          30,
-      remiseMaxAutorisee:          20
+
+      // === ZONES GÉOGRAPHIQUES (surcoût/jour en € HT) ===
+      zones: [
+        { id: 'zone1', label: 'Zone incluse (0\u2013150\u00a0km)',  surplusParJour: 0    },
+        { id: 'zone2', label: 'Zone 2 (151\u2013300\u00a0km)',      surplusParJour: 250  },
+        { id: 'zone3', label: 'Zone 3 (301\u2013500\u00a0km)',      surplusParJour: 450  },
+        { id: 'zone4', label: 'Zone 4 (500+\u00a0km)',              surplusParJour: null }
+      ],
+
+      // === REMISE FIDÉLITÉ (reconduction N+1) ===
+      remiseFidelitePourcent: 5,
+
+      // === REMISE MAX AUTORISÉE SANS ALERTE ===
+      remiseMaxAutorisee: 20,
+
+      // === CONDITIONS DE VENTE ===
+      validiteDevisJours: 30,
+      acomptePercent: 30,
+      paiementDelaiJours: 30
     }
   };
 

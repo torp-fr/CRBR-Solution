@@ -258,6 +258,42 @@
       color: #aaa;
       font-size: 8pt;
     }
+
+    /* ---- LIVRABLES ---- */
+    .livrables-section {
+      margin-bottom: 24px;
+      padding: 14px 16px;
+      background: #f5f5f7;
+      border-left: 3px solid #1a1a2e;
+      border-radius: 0 2px 2px 0;
+    }
+
+    .livrables-title {
+      font-size: 9pt;
+      font-weight: 700;
+      color: #1a1a2e;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      margin-bottom: 8px;
+    }
+
+    .livrables-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .livrables-list li {
+      font-size: 9pt;
+      color: #333;
+      padding: 3px 0;
+    }
+
+    .livrables-list li::before {
+      content: '\2713\00a0\00a0';
+      color: #1a1a2e;
+      font-weight: 700;
+    }
   </style>
 </head>
 <body>
@@ -340,6 +376,12 @@
           <span id="tot-ttc">&mdash;</span>
         </div>
       </div>
+    </div>
+
+    <!-- LIVRABLES (affiché uniquement si le palier inclut des livrables) -->
+    <div id="livrables-section" class="livrables-section" style="display:none;">
+      <div class="livrables-title">Inclus dans ce programme</div>
+      <ul class="livrables-list" id="livrables-list"></ul>
     </div>
 
     <hr class="section-sep" />
@@ -427,6 +469,27 @@
       setText('tot-ttc', fmtEur(d.totalTTC));
       setText('taux-tva', d.tauxTVA != null ? d.tauxTVA : '20');
 
+      /* ---- Livrables ---- */
+      var livrables = Array.isArray(d.livrables) ? d.livrables : [];
+      if (livrables.length > 0) {
+        var livrablesLabels = {
+          bilan_trimestriel:   'Bilans trimestriels transmis au commandement',
+          rapport_annuel:      'Rapport annuel de progression des effectifs',
+          rapport_territorial: 'Rapport territorial \u2014 synth\u00e8se multi-sites'
+        };
+        var livSection = document.getElementById('livrables-section');
+        var livList    = document.getElementById('livrables-list');
+        if (livSection && livList) {
+          var items = '';
+          livrables.forEach(function(key) {
+            var label = livrablesLabels[key] || key;
+            items += '<li>' + esc(label) + '</li>';
+          });
+          livList.innerHTML = items;
+          livSection.style.display = '';
+        }
+      }
+
       /* ---- Helpers ---- */
       function setText(id, val) {
         var el = document.getElementById(id);
@@ -455,7 +518,7 @@
       }
 
       function labelType(t) {
-        var m = { session: 'Session', abonnement: 'Abonnement', module: 'Module', forfait: 'Forfait', autre: 'Autre' };
+        var m = { session: 'Session', abonnement: 'Abonnement', one_shot: 'Ponctuel', module: 'Module', forfait: 'Forfait', autre: 'Autre' };
         return m[t] || t || 'Autre';
       }
     });
