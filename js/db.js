@@ -106,6 +106,7 @@ const DB = (() => {
   const sessions            = createCRUD('sessions');
   const locations           = createCRUD('locations');
   const clientSubscriptions = createCRUD('clientSubscriptions');
+  const prospects           = createCRUD('prospects');
 
   /* --- Paramètres économiques --- */
   const DEFAULT_SETTINGS = {
@@ -279,6 +280,7 @@ const DB = (() => {
         sessions: sessions.getAll(),
         locations: locations.getAll(),
         clientSubscriptions: clientSubscriptions.getAll(),
+        prospects: prospects.getAll(),
         settings: settings.get()
       }
     };
@@ -294,11 +296,12 @@ const DB = (() => {
     if (d.sessions) setStore('sessions', d.sessions);
     if (d.locations) setStore('locations', d.locations);
     if (d.clientSubscriptions) setStore('clientSubscriptions', d.clientSubscriptions);
+    if (d.prospects) setStore('prospects', d.prospects);
     if (d.settings) settings.set(d.settings);
   }
 
   function clearAll() {
-    ['operators','modules','clients','offers','sessions','locations','clientSubscriptions'].forEach(k => setStore(k, []));
+    ['operators','modules','clients','offers','sessions','locations','clientSubscriptions','prospects'].forEach(k => setStore(k, []));
     settings.reset();
   }
 
@@ -311,6 +314,7 @@ const DB = (() => {
     sessions,
     locations,
     clientSubscriptions,
+    prospects,
     settings,
     exportAll,
     importAll,

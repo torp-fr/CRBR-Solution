@@ -13,6 +13,7 @@ const App = (() => {
   /* --- Routes disponibles --- */
   const routes = {
     dashboard:  { label: 'Dashboard dirigeant', icon: '◉', view: () => Views.Dashboard },
+    prospects:  { label: 'Prospects',           icon: '🎯', view: () => Views.Prospects },
     clients:    { label: 'Clients',              icon: '⊡', view: () => Views.Clients },
     offers:     { label: 'Offres / Abonnements', icon: '⊞', view: () => Views.Offers },
     sessions:   { label: 'Planning',              icon: '▶', view: () => Views.Sessions },
@@ -94,6 +95,7 @@ const App = (() => {
 
     const navSections = [
       { title: 'Pilotage', items: ['dashboard'] },
+      { title: 'CRM', items: ['prospects'] },
       { title: 'Gestion opérationnelle', items: ['clients', 'offers', 'sessions'] },
       { title: 'Ressources', items: ['operators', 'modules', 'locations'] },
       { title: 'Configuration', items: ['settings'] }

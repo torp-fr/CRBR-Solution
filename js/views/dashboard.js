@@ -21,6 +21,11 @@ Views.Dashboard = {
     const sessions  = DB.sessions.getAll();
     const now       = new Date();
 
+    /* Prospects KPI */
+    const _allProspects = DB.prospects.getAll();
+    const _prospectsActifs  = _allProspects.filter(p => p.statut !== 'converti' && p.statut !== 'perdu').length;
+    const _prospectsNouveaux = _allProspects.filter(p => p.statut === 'nouveau').length;
+
     /* ----------------------------------------------------------
        1. CONSTRUCTION DES CARTES KPI
        ---------------------------------------------------------- */
@@ -120,6 +125,11 @@ Views.Dashboard = {
           <div class="kpi-label">Trésorerie théorique</div>
           <div class="kpi-value text-mono">${Engine.fmt(tresorerie.tresorerie)}</div>
           <div class="kpi-detail">CA ${Engine.fmt(tresorerie.caRealise)} — Charges ${Engine.fmt(tresorerie.chargesProrata)}</div>
+        </div>
+        <div class="kpi-card ${_prospectsNouveaux > 0 ? 'kpi-warning' : ''}" style="cursor:pointer;" onclick="App.navigate('prospects')">
+          <div class="kpi-label">Prospects actifs <span class="tag tag-blue" style="margin-left:4px;font-size:0.6rem;">CRM</span></div>
+          <div class="kpi-value">${_prospectsActifs}</div>
+          <div class="kpi-detail">${_prospectsNouveaux > 0 ? _prospectsNouveaux + ' \u00e0 traiter' : 'Aucun nouveau'}</div>
         </div>
       </div>
     `;
