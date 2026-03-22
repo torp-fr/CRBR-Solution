@@ -517,47 +517,46 @@ Views.Clients = (() => {
 
     if (subscriptions.length === 0) {
       html += '<div class="empty-state" style="padding:24px;"><p class="text-muted">Aucun abonnement personnalisé. Créez un abonnement pour parametrer une offre avec ce client.</p></div>';
-      return html;
+    } else {
+      html += `
+        <div class="data-table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Offre</th>
+                <th>Participants</th>
+                <th>Rythme</th>
+                <th class="text-right">Prix HT/an</th>
+                <th class="text-right">Jours/an</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${subscriptions.map(sub => {
+                const offer = DB.offers.getById(sub.offerId);
+                const offerLabel = offer ? (offer.label || '(sans nom)') : '(offre supprimée)';
+                const rhythmLabels = { 'mensuel': 'Mensuel', 'bimensuel': 'Bimensuel', 'hebdomadaire': 'Hebdomadaire', 'trimestriel': 'Trimestriel' };
+                const rhythmLabel = rhythmLabels[sub.rythme] || sub.rythme || '—';
+
+                return `
+                  <tr>
+                    <td><strong>${_escapeHtml(offerLabel)}</strong></td>
+                    <td class="num">${sub.participants || 1}</td>
+                    <td><small>${_escapeHtml(rhythmLabel)}</small></td>
+                    <td class="num">${Engine.fmt(sub.prixPersonnalise || 0)}</td>
+                    <td class="num">${sub.volumeJours || '—'}</td>
+                    <td class="actions-cell">
+                      <button class="btn btn-sm btn-edit-sub" data-id="${sub.id}" data-client="${client.id}" title="Modifier">&#9998;</button>
+                      <button class="btn btn-sm btn-delete-sub" data-id="${sub.id}" title="Supprimer">&#128465;</button>
+                    </td>
+                  </tr>
+                `;
+              }).join('')}
+            </tbody>
+          </table>
+        </div>
+      `;
     }
-
-    html += `
-      <div class="data-table-wrap">
-        <table class="data-table">
-          <thead>
-            <tr>
-              <th>Offre</th>
-              <th>Participants</th>
-              <th>Rythme</th>
-              <th class="text-right">Prix HT/an</th>
-              <th class="text-right">Jours/an</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${subscriptions.map(sub => {
-              const offer = DB.offers.getById(sub.offerId);
-              const offerLabel = offer ? (offer.label || '(sans nom)') : '(offre supprimée)';
-              const rhythmLabels = { 'mensuel': 'Mensuel', 'bimensuel': 'Bimensuel', 'hebdomadaire': 'Hebdomadaire', 'trimestriel': 'Trimestriel' };
-              const rhythmLabel = rhythmLabels[sub.rythme] || sub.rythme || '—';
-
-              return `
-                <tr>
-                  <td><strong>${_escapeHtml(offerLabel)}</strong></td>
-                  <td class="num">${sub.participants || 1}</td>
-                  <td><small>${_escapeHtml(rhythmLabel)}</small></td>
-                  <td class="num">${Engine.fmt(sub.prixPersonnalise || 0)}</td>
-                  <td class="num">${sub.volumeJours || '—'}</td>
-                  <td class="actions-cell">
-                    <button class="btn btn-sm btn-edit-sub" data-id="${sub.id}" data-client="${client.id}" title="Modifier">&#9998;</button>
-                    <button class="btn btn-sm btn-delete-sub" data-id="${sub.id}" title="Supprimer">&#128465;</button>
-                  </td>
-                </tr>
-              `;
-            }).join('')}
-          </tbody>
-        </table>
-      </div>
-    `;
 
     setTimeout(() => {
       const btnAdd = _container.querySelector('#btn-add-subscription');

@@ -473,9 +473,12 @@
       var livrables = Array.isArray(d.livrables) ? d.livrables : [];
       if (livrables.length > 0) {
         var livrablesLabels = {
-          bilan_trimestriel:   'Bilans trimestriels transmis au commandement',
-          rapport_annuel:      'Rapport annuel de progression des effectifs',
-          rapport_territorial: 'Rapport territorial \u2014 synth\u00e8se multi-sites'
+          bilan_trimestriel:       'Bilans trimestriels transmis au commandement',
+          rapport_annuel:          'Rapport annuel de progression des effectifs',
+          rapport_territorial:     'Rapport territorial \u2014 synth\u00e8se multi-sites',
+          rapport_unite:           'Rapport individuel par unit\u00e9',
+          synthese_territoriale:   'Synth\u00e8se territoriale annuelle',
+          rapport_annuel_national: 'Rapport annuel national (toutes unit\u00e9s)'
         };
         var livSection = document.getElementById('livrables-section');
         var livList    = document.getElementById('livrables-list');

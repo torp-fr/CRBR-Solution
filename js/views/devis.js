@@ -227,7 +227,12 @@ Views.Devis = (() => {
       rows +=
         '<tr>' +
           '<td><strong class="text-mono" style="font-size:0.85rem;">' + _esc(d.numero || '\u2014') + '</strong></td>' +
-          '<td>' + _esc(dest) + destDetail + '</td>' +
+          '<td>' + _esc(dest) + destDetail + (function() {
+            if (!d.segment) return '';
+            var _sm = { institutionnel: ['tag-blue','Institutionnel'], grand_compte: ['tag-purple','Grand Compte'], b2b: ['tag-green','B2B'], b2c: ['tag-yellow','B2C'] };
+            var _s = _sm[d.segment];
+            return _s ? '<br><span class="tag ' + _s[0] + '" style="font-size:0.65rem;margin-top:3px;">' + _s[1] + '</span>' : '';
+          }()) + '</td>' +
           '<td>' +
             _esc(d.titre || '\u2014') +
             (d.objet ? '<br><small class="text-muted">' + _esc(d.objet.length > 55 ? d.objet.substring(0, 55) + '\u2026' : d.objet) + '</small>' : '') +
