@@ -44,7 +44,10 @@ Views.Settings = {
         const _default = DB.settings.getDefaults().pricingCatalog;
         // Migration : si l'ancien catalogue (sans degressivite[]) est détecté, basculer sur les défauts
         return JSON.parse(JSON.stringify(Array.isArray(_stored.paliers) ? _stored : _default));
-      })()
+      })(),
+      coutJournee: JSON.parse(JSON.stringify(
+        settings.coutJournee || DB.settings.getDefaults().coutJournee || {}
+      ))
     };
 
     /* ----------------------------------------------------------
@@ -491,6 +494,194 @@ Views.Settings = {
         </div>`;
     }
 
+    /** Génère le HTML du tableau récapitulatif coût journée (réutilisé par refresh) */
+    function _buildCjRecapHTML(cj, tarifBase, targetMargin, alertThreshold) {
+      const nb      = Math.max(cj.nbJoursFacturesAn || 100, 1);
+      const coutOp  = Engine.round2(cj.coutOperateurJour || 0);
+      const amortSimu = cj.prixSimulateur
+        ? Engine.round2((cj.prixSimulateur / (cj.dureeAmortissementAns || 7)) / nb) : 0;
+      const conso      = Engine.round2(cj.consommablesJour || 0);
+      const assurances = Engine.round2(((cj.rcProAnnuelle || 0) + (cj.assurancesMaterielAnnuelle || 0)) / nb);
+      const fraisKm    = (cj.deplacementMoyenKm || 0) * (cj.tarifKm || 0.53);
+      const deplacement = Engine.round2(fraisKm + (cj.peagesAllerRetour || 0) + (cj.fraisStationnement || 0));
+      const admin      = Engine.round2(((cj.expertComptableAnnuel || 0)
+        + (cj.fraisBancairesAnnuels || 0) + (cj.autresFraisAdminAnnuels || 0)) / nb);
+      const coutDirect = Engine.round2(coutOp + amortSimu + conso + assurances + deplacement + admin);
+      const ratioTNF   = Math.min((cj.ratioTempsNonFacturable || 40) / 100, 0.95);
+      const coutAvecTNF = Engine.round2(coutDirect / (1 - ratioTNF));
+      const majTNF     = Engine.round2(coutAvecTNF - coutDirect);
+      const margeSec   = (cj.margeSecuritePourcent || 5) / 100;
+      const coutFinal  = Math.round(coutAvecTNF * (1 + margeSec));
+      const majSecurite = Engine.round2(coutFinal - coutAvecTNF);
+      const margeBrute = tarifBase > 0 ? Engine.round2((tarifBase - coutFinal) / tarifBase * 100) : 0;
+      const margeClass = margeBrute >= targetMargin ? 'tag-green'
+        : margeBrute >= alertThreshold ? 'tag-yellow' : 'tag-red';
+
+      return `<table class="data-table" style="font-size:0.85rem;max-width:480px;">
+        <thead><tr><th>Poste</th><th style="text-align:right;">\u20ac/jour</th></tr></thead>
+        <tbody>
+          <tr><td>Op\u00e9rateur</td><td style="text-align:right;" class="text-mono">${Engine.fmt(coutOp)}</td></tr>
+          <tr><td>Amortissement</td><td style="text-align:right;" class="text-mono">${Engine.fmt(amortSimu)}</td></tr>
+          <tr><td>Consommables</td><td style="text-align:right;" class="text-mono">${Engine.fmt(conso)}</td></tr>
+          <tr><td>Assurances</td><td style="text-align:right;" class="text-mono">${Engine.fmt(assurances)}</td></tr>
+          <tr><td>D\u00e9placements</td><td style="text-align:right;" class="text-mono">${Engine.fmt(deplacement)}</td></tr>
+          <tr><td>Administratif</td><td style="text-align:right;" class="text-mono">${Engine.fmt(admin)}</td></tr>
+          <tr style="border-top:1px solid var(--border-color);">
+            <td style="font-weight:600;">Sous-total direct</td>
+            <td style="text-align:right;font-weight:600;" class="text-mono">${Engine.fmt(coutDirect)}</td>
+          </tr>
+          <tr>
+            <td style="color:var(--text-muted);">Majoration TNF (+${cj.ratioTempsNonFacturable || 40}\u00a0%)</td>
+            <td style="text-align:right;" class="text-mono">+\u00a0${Engine.fmt(majTNF)}</td>
+          </tr>
+          <tr>
+            <td style="color:var(--text-muted);">Marge s\u00e9curit\u00e9 (+${cj.margeSecuritePourcent || 5}\u00a0%)</td>
+            <td style="text-align:right;" class="text-mono">+\u00a0${Engine.fmt(majSecurite)}</td>
+          </tr>
+          <tr style="border-top:2px solid var(--border-color);">
+            <td style="font-weight:700;font-size:0.9rem;">SEUIL PLANCHER</td>
+            <td style="text-align:right;font-weight:700;font-size:0.9rem;" class="text-mono">${Engine.fmt(coutFinal)}\u00a0\u20ac</td>
+          </tr>
+          <tr>
+            <td style="padding-top:10px;color:var(--text-muted);">Tarif journ\u00e9e r\u00e9f.</td>
+            <td style="text-align:right;padding-top:10px;" class="text-mono">${Engine.fmt(tarifBase)}\u00a0\u20ac</td>
+          </tr>
+          <tr>
+            <td style="font-weight:600;">Marge brute estim\u00e9e</td>
+            <td style="text-align:right;"><span class="tag ${margeClass}">${margeBrute}\u00a0%</span></td>
+          </tr>
+        </tbody>
+      </table>`;
+    }
+
+    /** Section 6b — Coût journée réel */
+    function renderCoutJournee() {
+      const cj = state.coutJournee;
+      const nb = Math.max(cj.nbJoursFacturesAn || 100, 1);
+      const amortSimuInit   = cj.prixSimulateur
+        ? Engine.round2((cj.prixSimulateur / (cj.dureeAmortissementAns || 7)) / nb) : 0;
+      const fraisKmInit     = (cj.deplacementMoyenKm || 0) * (cj.tarifKm || 0.53);
+      const deplacementInit = Engine.round2(fraisKmInit + (cj.peagesAllerRetour || 0) + (cj.fraisStationnement || 0));
+      const tarifBase       = state.pricingCatalog.tarifJourneeBase || 0;
+      const targetMargin    = state.targetMarginPercent || 30;
+      const alertThreshold  = state.marginAlertThreshold || 15;
+
+      function numF(id, val, step, max) {
+        return `<input type="number" id="${id}" class="form-control cj-field" value="${val}" min="0"
+          step="${step || 'any'}" ${max ? `max="${max}"` : ''} style="max-width:130px;padding:4px 8px;text-align:right;">`;
+      }
+
+      return `
+        <div class="card" id="section-cout-journee">
+          <div class="card-header"><h2>Co\u00fbt journ\u00e9e r\u00e9el</h2></div>
+          <p class="form-help" style="margin-bottom:16px;">Ces param\u00e8tres alimentent le calcul automatique du seuil plancher journalier.</p>
+
+          <h3 style="margin:0 0 10px;font-size:0.88rem;color:var(--text-heading);">A. Op\u00e9rateur</h3>
+          <div class="form-row" style="margin-bottom:16px;">
+            <div class="form-group">
+              <label for="cj-cout-operateur">Co\u00fbt op\u00e9rateur par jour (\u20ac)</label>
+              ${numF('cj-cout-operateur', cj.coutOperateurJour || 0)}
+              <span class="form-help">TJM freelance ou co\u00fbt charg\u00e9 salari\u00e9 tout compris</span>
+            </div>
+          </div>
+
+          <h3 style="margin:0 0 10px;font-size:0.88rem;color:var(--text-heading);">B. Mat\u00e9riel</h3>
+          <div class="form-row" style="margin-bottom:8px;">
+            <div class="form-group">
+              <label for="cj-prix-simu">Prix d\u2019achat simulateur (\u20ac\u00a0HT)</label>
+              ${numF('cj-prix-simu', cj.prixSimulateur || 0)}
+            </div>
+            <div class="form-group">
+              <label for="cj-duree-amort">Dur\u00e9e d\u2019amortissement (ans)</label>
+              ${numF('cj-duree-amort', cj.dureeAmortissementAns || 7, 1)}
+            </div>
+            <div class="form-group">
+              <label for="cj-consommables">Consommables par jour (\u20ac)</label>
+              ${numF('cj-consommables', cj.consommablesJour || 0)}
+            </div>
+          </div>
+          <p class="form-help" style="margin-bottom:16px;">
+            Amortissement/jour (base <strong id="cj-nb-jours-display">${nb}</strong>\u00a0j/an)\u00a0:
+            <strong id="cj-amort-display">${Engine.fmt(amortSimuInit)}</strong>\u00a0\u20ac
+          </p>
+
+          <h3 style="margin:0 0 10px;font-size:0.88rem;color:var(--text-heading);">C. Assurances</h3>
+          <div class="form-row" style="margin-bottom:16px;">
+            <div class="form-group">
+              <label for="cj-rc-pro">RC Pro annuelle (\u20ac)</label>
+              ${numF('cj-rc-pro', cj.rcProAnnuelle || 0)}
+            </div>
+            <div class="form-group">
+              <label for="cj-assur-materiel">Assurance mat\u00e9riel annuelle (\u20ac)</label>
+              ${numF('cj-assur-materiel', cj.assurancesMaterielAnnuelle || 0)}
+            </div>
+          </div>
+
+          <h3 style="margin:0 0 10px;font-size:0.88rem;color:var(--text-heading);">D. D\u00e9placements (zone incluse)</h3>
+          <div class="form-row" style="margin-bottom:8px;">
+            <div class="form-group">
+              <label for="cj-km">Distance moyenne AR par mission (km)</label>
+              ${numF('cj-km', cj.deplacementMoyenKm || 0, 1)}
+            </div>
+            <div class="form-group">
+              <label for="cj-tarif-km">Tarif kilom\u00e9trique (\u20ac/km)</label>
+              ${numF('cj-tarif-km', cj.tarifKm || 0.53, 0.01)}
+            </div>
+            <div class="form-group">
+              <label for="cj-peages">P\u00e9ages moyens AR (\u20ac)</label>
+              ${numF('cj-peages', cj.peagesAllerRetour || 0)}
+            </div>
+            <div class="form-group">
+              <label for="cj-parking">Stationnement moyen (\u20ac)</label>
+              ${numF('cj-parking', cj.fraisStationnement || 0)}
+            </div>
+          </div>
+          <p class="form-help" style="margin-bottom:16px;">
+            Co\u00fbt d\u00e9placement estim\u00e9/mission\u00a0:
+            <strong id="cj-deplacement-display">${Engine.fmt(deplacementInit)}</strong>\u00a0\u20ac
+          </p>
+
+          <h3 style="margin:0 0 10px;font-size:0.88rem;color:var(--text-heading);">E. Administratif &amp; Structure</h3>
+          <div class="form-row" style="margin-bottom:16px;">
+            <div class="form-group">
+              <label for="cj-expert-comptable">Expert-comptable (\u20ac/an)</label>
+              ${numF('cj-expert-comptable', cj.expertComptableAnnuel || 0)}
+            </div>
+            <div class="form-group">
+              <label for="cj-frais-bancaires">Frais bancaires (\u20ac/an)</label>
+              ${numF('cj-frais-bancaires', cj.fraisBancairesAnnuels || 0)}
+            </div>
+            <div class="form-group">
+              <label for="cj-autres-admin">Autres frais administratifs (\u20ac/an)</label>
+              ${numF('cj-autres-admin', cj.autresFraisAdminAnnuels || 0)}
+            </div>
+            <div class="form-group">
+              <label for="cj-nb-jours">Jours factur\u00e9s objectif (an)</label>
+              ${numF('cj-nb-jours', cj.nbJoursFacturesAn || 100, 1)}
+            </div>
+          </div>
+
+          <h3 style="margin:0 0 10px;font-size:0.88rem;color:var(--text-heading);">F. Coefficients</h3>
+          <div class="form-row" style="margin-bottom:16px;">
+            <div class="form-group">
+              <label for="cj-tnf">Temps non facturable (%)</label>
+              ${numF('cj-tnf', cj.ratioTempsNonFacturable || 40, 1, 95)}
+              <span class="form-help">Prospection, pr\u00e9paration, comptes-rendus, admin.<br>
+              Un ratio de 40\u00a0% signifie que pour 10 jours factur\u00e9s, vous travaillez 16,7 jours au total.</span>
+            </div>
+            <div class="form-group">
+              <label for="cj-marge-secu">Marge de s\u00e9curit\u00e9 tr\u00e9sorerie (%)</label>
+              ${numF('cj-marge-secu', cj.margeSecuritePourcent || 5, 1)}
+            </div>
+          </div>
+
+          <h3 style="margin:0 0 10px;font-size:0.88rem;color:var(--text-heading);">R\u00e9capitulatif</h3>
+          <div id="cj-recap">
+            ${_buildCjRecapHTML(cj, tarifBase, targetMargin, alertThreshold)}
+          </div>
+        </div>`;
+    }
+
     /** Section 7 — Catalogue tarifaire */
     function renderPricingCatalog() {
       const pc = state.pricingCatalog;
@@ -669,6 +860,8 @@ Views.Settings = {
           ${renderTypes()}
         </div>
       </div>
+
+      ${renderCoutJournee()}
 
       ${renderPricingCatalog()}
 
@@ -882,6 +1075,71 @@ Views.Settings = {
       });
     }
 
+    function syncCoutJourneeFromDOM() {
+      const cj = state.coutJournee;
+      const f  = (id, fallback) => {
+        const el = $('#' + id);
+        return el ? (parseFloat(el.value) || fallback) : fallback;
+      };
+      cj.coutOperateurJour         = f('cj-cout-operateur',   0);
+      cj.prixSimulateur             = f('cj-prix-simu',        0);
+      cj.dureeAmortissementAns      = Math.max(f('cj-duree-amort', 7), 1);
+      cj.consommablesJour           = f('cj-consommables',     0);
+      cj.rcProAnnuelle              = f('cj-rc-pro',           0);
+      cj.assurancesMaterielAnnuelle = f('cj-assur-materiel',   0);
+      cj.deplacementMoyenKm         = f('cj-km',               0);
+      cj.tarifKm                    = f('cj-tarif-km',         0.53);
+      cj.peagesAllerRetour          = f('cj-peages',           0);
+      cj.fraisStationnement         = f('cj-parking',          0);
+      cj.expertComptableAnnuel      = f('cj-expert-comptable', 0);
+      cj.fraisBancairesAnnuels      = f('cj-frais-bancaires',  0);
+      cj.autresFraisAdminAnnuels    = f('cj-autres-admin',     0);
+      cj.nbJoursFacturesAn          = Math.max(f('cj-nb-jours', 100), 1);
+      cj.ratioTempsNonFacturable    = f('cj-tnf',              40);
+      cj.margeSecuritePourcent      = f('cj-marge-secu',       5);
+    }
+
+    /** Recalcule et met à jour le récapitulatif coût journée en temps réel */
+    function refreshCoutJourneeRecap() {
+      syncCoutJourneeFromDOM();
+      const cj = state.coutJournee;
+      const nb = Math.max(cj.nbJoursFacturesAn || 100, 1);
+
+      // Mettre à jour les affichages intermédiaires
+      const amortSimu   = cj.prixSimulateur
+        ? Engine.round2((cj.prixSimulateur / (cj.dureeAmortissementAns || 7)) / nb) : 0;
+      const fraisKm     = (cj.deplacementMoyenKm || 0) * (cj.tarifKm || 0.53);
+      const deplacement = Engine.round2(fraisKm + (cj.peagesAllerRetour || 0) + (cj.fraisStationnement || 0));
+
+      const nbDispEl = $('#cj-nb-jours-display');
+      if (nbDispEl) nbDispEl.textContent = nb;
+      const amortEl = $('#cj-amort-display');
+      if (amortEl) amortEl.textContent = Engine.fmt(amortSimu);
+      const deplEl  = $('#cj-deplacement-display');
+      if (deplEl) deplEl.textContent = Engine.fmt(deplacement);
+
+      // Mettre à jour le tableau récapitulatif
+      const recapDiv = $('#cj-recap');
+      if (recapDiv) {
+        const elBase     = $('#pc-tarif-journee-base');
+        const tarifBase  = elBase ? (parseFloat(elBase.value) || 0) : (state.pricingCatalog.tarifJourneeBase || 0);
+        const targetM    = parseFloat(($('#eco-target-margin') || {}).value) || state.targetMarginPercent || 30;
+        const alertM     = parseFloat(($('#eco-margin-alert')  || {}).value) || state.marginAlertThreshold || 15;
+        recapDiv.innerHTML = _buildCjRecapHTML(cj, tarifBase, targetM, alertM);
+      }
+
+      // Mettre à jour le tag seuil plancher dans le catalogue tarifaire
+      const seuilTag = $('#pc-seuil-tag');
+      if (seuilTag) {
+        const seuil   = Engine.calculateSeuilPlancher(state);
+        const elBase  = $('#pc-tarif-journee-base');
+        const tarifPC = elBase ? (parseFloat(elBase.value) || 0) : 0;
+        const ok      = tarifPC > 0 && tarifPC >= seuil;
+        seuilTag.className   = 'tag ' + (ok ? 'tag-green' : 'tag-red');
+        seuilTag.textContent = 'Seuil plancher\u00a0: ' + Engine.fmt(seuil) + '\u00a0\u2014\u00a0' + (ok ? 'Couvert' : '\u26a0\u00a0Insuffisant');
+      }
+    }
+
     /** Synchronise l'intégralité du state depuis les valeurs DOM */
     function syncAllFromDOM() {
       syncFixedCostsFromDOM();
@@ -889,6 +1147,7 @@ Views.Settings = {
       syncVariableCostsFromDOM();
       syncScalarsFromDOM();
       syncPricingCatalogFromDOM();
+      syncCoutJourneeFromDOM();
     }
 
     /* ----------------------------------------------------------
@@ -1000,6 +1259,9 @@ Views.Settings = {
         const firstCoeff   = firstCoeffEl ? ((parseFloat(firstCoeffEl.value) || 100) / 100) : 1;
         const demiPoncEl   = $('#pc-ponctuel-demi-prix');
         if (demiPoncEl) demiPoncEl.textContent = Engine.fmt(Engine.round2(tarifBase * firstCoeff * demiCoeff));
+
+        // Mettre à jour la marge brute dans le récapitulatif coût journée
+        refreshCoutJourneeRecap();
       }
 
       const pcBaseEl = $('#pc-tarif-journee-base');
@@ -1007,6 +1269,11 @@ Views.Settings = {
       if (pcBaseEl) pcBaseEl.addEventListener('input', refreshPricingCatalogCalcs);
       if (pcDemiEl) pcDemiEl.addEventListener('input', refreshPricingCatalogCalcs);
       $$('.palier-coeff').forEach(inp => inp.addEventListener('input', refreshPricingCatalogCalcs));
+
+      /* --- Coût journée réel : recalcul en temps réel --- */
+      $$('.cj-field').forEach(inp => {
+        inp.addEventListener('input', refreshCoutJourneeRecap);
+      });
     }
 
     /* ----------------------------------------------------------
@@ -1138,7 +1405,8 @@ Views.Settings = {
           operatorDependencyRiskThreshold: state.operatorDependencyRiskThreshold,
           urssafRequalificationDays:   state.urssafRequalificationDays,
           chargesConfig:               state.chargesConfig,
-          pricingCatalog:              state.pricingCatalog
+          pricingCatalog:              state.pricingCatalog,
+          coutJournee:                 state.coutJournee
         };
 
         DB.settings.update(update);

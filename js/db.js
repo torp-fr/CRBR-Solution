@@ -327,6 +327,44 @@ const DB = (() => {
       validiteDevisJours: 30,
       acomptePercent: 30,
       paiementDelaiJours: 30
+    },
+
+    // Coûts journée réels — alimentent calculateSeuilPlancher
+    coutJournee: {
+      // === OPÉRATEUR ===
+      coutOperateurJour:          500,   // € coût total opérateur/jour (TJM ou coût chargé)
+
+      // === MATÉRIEL ===
+      prixSimulateur:             60000, // € HT prix d'achat simulateur
+      dureeAmortissementAns:      7,     // années d'amortissement
+      consommablesJour:           15,    // € consommables par jour
+
+      // === ASSURANCES ===
+      rcProAnnuelle:              2000,  // € RC Pro par an
+      assurancesMaterielAnnuelle: 650,   // € assurance matériel par an
+
+      // === DÉPLACEMENTS (base zone incluse) ===
+      deplacementMoyenKm:         100,   // km aller-retour moyen par mission
+      tarifKm:                    0.53,  // € / km (barème fiscal 2025)
+      prixCarburantL:             1.85,  // € / litre (référence)
+      consommationVhlL100:        7,     // litres / 100 km
+      peagesAllerRetour:          20,    // € péages moyens AR par mission
+      fraisStationnement:         5,     // € stationnement moyen
+
+      // === ADMINISTRATIF ===
+      expertComptableAnnuel:      1800,  // € / an
+      fraisBancairesAnnuels:      500,   // € / an
+      autresFraisAdminAnnuels:    400,   // € / an (cotisations, divers)
+
+      // === TEMPS NON FACTURABLE ===
+      ratioTempsNonFacturable:    40,    // % du temps passé non facturé
+                                         // (prospection, admin, prépa, CR)
+
+      // === TRÉSORERIE DE SÉCURITÉ ===
+      margeSecuritePourcent:      5,     // % ajouté au coût pour trésorerie
+
+      // === VOLUME DE RÉFÉRENCE ===
+      nbJoursFacturesAn:          100    // jours facturés par an (objectif)
     }
   };
 

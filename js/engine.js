@@ -908,14 +908,60 @@ const Engine = (() => {
   /** Calcule le seuil plancher journalier auto-calculé */
   function calculateSeuilPlancher(settings) {
     const s = settings || DB.settings.get();
-    const totalFixed = s.fixedCosts.reduce((sum, c) => sum + (c.amount || 0), 0);
-    const totalAmort = s.equipmentAmortization.reduce((sum, a) => {
-      const years = Math.max(a.durationYears || 1, 1);
-      return sum + ((a.amount || 0) / years);
-    }, 0);
-    const nbJours = Math.max(s.nbJoursObjectifAnnuel || 50, 1);
-    const totalVarDefaut = (s.defaultSessionVariableCosts || []).reduce((sum, v) => sum + (v.amount || 0), 0);
-    return round2(((totalFixed + totalAmort) / nbJours) + totalVarDefaut);
+    const cj = s.coutJournee;
+
+    // FALLBACK : ancienne logique si coutJournee absent ou coutOperateurJour = 0
+    if (!cj || !cj.coutOperateurJour) {
+      const totalFixed = (s.fixedCosts || []).reduce((sum, c) => sum + (c.amount || 0), 0);
+      const totalAmort = (s.equipmentAmortization || []).reduce((sum, a) => {
+        const years = Math.max(a.durationYears || 1, 1);
+        return sum + ((a.amount || 0) / years);
+      }, 0);
+      const nbJours = Math.max(s.nbJoursObjectifAnnuel || 50, 1);
+      const totalVarDefaut = (s.defaultSessionVariableCosts || []).reduce((sum, v) => sum + (v.amount || 0), 0);
+      return round2(((totalFixed + totalAmort) / nbJours) + totalVarDefaut);
+    }
+
+    const nb = Math.max(cj.nbJoursFacturesAn || 100, 1);
+
+    // 1. Coût opérateur
+    const coutOp = cj.coutOperateurJour;
+
+    // 2. Amortissement simulateur
+    const amortSimu = cj.prixSimulateur
+      ? round2((cj.prixSimulateur / (cj.dureeAmortissementAns || 7)) / nb)
+      : 0;
+
+    // 3. Consommables
+    const conso = cj.consommablesJour || 0;
+
+    // 4. Assurances ramenées au jour
+    const assurances = round2(((cj.rcProAnnuelle || 0) + (cj.assurancesMaterielAnnuelle || 0)) / nb);
+
+    // 5. Déplacements (base zone incluse)
+    const km = cj.deplacementMoyenKm || 0;
+    const fraisKm = km * (cj.tarifKm || 0.53);
+    const peages = cj.peagesAllerRetour || 0;
+    const parking = cj.fraisStationnement || 0;
+    const deplacement = round2(fraisKm + peages + parking);
+
+    // 6. Administratif ramené au jour
+    const admin = round2(((cj.expertComptableAnnuel || 0)
+      + (cj.fraisBancairesAnnuels || 0)
+      + (cj.autresFraisAdminAnnuels || 0)) / nb);
+
+    // 7. Sous-total coût direct
+    const coutDirect = round2(coutOp + amortSimu + conso + assurances + deplacement + admin);
+
+    // 8. Majoration temps non facturable
+    const ratioTNF = Math.min((cj.ratioTempsNonFacturable || 40) / 100, 0.95);
+    const coutAvecTNF = round2(coutDirect / (1 - ratioTNF));
+
+    // 9. Marge de sécurité trésorerie
+    const margeSec = (cj.margeSecuritePourcent || 5) / 100;
+    const coutFinal = Math.round(coutAvecTNF * (1 + margeSec));
+
+    return coutFinal;
   }
 
   /* ----------------------------------------------------------
