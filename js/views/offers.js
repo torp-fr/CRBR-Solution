@@ -615,9 +615,11 @@ Views.Offers = {
         if (!hintEl) return;
         const type = overlay.querySelector('#offer-type').value;
         if (type === 'one_shot') {
-          hintEl.textContent = 'Tarif de r\u00e9f\u00e9rence\u00a0: ' + Engine.fmt(pc.tarifJourneeUnite || 0) + ' \u00e0 ' + Engine.fmt(pc.tarifJourneeTerritorial || 0) + '\u00a0HT/jour';
+          hintEl.textContent = pc.tarifJourneeBase > 0
+            ? 'Tarif journ\u00e9e de r\u00e9f\u00e9rence\u00a0: ' + Engine.fmt(pc.tarifJourneeBase) + '\u00a0HT/jour'
+            : 'Tarif de r\u00e9f\u00e9rence non param\u00e9tr\u00e9 \u2014 d\u00e9finissez-le dans le catalogue tarifaire';
         } else if (type === 'abonnement') {
-          hintEl.textContent = 'Fourchettes annuelles\u00a0: Communal ' + Engine.fmt(pc.abonnementCommunal_min || 0) + '\u2013' + Engine.fmt(pc.abonnementCommunal_max || 0) + ' \u00b7 Intercommunal ' + Engine.fmt(pc.abonnementIntercommunal_min || 0) + '\u2013' + Engine.fmt(pc.abonnementIntercommunal_max || 0) + ' \u00b7 Territorial ' + Engine.fmt(pc.abonnementTerritorial_min || 0) + '\u2013' + Engine.fmt(pc.abonnementTerritorial_max || 0);
+          hintEl.textContent = 'Utilisez l\u2019assistant de tarification dans le module Devis pour calculer un prix HT';
         } else {
           hintEl.textContent = 'Sur devis \u2014 r\u00e9f\u00e9rez-vous au catalogue tarifaire';
         }

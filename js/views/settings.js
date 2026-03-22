@@ -39,7 +39,12 @@ Views.Settings = {
       operatorDependencyRiskThreshold: settings.operatorDependencyRiskThreshold ?? 40,
       urssafRequalificationDays: settings.urssafRequalificationDays ?? 45,
       chargesConfig:            JSON.parse(JSON.stringify(settings.chargesConfig || DB.settings.getDefaults().chargesConfig)),
-      pricingCatalog:           JSON.parse(JSON.stringify(settings.pricingCatalog || DB.settings.getDefaults().pricingCatalog))
+      pricingCatalog: (() => {
+        const _stored  = settings.pricingCatalog || {};
+        const _default = DB.settings.getDefaults().pricingCatalog;
+        // Migration : si l'ancien catalogue (sans degressivite[]) est détecté, basculer sur les défauts
+        return JSON.parse(JSON.stringify(Array.isArray(_stored.degressivite) ? _stored : _default));
+      })()
     };
 
     /* ----------------------------------------------------------
@@ -494,80 +499,96 @@ Views.Settings = {
         return `<input type="number" id="${id}" class="form-control" value="${val}" min="0" step="${step || 'any'}" style="max-width:130px;padding:4px 8px;text-align:right;">`;
       }
 
+      const seuilPlancher = Engine.calculateSeuilPlancher(state);
+      const tarifSuggere  = Math.round(seuilPlancher * (1 + (state.targetMarginPercent || 30) / 100));
+
+      // Tableau dégressivité — toujours 3 lignes, row 0 non éditable
+      const degr = (Array.isArray(pc.degressivite) && pc.degressivite.length >= 3)
+        ? pc.degressivite
+        : [{ seuilJours: 0, remisePourcent: 0 }, { seuilJours: 10, remisePourcent: 5 }, { seuilJours: 20, remisePourcent: 10 }];
+
+      const degrRows = degr.map((d, i) => {
+        if (i === 0) {
+          return `<tr>
+            <td style="color:var(--text-muted);">&ge;&nbsp;${d.seuilJours}&nbsp;jour(s)</td>
+            <td style="text-align:right;color:var(--text-muted);">— (tarif de r\u00e9f\u00e9rence)</td>
+          </tr>`;
+        }
+        return `<tr>
+          <td>
+            &ge;&nbsp;<input type="number" class="form-control degr-seuil" data-index="${i}" value="${d.seuilJours}" min="1" step="1"
+              style="max-width:70px;padding:4px 6px;text-align:right;display:inline-block;">&nbsp;jours
+          </td>
+          <td style="text-align:right;">${numField('pc-degr-remise-' + i, d.remisePourcent)}&nbsp;%</td>
+        </tr>`;
+      }).join('');
+
       return `
         <div class="card" id="section-pricing-catalog">
           <div class="card-header">
             <h2>Catalogue tarifaire</h2>
           </div>
 
-          <!-- A. Tarifs journées -->
-          <h3 style="margin:0 0 8px;font-size:0.88rem;color:var(--text-heading);">A. Tarifs journ\u00e9es (€\u00a0HT)</h3>
-          <div class="data-table-wrap" style="margin-bottom:20px;">
-            <table class="data-table" style="font-size:0.85rem;">
-              <thead><tr><th>Prestation</th><th style="width:160px;text-align:right;">Tarif €\u00a0HT</th></tr></thead>
-              <tbody>
-                <tr><td>Journ\u00e9e Unit\u00e9 (\u2264\u00a015 agents)</td><td style="text-align:right;">${numField('pc-tarif-journee-unite', pc.tarifJourneeUnite)}</td></tr>
-                <tr><td>Journ\u00e9e Renforc\u00e9 (15\u201330 agents)</td><td style="text-align:right;">${numField('pc-tarif-journee-renforce', pc.tarifJourneeRenforce)}</td></tr>
-                <tr><td>Journ\u00e9e Territorial (30+ agents)</td><td style="text-align:right;">${numField('pc-tarif-journee-territorial', pc.tarifJourneeTerritorial)}</td></tr>
-                <tr><td>Demi-journ\u00e9e (tous niveaux)</td><td style="text-align:right;">${numField('pc-tarif-demi-journee', pc.tarifDemiJournee)}</td></tr>
-                <tr><td>Surco\u00fbt module sp\u00e9cialis\u00e9</td><td style="text-align:right;">${numField('pc-tarif-module-specialise', pc.tarifModuleSpecialise)}</td></tr>
-              </tbody>
-            </table>
+          <!-- A. Tarif journée de référence -->
+          <h3 style="margin:0 0 8px;font-size:0.88rem;color:var(--text-heading);">A. Tarif journ\u00e9e de r\u00e9f\u00e9rence</h3>
+          <div class="form-row" style="margin-bottom:16px;">
+            <div class="form-group">
+              <label for="pc-tarif-journee-base">Tarif journ\u00e9e (\u20ac&nbsp;HT)</label>
+              <input type="number" id="pc-tarif-journee-base" class="form-control" value="${pc.tarifJourneeBase || 0}" min="0" step="any" style="max-width:200px;">
+              <span class="form-help">
+                Seuil plancher calcul\u00e9&nbsp;: <strong>${Engine.fmt(seuilPlancher)}</strong>
+                &nbsp;\u2014&nbsp;Tarif sugg\u00e9r\u00e9 (marge&nbsp;${state.targetMarginPercent}&nbsp;%)&nbsp;:
+                <strong class="text-mono" style="color:var(--color-success);">${Engine.fmt(tarifSuggere)}</strong>
+              </span>
+            </div>
           </div>
 
-          <!-- B. Fourchettes abonnements -->
-          <h3 style="margin:0 0 8px;font-size:0.88rem;color:var(--text-heading);">B. Fourchettes abonnements (€\u00a0HT/an)</h3>
-          <div class="data-table-wrap" style="margin-bottom:20px;">
+          <!-- B. Dégressivité volume -->
+          <h3 style="margin:0 0 8px;font-size:0.88rem;color:var(--text-heading);">B. D\u00e9gressivit\u00e9 volume</h3>
+          <p class="form-help" style="margin-bottom:8px;">Remise automatique selon le nombre de jours command\u00e9s.</p>
+          <div class="data-table-wrap" style="margin-bottom:12px;">
             <table class="data-table" style="font-size:0.85rem;">
-              <thead><tr><th>Niveau</th><th style="text-align:right;">Min €\u00a0HT</th><th style="text-align:right;">Max €\u00a0HT</th></tr></thead>
-              <tbody>
-                <tr><td>Communal</td><td style="text-align:right;">${numField('pc-abo-communal-min', pc.abonnementCommunal_min)}</td><td style="text-align:right;">${numField('pc-abo-communal-max', pc.abonnementCommunal_max)}</td></tr>
-                <tr><td>Intercommunal</td><td style="text-align:right;">${numField('pc-abo-intercommunal-min', pc.abonnementIntercommunal_min)}</td><td style="text-align:right;">${numField('pc-abo-intercommunal-max', pc.abonnementIntercommunal_max)}</td></tr>
-                <tr><td>Territorial</td><td style="text-align:right;">${numField('pc-abo-territorial-min', pc.abonnementTerritorial_min)}</td><td style="text-align:right;">${numField('pc-abo-territorial-max', pc.abonnementTerritorial_max)}</td></tr>
-              </tbody>
+              <thead><tr><th>Seuil</th><th style="text-align:right;">Remise (%)</th></tr></thead>
+              <tbody>${degrRows}</tbody>
             </table>
           </div>
-
-          <!-- C. Conditions commerciales -->
-          <h3 style="margin:0 0 8px;font-size:0.88rem;color:var(--text-heading);">C. Conditions commerciales</h3>
-          <div class="data-table-wrap" style="margin-bottom:4px;">
-            <table class="data-table" style="font-size:0.85rem;">
-              <thead><tr><th>Param\u00e8tre</th><th style="width:160px;text-align:right;">Valeur</th></tr></thead>
-              <tbody>
-                <tr><td>Volume \u2014 seuil (jours/an)</td><td style="text-align:right;">${numField('pc-remise-volume-seuil', pc.remiseVolumeSeuilJours, 1)}</td></tr>
-                <tr><td>Remise volume (%)</td><td style="text-align:right;">${numField('pc-remise-volume', pc.remiseVolumePourcent)}</td></tr>
-                <tr><td>Remise fid\u00e9lit\u00e9 (%)</td><td style="text-align:right;">${numField('pc-remise-fidelite', pc.remiseFidelitePourcent)}</td></tr>
-                <tr><td>Remise 1\u00e8re commande (%)</td><td style="text-align:right;">${numField('pc-remise-premiere', pc.remisePremiereCommande)}</td></tr>
-                <tr><td>Remise max autoris\u00e9e (%)</td><td style="text-align:right;">${numField('pc-remise-max', pc.remiseMaxAutorisee)}</td></tr>
-              </tbody>
-            </table>
+          <div class="form-row" style="margin-bottom:20px;">
+            <div class="form-group">
+              <label for="pc-remise-fidelite">Remise fid\u00e9lit\u00e9 (%)</label>
+              <input type="number" id="pc-remise-fidelite" class="form-control" value="${pc.remiseFidelitePourcent || 0}" min="0" max="100" step="any" style="max-width:130px;">
+              <span class="form-help">Appliqu\u00e9e en cas de renouvellement</span>
+            </div>
+            <div class="form-group">
+              <label for="pc-remise-max">Remise max autoris\u00e9e (%)</label>
+              <input type="number" id="pc-remise-max" class="form-control" value="${pc.remiseMaxAutorisee || 0}" min="0" max="100" step="any" style="max-width:130px;">
+              <span class="form-help">Cumul volume + fid\u00e9lit\u00e9 plafonn\u00e9</span>
+            </div>
           </div>
-          <p class="form-help" style="margin-bottom:20px;">Au-del\u00e0 de la remise max, une confirmation manuelle est requise.</p>
 
-          <!-- D. Frais & majorations -->
-          <h3 style="margin:0 0 8px;font-size:0.88rem;color:var(--text-heading);">D. Frais &amp; majorations</h3>
+          <!-- C. Majorations & déplacements -->
+          <h3 style="margin:0 0 8px;font-size:0.88rem;color:var(--text-heading);">C. Majorations &amp; d\u00e9placements</h3>
           <div class="data-table-wrap" style="margin-bottom:20px;">
             <table class="data-table" style="font-size:0.85rem;">
               <thead><tr><th>Param\u00e8tre</th><th style="width:160px;text-align:right;">Valeur</th></tr></thead>
               <tbody>
-                <tr><td>Frais kilom\u00e9triques (€/km)</td><td style="text-align:right;">${numField('pc-frais-km', pc.fraisDeplacementKm, 0.01)}</td></tr>
-                <tr><td>Zone incluse (km)</td><td style="text-align:right;">${numField('pc-zone-incluse', pc.fraisDeplacementZoneIncluse, 1)}</td></tr>
-                <tr><td>H\u00e9bergement (€/nuit)</td><td style="text-align:right;">${numField('pc-hebergement', pc.fraisHebergement)}</td></tr>
-                <tr><td>Majoration week-end (%)</td><td style="text-align:right;">${numField('pc-majoration-weekend', pc.majorationWeekend)}</td></tr>
-                <tr><td>Majoration urgence (%)</td><td style="text-align:right;">${numField('pc-majoration-urgence', pc.majorationUrgence)}</td></tr>
+                <tr><td>Majoration week-end (%)</td><td style="text-align:right;">${numField('pc-majoration-weekend', pc.majorationWeekendPourcent || 0)}</td></tr>
+                <tr><td>Majoration urgence (%)</td><td style="text-align:right;">${numField('pc-majoration-urgence', pc.majorationUrgencePourcent || 0)}</td></tr>
+                <tr><td>D\u00e9lai urgence (jours)</td><td style="text-align:right;">${numField('pc-majoration-urgence-seuil', pc.majorationUrgenceSeuilJours || 14, 1)}</td></tr>
+                <tr><td>Frais kilom\u00e9triques (\u20ac/km)</td><td style="text-align:right;">${numField('pc-frais-km', pc.fraisDeplacementKm || 0, 0.01)}</td></tr>
+                <tr><td>Zone incluse (km)</td><td style="text-align:right;">${numField('pc-zone-incluse', pc.fraisDeplacementZoneIncluse || 0, 1)}</td></tr>
               </tbody>
             </table>
           </div>
 
-          <!-- E. Conditions de vente -->
-          <h3 style="margin:0 0 8px;font-size:0.88rem;color:var(--text-heading);">E. Conditions de vente</h3>
+          <!-- D. Conditions de vente -->
+          <h3 style="margin:0 0 8px;font-size:0.88rem;color:var(--text-heading);">D. Conditions de vente</h3>
           <div class="data-table-wrap">
             <table class="data-table" style="font-size:0.85rem;">
               <thead><tr><th>Param\u00e8tre</th><th style="width:160px;text-align:right;">Valeur</th></tr></thead>
               <tbody>
-                <tr><td>Validit\u00e9 devis (jours)</td><td style="text-align:right;">${numField('pc-validite-devis', pc.validiteDevisJours, 1)}</td></tr>
-                <tr><td>Acompte \u00e0 la commande (%)</td><td style="text-align:right;">${numField('pc-acompte', pc.acomptePercent)}</td></tr>
-                <tr><td>D\u00e9lai de paiement (jours)</td><td style="text-align:right;">${numField('pc-paiement-delai', pc.paiementDelaiJours, 1)}</td></tr>
+                <tr><td>Validit\u00e9 devis (jours)</td><td style="text-align:right;">${numField('pc-validite-devis', pc.validiteDevisJours || 30, 1)}</td></tr>
+                <tr><td>Acompte \u00e0 la commande (%)</td><td style="text-align:right;">${numField('pc-acompte', pc.acomptePercent || 30)}</td></tr>
+                <tr><td>D\u00e9lai de paiement (jours)</td><td style="text-align:right;">${numField('pc-paiement-delai', pc.paiementDelaiJours || 30, 1)}</td></tr>
               </tbody>
             </table>
           </div>
@@ -800,28 +821,17 @@ Views.Settings = {
 
     function syncPricingCatalogFromDOM() {
       const pc = state.pricingCatalog;
+
+      // Champs scalaires
       [
-        ['pc-tarif-journee-unite',       'tarifJourneeUnite'],
-        ['pc-tarif-journee-renforce',    'tarifJourneeRenforce'],
-        ['pc-tarif-journee-territorial', 'tarifJourneeTerritorial'],
-        ['pc-tarif-demi-journee',        'tarifDemiJournee'],
-        ['pc-tarif-module-specialise',   'tarifModuleSpecialise'],
-        ['pc-abo-communal-min',          'abonnementCommunal_min'],
-        ['pc-abo-communal-max',          'abonnementCommunal_max'],
-        ['pc-abo-intercommunal-min',     'abonnementIntercommunal_min'],
-        ['pc-abo-intercommunal-max',     'abonnementIntercommunal_max'],
-        ['pc-abo-territorial-min',       'abonnementTerritorial_min'],
-        ['pc-abo-territorial-max',       'abonnementTerritorial_max'],
-        ['pc-remise-volume-seuil',       'remiseVolumeSeuilJours'],
-        ['pc-remise-volume',             'remiseVolumePourcent'],
+        ['pc-tarif-journee-base',        'tarifJourneeBase'],
         ['pc-remise-fidelite',           'remiseFidelitePourcent'],
-        ['pc-remise-premiere',           'remisePremiereCommande'],
         ['pc-remise-max',                'remiseMaxAutorisee'],
+        ['pc-majoration-weekend',        'majorationWeekendPourcent'],
+        ['pc-majoration-urgence',        'majorationUrgencePourcent'],
+        ['pc-majoration-urgence-seuil',  'majorationUrgenceSeuilJours'],
         ['pc-frais-km',                  'fraisDeplacementKm'],
         ['pc-zone-incluse',              'fraisDeplacementZoneIncluse'],
-        ['pc-hebergement',               'fraisHebergement'],
-        ['pc-majoration-weekend',        'majorationWeekend'],
-        ['pc-majoration-urgence',        'majorationUrgence'],
         ['pc-validite-devis',            'validiteDevisJours'],
         ['pc-acompte',                   'acomptePercent'],
         ['pc-paiement-delai',            'paiementDelaiJours']
@@ -829,6 +839,19 @@ Views.Settings = {
         const el = $('#' + id);
         if (el) pc[key] = parseFloat(el.value) || 0;
       });
+
+      // Dégressivité — 3 lignes fixes, index 0 non éditable
+      if (!Array.isArray(pc.degressivite)) {
+        pc.degressivite = [{ seuilJours: 0, remisePourcent: 0 }, { seuilJours: 10, remisePourcent: 5 }, { seuilJours: 20, remisePourcent: 10 }];
+      }
+      $$('.degr-seuil').forEach(input => {
+        const i = parseInt(input.dataset.index, 10);
+        if (i > 0 && pc.degressivite[i]) pc.degressivite[i].seuilJours = parseInt(input.value, 10) || 0;
+      });
+      for (let i = 1; i < pc.degressivite.length; i++) {
+        const el = $('#pc-degr-remise-' + i);
+        if (el) pc.degressivite[i].remisePourcent = parseFloat(el.value) || 0;
+      }
     }
 
     /** Synchronise l'intégralité du state depuis les valeurs DOM */
