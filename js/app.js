@@ -22,11 +22,50 @@ const App = (() => {
     operators:  { label: 'Opérateurs',           icon: '⊕', view: () => Views.Operators },
     modules:    { label: 'Modules',              icon: '⬡', view: () => Views.Modules },
     locations:  { label: 'Lieux',                icon: '⊿', view: () => Views.Locations },
+    regions:    { label: 'Régions',              icon: '🗺', view: () => Views.Regions },
+    simulateurs:{ label: 'Simulateurs',          icon: '🎯', view: () => Views.Simulateurs },
     settings:   { label: 'Paramètres',           icon: '⚙', view: () => Views.Settings }
   };
 
+  /* --- Initialisation des données par défaut --- */
+  function _initDefaultData() {
+    // Région Nationale (Phase 1) si aucune région n'existe
+    if (DB.regions.getAll().length === 0) {
+      DB.regions.create({
+        nom:          'Nationale',
+        code:         'NAT',
+        statut:       'nationale',
+        departements: [],
+        operateurIds: [],
+        simulateurIds: [],
+        notes:        'Zone par défaut — Phase 1 : déploiement national centralisé.',
+        dateCreation: new Date().toISOString().slice(0, 10)
+      });
+    }
+
+    // Simulateur SIM-001 si aucun simulateur n'existe
+    if (DB.simulateurs.getAll().length === 0) {
+      const regionId = DB.regions.getAll().length > 0 ? DB.regions.getAll()[0].id : null;
+      DB.simulateurs.create({
+        nom:                     'SIM-001',
+        modele:                  '',
+        numeroSerie:             '',
+        etat:                    'actif',
+        regionId,
+        joursMaxParAn:           150,
+        dateAcquisition:         null,
+        prixAcquisitionHT:       0,
+        derniereMaintenance:     null,
+        periodeMaintenanceJours: 180,
+        prochaineMaintenance:    null,
+        notes:                   'Simulateur principal — créé automatiquement au premier démarrage.'
+      });
+    }
+  }
+
   /* --- Initialisation --- */
   function init() {
+    _initDefaultData();
     renderSidebar();
     renderHeader();
 
@@ -99,7 +138,7 @@ const App = (() => {
       { title: 'Pilotage', items: ['dashboard'] },
       { title: 'CRM', items: ['prospects', 'devis', 'factures'] },
       { title: 'Gestion opérationnelle', items: ['clients', 'offers', 'sessions'] },
-      { title: 'Ressources', items: ['operators', 'modules', 'locations'] },
+      { title: 'Ressources', items: ['operators', 'modules', 'locations', 'regions', 'simulateurs'] },
       { title: 'Configuration', items: ['settings'] }
     ];
 

@@ -771,11 +771,12 @@ Views.Dashboard = {
       /* Rythme mensuel actuel */
       const nowW = new Date();
       const rythmeMoisActuel = sessions.filter(s => {
+        if (!s.date) return false;
         const d = new Date(s.date);
         return d.getFullYear() === nowW.getFullYear()
           && d.getMonth() === nowW.getMonth()
-          && s.status !== 'annulee';
-      }).length;
+          && s.statut !== 'annulee';
+      }).reduce((sum, s) => sum + (Number(s.nbJours) || 1), 0);
 
       const investBox = invest.investissementNecessaire ? `
         <div style="margin-top:16px;padding:12px 14px;border-radius:6px;border:1px solid ${util.estEnCritique ? '#d32f2f' : '#e65100'};background:${util.estEnCritique ? 'rgba(211,47,47,0.08)' : 'rgba(230,81,0,0.08)'};">
@@ -833,8 +834,61 @@ Views.Dashboard = {
           </table>
 
           ${investBox}
+          ${_buildRegionsSubTable(util)}
         </div>
       `;
+    }
+
+    /* ----------------------------------------------------------
+       5B-TER. SOUS-TABLEAU PAR RÉGION
+       ---------------------------------------------------------- */
+    function _buildRegionsSubTable(util) {
+      const regions = DB.regions.getAll();
+      if (regions.length < 2) {
+        // Phase 1 : une seule zone nationale — lien vers la config régions
+        const allNationale = regions.every(r => !r.statut || r.statut === 'nationale');
+        if (allNationale) {
+          return `
+            <div style="margin-top:14px;padding:10px 12px;border-radius:5px;background:rgba(255,255,255,0.03);border:1px dashed var(--border-color);font-size:0.78rem;color:var(--text-muted);">
+              Phase 1 — Déploiement national centralisé. Pour activer le suivi multi-régions, configurez vos zones dans
+              <a href="#regions" onclick="App.navigate('regions')" style="color:var(--accent-blue);">Régions</a>.
+            </div>`;
+        }
+        return '';
+      }
+
+      const rows = (util.parRegion || []).map(r => {
+        const pct       = r.capacite > 0 ? r.tauxUtilisation : null;
+        const pctClass  = pct === null ? '' : pct >= 93 ? 'color:#d32f2f' : pct >= 80 ? 'color:#e65100' : 'color:#4caf50';
+        const statutBadge = r.regionStatut === 'renforcee' ? 'tag-green'
+                          : r.regionStatut === 'attribuee' ? 'tag-yellow'
+                          : 'tag-blue';
+        return `
+          <tr style="border-bottom:1px solid var(--border-color);">
+            <td style="padding:5px 4px;"><a href="#regions" onclick="App.navigate('regions')" style="color:var(--text-primary);text-decoration:none;">${escapeHTML(r.regionNom)}</a></td>
+            <td style="padding:5px 4px;"><span class="tag ${statutBadge}" style="font-size:0.65rem;">${escapeHTML(r.regionCode)}</span></td>
+            <td style="padding:5px 4px;text-align:right;">${r.joursFactures} j</td>
+            <td style="padding:5px 4px;text-align:right;">${r.capacite > 0 ? r.capacite + ' j' : '—'}</td>
+            <td style="padding:5px 4px;text-align:right;font-weight:600;${pctClass}">${pct !== null ? pct + '%' : '—'}</td>
+          </tr>`;
+      }).join('');
+
+      return `
+        <div style="margin-top:16px;">
+          <div style="font-size:0.72rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:6px;">Par région</div>
+          <table style="width:100%;border-collapse:collapse;font-size:0.82rem;">
+            <thead>
+              <tr style="border-bottom:1px solid var(--border-color);">
+                <th style="text-align:left;padding:4px;font-size:0.72rem;color:var(--text-muted);">Région</th>
+                <th style="text-align:left;padding:4px;font-size:0.72rem;color:var(--text-muted);">Phase</th>
+                <th style="text-align:right;padding:4px;font-size:0.72rem;color:var(--text-muted);">Réalisés</th>
+                <th style="text-align:right;padding:4px;font-size:0.72rem;color:var(--text-muted);">Capacité</th>
+                <th style="text-align:right;padding:4px;font-size:0.72rem;color:var(--text-muted);">Taux</th>
+              </tr>
+            </thead>
+            <tbody>${rows}</tbody>
+          </table>
+        </div>`;
     }
 
     /* ----------------------------------------------------------

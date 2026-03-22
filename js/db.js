@@ -109,6 +109,8 @@ const DB = (() => {
   const prospects           = createCRUD('prospects');
   const devis               = createCRUD('devis');
   const factures            = createCRUD('factures');
+  const regions             = createCRUD('regions');
+  const simulateurs         = createCRUD('simulateurs');
 
   /* --- Numérotation automatique des devis --- */
   function getNextNumeroDevis() {
@@ -476,6 +478,8 @@ const DB = (() => {
         prospects: prospects.getAll(),
         devis: devis.getAll(),
         factures: factures.getAll(),
+        regions: regions.getAll(),
+        simulateurs: simulateurs.getAll(),
         settings: settings.get()
       }
     };
@@ -494,11 +498,13 @@ const DB = (() => {
     if (d.prospects) setStore('prospects', d.prospects);
     if (d.devis) setStore('devis', d.devis);
     if (d.factures) setStore('factures', d.factures);
+    if (d.regions) setStore('regions', d.regions);
+    if (d.simulateurs) setStore('simulateurs', d.simulateurs);
     if (d.settings) settings.set(d.settings);
   }
 
   function clearAll() {
-    ['operators','modules','clients','offers','sessions','locations','clientSubscriptions','prospects','devis','factures'].forEach(k => setStore(k, []));
+    ['operators','modules','clients','offers','sessions','locations','clientSubscriptions','prospects','devis','factures','regions','simulateurs'].forEach(k => setStore(k, []));
     settings.reset();
   }
 
@@ -537,6 +543,8 @@ const DB = (() => {
     prospects,
     devis,
     factures,
+    regions,
+    simulateurs,
     settings,
     exportAll,
     importAll,

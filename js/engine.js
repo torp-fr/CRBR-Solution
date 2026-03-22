@@ -1525,22 +1525,60 @@ const Engine = (() => {
   function calculateTauxUtilisation(settings) {
     const s = settings || DB.settings.get();
     const cap = s.capacite || {};
-    const sessions = DB.sessions.getAll();
+    const allSessions = DB.sessions.getAll();
+    const allClients  = DB.clients.getAll();
+    const allLocs     = DB.locations.getAll();
     const anneeEnCours = new Date().getFullYear();
 
-    const joursFacturesAn = sessions.filter(sess => {
-      if (!sess.date) return false;
-      const annee = new Date(sess.date).getFullYear();
-      const statut = sess.status;
-      return annee === anneeEnCours
-        && statut !== 'annulee'
-        && statut !== 'planifiee';
-    }).length;
+    function sessionsActives(year) {
+      return allSessions.filter(sess => {
+        if (!sess.date) return false;
+        const annee = new Date(sess.date).getFullYear();
+        return annee === year
+          && sess.statut !== 'annulee'
+          && sess.statut !== 'planifiee';
+      });
+    }
+
+    const actives = sessionsActives(anneeEnCours);
+    const joursFacturesAn = actives.reduce((sum, s) => sum + (Number(s.nbJours) || 1), 0);
 
     const capaciteTotale = (cap.nbUnites || 1) * (cap.joursMaxParUniteParAn || 150);
     const tauxUtilisation = capaciteTotale > 0
       ? (joursFacturesAn / capaciteTotale) * 100
       : 0;
+
+    // Décomposition par région
+    const regions    = DB.regions.getAll();
+    const simulateurs = DB.simulateurs.getAll();
+    const joursMax   = cap.joursMaxParUniteParAn || 150;
+
+    const parRegion = regions.map(region => {
+      const simActifs  = simulateurs.filter(sim => sim.regionId === region.id && sim.etat === 'actif');
+      const capacite   = simActifs.reduce((sum, sim) => sum + (sim.joursMaxParAn || joursMax), 0);
+      const joursReg   = actives.filter(sess => {
+        const client = allClients.find(c => c.id === sess.clientId);
+        if (client && client.zoneLabel === region.nom) return true;
+        if (sess.locationId) {
+          const loc = allLocs.find(l => l.id === sess.locationId);
+          if (loc && loc.departement && (region.departements || []).includes(loc.departement)) return true;
+        }
+        return false;
+      }).reduce((sum, s) => sum + (Number(s.nbJours) || 1), 0);
+
+      const taux = capacite > 0 ? round2((joursReg / capacite) * 100) : 0;
+      return {
+        regionId:        region.id,
+        regionNom:       region.nom,
+        regionCode:      region.code || '',
+        regionStatut:    region.statut || 'nationale',
+        joursFactures:   joursReg,
+        capacite,
+        tauxUtilisation: taux,
+        estEnAlerte:     joursReg >= (cap.seuilAlerteJours || 120),
+        estEnCritique:   joursReg >= (cap.seuilCritiqueJours || 140)
+      };
+    });
 
     return {
       joursFacturesAn,
@@ -1550,7 +1588,8 @@ const Engine = (() => {
       seuilCritique: cap.seuilCritiqueJours || 140,
       estEnAlerte: joursFacturesAn >= (cap.seuilAlerteJours || 120),
       estEnCritique: joursFacturesAn >= (cap.seuilCritiqueJours || 140),
-      joursRestants: capaciteTotale - joursFacturesAn
+      joursRestants: capaciteTotale - joursFacturesAn,
+      parRegion
     };
   }
 
