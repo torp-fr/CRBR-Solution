@@ -1,17 +1,7 @@
 {
-  "$schema": "https://openapi.vercel.sh/vercel.json",
-  "buildCommand": "",
-  "outputDirectory": ".",
+  "outputDirectory": "vitrine",
   "framework": null,
-  "rewrites": [
-    { "source": "/js/db.js",         "destination": "/js/db.js" },
-    { "source": "/js/engine.js",     "destination": "/js/engine.js" },
-    { "source": "/js/app.js",        "destination": "/js/app.js" },
-    { "source": "/js/views/:path*",  "destination": "/js/views/:path*" },
-    { "source": "/css/:path*",       "destination": "/css/:path*" },
-    { "source": "/img/:path*",       "destination": "/img/:path*" },
-    { "source": "/:path*",           "destination": "/vitrine/:path*" }
-  ],
+  "buildCommand": "",
   "headers": [
     {
       "source": "/(.*)",
