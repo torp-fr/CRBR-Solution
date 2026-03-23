@@ -427,7 +427,8 @@ Views.Devis = (() => {
       totalTVA:      d.totalTVA,
       totalTTC:      d.totalTTC,
       livrables:     d.livrables || [],
-      entreprise:    settings.entreprise || {}
+      entreprise:    settings.entreprise || {},
+      paiement:      settings.paiement || {}
     };
 
     const encoded = encodeURIComponent(JSON.stringify(payload));

@@ -151,8 +151,8 @@
         <span class="val" id="cond-solde">&mdash;</span>
       </div>
       <hr class="conditions-sep" />
-      <div class="conditions-mention">R&egrave;glement par virement bancaire &mdash; RIB disponible sur demande.</div>
-      <div class="conditions-mention">P&eacute;nalit&eacute;s de retard : taux l&eacute;gal en vigueur + indemnit&eacute; forfaitaire de 40&nbsp;&euro; pour frais de recouvrement.</div>
+      <div class="conditions-mention" id="cond-msg-acompte">Règlement par virement bancaire &mdash; RIB disponible sur demande.</div>
+      <div class="conditions-mention" id="cond-msg-solde">Pénalités de retard : taux légal en vigueur + indemnité forfaitaire de 40&nbsp;€ pour frais de recouvrement.</div>
     </div>
 
     <hr class="section-sep" />
@@ -263,6 +263,13 @@
       if (d.tauxTVA && d.tauxTVA > 0) {
         setText('ftr-tva-mention', 'TVA ' + d.tauxTVA + '\u00a0%');
       }
+
+      /* ---- Messages conditions de paiement (dynamiques) ---- */
+      var pai = d.paiement || {};
+      var msgAcompteEl = document.getElementById('cond-msg-acompte');
+      var msgSoldeEl   = document.getElementById('cond-msg-solde');
+      if (msgAcompteEl && pai.messageAcompte) msgAcompteEl.textContent = pai.messageAcompte;
+      if (msgSoldeEl   && pai.messageSolde)   msgSoldeEl.textContent   = pai.messageSolde;
 
       /* ---- Mentions légales pied de page ---- */
       var mentionsEl = document.getElementById('mentions-facture');

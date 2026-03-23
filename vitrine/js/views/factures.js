@@ -442,7 +442,8 @@ Views.Factures = (() => {
       acompteMontant:      acompte,
       soldeRestant:        solde,
       paiementDelaiJours:  f.paiementDelaiJours || 30,
-      entreprise:          settings.entreprise || {}
+      entreprise:          settings.entreprise || {},
+      paiement:            settings.paiement || {}
     };
 
     const encoded = encodeURIComponent(JSON.stringify(payload));

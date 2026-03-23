@@ -85,6 +85,37 @@ Views.Dashboard = {
       });
     }
 
+    /* Alerte CDI / Freelance — seuil de bascule RH */
+    (function() {
+      try {
+        const currentYear = now.getFullYear();
+        const sessCurrent = sessions.filter(s =>
+          s.statut !== 'annulee' &&
+          (s.statut === 'realisee' || s.statut === 'terminee' || s.statut === 'planifiee' || s.statut === 'confirmee') &&
+          new Date(s.date).getFullYear() === currentYear
+        );
+        const nbJoursAn = sessCurrent.reduce((sum, s) => sum + (s.nbJours || 1), 0);
+        if (nbJoursAn > 0 && Engine.calculateComparaisonRH) {
+          const sim = Engine.calculateComparaisonRH(settings, nbJoursAn);
+          if (sim.pointBasculejours > 0) {
+            if (nbJoursAn >= sim.pointBasculejours) {
+              alerts.push({
+                level:   'critical',
+                message: '\uD83D\uDD34 CDI plus rentable que freelance au volume actuel. Économie estimée\u00a0: ' + Engine.fmt(sim.economie) + '/an.',
+                context: 'RH'
+              });
+            } else if (nbJoursAn >= sim.pointBasculejours * 0.80) {
+              alerts.push({
+                level:   'warning',
+                message: '\uD83D\uDCCA Vous approchez du seuil de rentabilité CDI (' + nbJoursAn + ' jours / seuil ' + sim.pointBasculejours + ' jours). Évaluez l\'embauche.',
+                context: 'RH'
+              });
+            }
+          }
+        }
+      } catch(e) { /* non bloquant */ }
+    })();
+
     /* ----------------------------------------------------------
        1. CONSTRUCTION DES CARTES KPI
        ---------------------------------------------------------- */

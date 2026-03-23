@@ -433,6 +433,29 @@ const DB = (() => {
       conditionsAnnulation:  'Annulation >72h : sans frais. <72h : 50%. Jour J : 100%.'
     },
 
+    // Règles de paiement et conditions contractuelles
+    paiement: {
+      acomptePercent:            30,       // % acompte demandé à la commande
+      acompteObligatoire:        true,     // blocage alerte si non reçu
+      delaiSoldJours:            30,       // délai paiement solde (jours)
+      penaliteRetardPercent:     3,        // taux pénalités légal (%)
+      indemniteForfaitaire:      40,       // € forfait recouvrement
+      blocageSessionSiImpaye:    true,     // alerte session si facture en retard
+      messageAcompte:            'Un acompte de 30\u00a0% est exigible à la commande. Aucune session ne sera réalisée avant réception de l\'acompte.',
+      messageSolde:              'Solde payable à 30 jours date de facture. Tout retard entraîne des pénalités au taux légal en vigueur + indemnité forfaitaire de 40\u00a0€ pour frais de recouvrement.'
+    },
+
+    // Paramètres RH avancés (CDI vs Freelance)
+    rh: {
+      cdi: {
+        salaireBrutMensuel:        2800,   // € brut/mois cible
+        chargesPatronalesPercent:  42,     // % charges patronales
+        primesAnnuelles:           1000,   // € primes/an
+        coutRecrutement:           3000,   // € one-shot (amorti sur 3 ans)
+        avantagesNature:           0       // € avantages en nature/an
+      }
+    },
+
     // Capacité opérationnelle — 1 unité = 1 simulateur + 1 opérateur
     capacite: {
       // === PAR UNITÉ OPÉRATIONNELLE ===

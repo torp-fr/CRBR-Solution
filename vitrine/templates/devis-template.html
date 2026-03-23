@@ -519,6 +519,9 @@
       var mentionsEl = document.getElementById('mentions-devis');
       if (mentionsEl) {
         var parts = [];
+        var pai = d.paiement || {};
+        if (pai.messageAcompte) parts.push('<p>' + esc(pai.messageAcompte) + '</p>');
+        if (pai.messageSolde)   parts.push('<p>' + esc(pai.messageSolde) + '</p>');
         if (ent.mentionLegaleDevis)   parts.push('<p>' + esc(ent.mentionLegaleDevis) + '</p>');
         if (ent.mentionRGPD)          parts.push('<p>' + esc(ent.mentionRGPD) + '</p>');
         if (ent.conditionsAnnulation) parts.push('<p>' + esc(ent.conditionsAnnulation) + '</p>');

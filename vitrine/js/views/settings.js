@@ -55,6 +55,12 @@ Views.Settings = {
       )),
       entreprise: JSON.parse(JSON.stringify(
         settings.entreprise || DB.settings.getDefaults().entreprise || {}
+      )),
+      paiement: JSON.parse(JSON.stringify(
+        settings.paiement || DB.settings.getDefaults().paiement || {}
+      )),
+      rh: JSON.parse(JSON.stringify(
+        settings.rh || DB.settings.getDefaults().rh || {}
       ))
     };
 
@@ -284,6 +290,123 @@ Views.Settings = {
               <input type="number" id="rh-cdi-threshold" class="form-control" value="${state.cdiThreshold}" min="0" step="any">
               <span class="form-help">Suggestion de CDI si un opérateur atteint ce nombre annuel</span>
             </div>
+          </div>
+        </div>`;
+    }
+
+    /** Section RH — Stratégie CDI vs Freelance */
+    function renderRHStrategy() {
+      const rh  = state.rh || {};
+      const cdi = rh.cdi || {};
+
+      // Volume actuel depuis les sessions de l'année
+      const currentYear = new Date().getFullYear();
+      const sessionsAnnee = DB.sessions.filter(s =>
+        s.statut !== 'annulee' && new Date(s.date).getFullYear() === currentYear
+      );
+      const nbJoursDefault = Math.max(
+        sessionsAnnee.reduce((sum, s) => sum + (s.nbJours || 1), 0),
+        1
+      );
+
+      // Calcul initial
+      const simInit = Engine.calculateComparaisonRH(state, nbJoursDefault);
+      const bgColor = simInit.recommandation === 'CDI'
+        ? 'rgba(45,212,160,0.08)' : 'rgba(59,130,246,0.08)';
+      const recoClass = simInit.recommandation === 'CDI' ? 'tag-green' : 'tag-blue';
+
+      function numF(id, val, step) {
+        return `<input type="number" id="${id}" class="form-control rh-cdi-field" value="${val}" min="0" step="${step || 'any'}" style="max-width:160px;padding:4px 8px;text-align:right;">`;
+      }
+
+      return `
+        <div class="card" id="section-rh-strategy">
+          <div class="card-header">
+            <h2>Stratégie RH — CDI vs Freelance</h2>
+            <span class="tag tag-blue" style="font-size:0.65rem;">Simulateur temps réel</span>
+          </div>
+          <p class="form-help" style="margin-bottom:16px;">
+            Calculez le point de bascule à partir duquel embaucher en CDI devient moins coûteux que de travailler en freelance/vacation.
+          </p>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start;">
+
+            <!-- Colonne gauche : paramètres CDI -->
+            <div>
+              <h3 style="margin:0 0 12px;font-size:0.88rem;color:var(--text-heading);">Paramètres CDI cible</h3>
+              <div class="form-group">
+                <label for="rh-cdi-salaire-brut">Salaire brut mensuel cible (€)</label>
+                ${numF('rh-cdi-salaire-brut', cdi.salaireBrutMensuel || 2800)}
+              </div>
+              <div class="form-group">
+                <label for="rh-cdi-charges-patron">Charges patronales (%)</label>
+                ${numF('rh-cdi-charges-patron', cdi.chargesPatronalesPercent || 42)}
+              </div>
+              <div class="form-group">
+                <label for="rh-cdi-primes">Primes annuelles (€)</label>
+                ${numF('rh-cdi-primes', cdi.primesAnnuelles || 1000)}
+              </div>
+              <div class="form-group">
+                <label for="rh-cdi-recrutement">Coût recrutement (€)</label>
+                ${numF('rh-cdi-recrutement', cdi.coutRecrutement || 3000)}
+                <span class="form-help">Amorti sur 3 ans</span>
+              </div>
+              <div class="form-group">
+                <label for="rh-cdi-avantages">Avantages en nature (€/an)</label>
+                ${numF('rh-cdi-avantages', cdi.avantagesNature || 0)}
+              </div>
+              <button class="btn btn-primary btn-sm" id="btn-save-rh-cdi" style="margin-top:8px;">Sauvegarder les paramètres CDI</button>
+            </div>
+
+            <!-- Colonne droite : simulateur -->
+            <div>
+              <h3 style="margin:0 0 12px;font-size:0.88rem;color:var(--text-heading);">Simulateur</h3>
+              <div class="form-group">
+                <label for="rh-sim-jours">Volume annuel simulé (jours)</label>
+                <input type="range" id="rh-sim-jours" min="1" max="220" step="1" value="${nbJoursDefault}"
+                       style="width:100%;accent-color:var(--color-primary);">
+                <div style="display:flex;justify-content:space-between;font-size:0.75rem;color:var(--text-muted);">
+                  <span>1j</span>
+                  <span id="rh-sim-jours-display" style="font-weight:700;font-size:0.9rem;color:var(--text-heading);">${nbJoursDefault}j</span>
+                  <span>220j</span>
+                </div>
+              </div>
+
+              <div id="rh-sim-result" style="margin-top:12px;padding:16px;border-radius:6px;background:${bgColor};border:1px solid rgba(255,255,255,0.08);">
+                <div style="font-size:0.78rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px;">
+                  Pour <span id="rh-r-jours">${nbJoursDefault}</span> jours/an
+                </div>
+                <table style="width:100%;font-size:0.84rem;border-collapse:collapse;">
+                  <tr>
+                    <td style="padding:3px 0;color:var(--text-muted);">FREELANCE</td>
+                    <td style="padding:3px 0;text-align:right;">
+                      <span class="text-mono" id="rh-r-freelance-j">${Engine.fmt(simInit.coutJourFreelance)}/j</span>
+                      × <span id="rh-r-freelance-nb">${nbJoursDefault}</span>j
+                      = <strong class="text-mono" id="rh-r-freelance-total">${Engine.fmt(simInit.totalFreelance)}</strong>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style="padding:3px 0;color:var(--text-muted);">CDI (pro-rata)</td>
+                    <td style="padding:3px 0;text-align:right;">
+                      <span class="text-mono" id="rh-r-cdi-annuel">${Engine.fmt(simInit.coutCDIAnnuel)}/an</span>
+                      → <strong class="text-mono" id="rh-r-cdi-total">${Engine.fmt(simInit.coutCDIPourNbJours)}</strong>
+                    </td>
+                  </tr>
+                </table>
+                <hr style="border:none;border-top:1px solid rgba(255,255,255,0.1);margin:10px 0;">
+                <div style="font-size:0.82rem;margin-bottom:6px;">
+                  Point de bascule : <strong id="rh-r-bascule">${simInit.pointBasculejours}</strong> jours/an
+                </div>
+                <div style="display:flex;align-items:center;gap:10px;margin-top:6px;">
+                  <span style="font-weight:700;font-size:0.88rem;">RECOMMANDATION :</span>
+                  <span class="tag ${recoClass}" id="rh-r-reco">${simInit.recommandation}</span>
+                </div>
+                <div style="font-size:0.82rem;margin-top:6px;color:var(--text-muted);">
+                  Économie estimée : <strong class="text-mono" id="rh-r-economie">${Engine.fmt(simInit.economie)}</strong>/an
+                </div>
+              </div>
+            </div>
+
           </div>
         </div>`;
     }
@@ -875,12 +998,24 @@ Views.Settings = {
       const b2cCfg    = pc.b2c || DB.settings.getDefaults().pricingCatalog.b2c;
 
       const palierRows = paliers.map((p, i) => {
-        const prixJour = Engine.round2(tarifBase * p.coeff);
-        const remPct   = Math.round((1 - p.coeff) * 100);
+        const prixJour  = Engine.round2(tarifBase * p.coeff);
+        const nextPalier = paliers[i + 1];
+        const overlap   = nextPalier && (p.volumeMax >= nextPalier.volumeMin);
         return `<tr>
           <td style="font-weight:600;">${escapeHTML(p.label)}</td>
-          <td style="text-align:center;">${p.volumeMin}</td>
-          <td style="text-align:center;">${p.volumeMax === 9999 ? '25+' : p.volumeMax}</td>
+          <td style="text-align:center;">
+            <input type="number" min="1" max="999"
+                   class="input-sm palier-minj"
+                   data-palier="${i}" data-field="volumeMin"
+                   value="${p.volumeMin}">
+          </td>
+          <td style="text-align:center;">
+            <input type="number" min="1" max="999"
+                   class="input-sm palier-maxj"
+                   data-palier="${i}" data-field="volumeMax"
+                   value="${p.volumeMax === 9999 ? 9999 : p.volumeMax}">
+            ${overlap ? `<div class="palier-overlap-warn" style="color:#d32f2f;font-size:0.75rem;white-space:nowrap;">⚠ Chevauchement</div>` : ''}
+          </td>
           <td style="text-align:right;">
             <input type="number" class="form-control palier-coeff" data-index="${i}"
               value="${Math.round(p.coeff * 100)}" min="0" max="100" step="1"
@@ -1045,6 +1180,80 @@ Views.Settings = {
         </div>`;
     }
 
+    /** Section 7b — Conditions de règlement */
+    function renderPaiement() {
+      const p = state.paiement || {};
+
+      function chk(id, val) {
+        return `<input type="checkbox" id="${id}" ${val ? 'checked' : ''}>`;
+      }
+
+      return `
+        <div class="card" id="section-paiement">
+          <div class="card-header">
+            <h2>Conditions de règlement</h2>
+          </div>
+          <p class="form-help" style="margin-bottom:16px;">
+            Ces paramètres s'appliquent automatiquement dans vos devis, factures et le planning.
+          </p>
+
+          <!-- A. Acompte -->
+          <h3 style="margin:0 0 10px;font-size:0.88rem;color:var(--text-heading);">A. Acompte</h3>
+          <div class="form-row" style="margin-bottom:8px;">
+            <div class="form-group">
+              <label for="pai-acompte-pct">Acompte demandé (%)</label>
+              <input type="number" id="pai-acompte-pct" class="form-control" value="${p.acomptePercent ?? 30}" min="0" max="100" step="1" style="max-width:130px;">
+            </div>
+            <div class="form-group" style="align-self:flex-end;">
+              <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+                ${chk('pai-acompte-oblig', p.acompteObligatoire ?? true)}
+                <span>Acompte obligatoire</span>
+              </label>
+              <span class="form-help" style="margin-top:4px;">Si activé, une alerte s'affiche sur les devis sans acompte reçu et les sessions associées.</span>
+            </div>
+          </div>
+
+          <!-- B. Délais & Pénalités -->
+          <h3 style="margin:16px 0 10px;font-size:0.88rem;color:var(--text-heading);">B. Délais &amp; Pénalités</h3>
+          <div class="form-row" style="margin-bottom:8px;">
+            <div class="form-group">
+              <label for="pai-delai-sold">Délai de paiement solde (jours)</label>
+              <input type="number" id="pai-delai-sold" class="form-control" value="${p.delaiSoldJours ?? 30}" min="1" step="1" style="max-width:130px;">
+            </div>
+            <div class="form-group">
+              <label for="pai-penalite-pct">Taux pénalités retard (%)</label>
+              <input type="number" id="pai-penalite-pct" class="form-control" value="${p.penaliteRetardPercent ?? 3}" min="0" step="0.01" style="max-width:130px;">
+            </div>
+            <div class="form-group">
+              <label for="pai-indemnite">Indemnité forfaitaire (€)</label>
+              <input type="number" id="pai-indemnite" class="form-control" value="${p.indemniteForfaitaire ?? 40}" min="0" step="1" style="max-width:130px;">
+            </div>
+          </div>
+
+          <!-- C. Blocage automatique -->
+          <h3 style="margin:16px 0 10px;font-size:0.88rem;color:var(--text-heading);">C. Blocage automatique</h3>
+          <div class="form-group" style="margin-bottom:8px;">
+            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+              ${chk('pai-blocage-impaye', p.blocageSessionSiImpaye ?? true)}
+              <span>Bloquer les sessions si impayé</span>
+            </label>
+            <span class="form-help" style="margin-top:4px;">Si activé, toute session planifiée pour un client avec facture en retard affiche une alerte rouge dans le planning.</span>
+          </div>
+
+          <!-- D. Messages contractuels -->
+          <h3 style="margin:16px 0 10px;font-size:0.88rem;color:var(--text-heading);">D. Messages contractuels</h3>
+          <p class="form-help" style="margin-bottom:12px;">Ces messages s'affichent automatiquement en bas de vos devis et factures.</p>
+          <div class="form-group" style="margin-bottom:12px;">
+            <label for="pai-msg-acompte">Message conditions acompte</label>
+            <textarea id="pai-msg-acompte" class="form-control" rows="3">${escapeHTML(p.messageAcompte || '')}</textarea>
+          </div>
+          <div class="form-group">
+            <label for="pai-msg-solde">Message conditions solde</label>
+            <textarea id="pai-msg-solde" class="form-control" rows="3">${escapeHTML(p.messageSolde || '')}</textarea>
+          </div>
+        </div>`;
+    }
+
     /** Section 8 — Données (export / import / reset) */
     function renderData() {
       return `
@@ -1093,9 +1302,13 @@ Views.Settings = {
 
       ${renderPricingCatalog()}
 
+      ${renderPaiement()}
+
       ${renderCapacite()}
 
       ${renderHR()}
+
+      ${renderRHStrategy()}
 
       ${renderEconomic()}
 
@@ -1241,12 +1454,24 @@ Views.Settings = {
       const elDemiCoeff = $('#pc-demi-coeff');
       if (elDemiCoeff) pc.tarifDemiJourneeCoeff = parseFloat(elDemiCoeff.value) || 0.70;
 
-      // Paliers : coeff (en % → ratio)
+      // Paliers : coeff (en % → ratio) + volumeMin/volumeMax éditables
       if (Array.isArray(pc.paliers)) {
         $$('.palier-coeff').forEach(input => {
           const i = parseInt(input.dataset.index, 10);
           if (pc.paliers[i] !== undefined) {
             pc.paliers[i].coeff = (parseFloat(input.value) || 0) / 100;
+          }
+        });
+        $$('.palier-minj').forEach(input => {
+          const i = parseInt(input.dataset.palier, 10);
+          if (pc.paliers[i] !== undefined) {
+            pc.paliers[i].volumeMin = parseInt(input.value, 10) || 1;
+          }
+        });
+        $$('.palier-maxj').forEach(input => {
+          const i = parseInt(input.dataset.palier, 10);
+          if (pc.paliers[i] !== undefined) {
+            pc.paliers[i].volumeMax = parseInt(input.value, 10) || 9999;
           }
         });
       }
@@ -1426,6 +1651,32 @@ Views.Settings = {
       // mis à jour directement par les FileReaders
     }
 
+    function syncPaiementFromDOM() {
+      const p = state.paiement;
+      const fnum = (id, def) => { const el = $('#' + id); return el ? (parseFloat(el.value) ?? def) : def; };
+      const fchk = (id, def) => { const el = $('#' + id); return el ? el.checked : def; };
+      const fstr = (id) => { const el = $('#' + id); return el ? el.value.trim() : ''; };
+      p.acomptePercent          = fnum('pai-acompte-pct', 30);
+      p.acompteObligatoire      = fchk('pai-acompte-oblig', true);
+      p.delaiSoldJours          = fnum('pai-delai-sold', 30);
+      p.penaliteRetardPercent   = fnum('pai-penalite-pct', 3);
+      p.indemniteForfaitaire    = fnum('pai-indemnite', 40);
+      p.blocageSessionSiImpaye  = fchk('pai-blocage-impaye', true);
+      p.messageAcompte          = fstr('pai-msg-acompte');
+      p.messageSolde            = fstr('pai-msg-solde');
+    }
+
+    function syncRHFromDOM() {
+      const rh = state.rh;
+      if (!rh.cdi) rh.cdi = {};
+      const fnum = (id, def) => { const el = $('#' + id); return el ? (parseFloat(el.value) || def) : def; };
+      rh.cdi.salaireBrutMensuel       = fnum('rh-cdi-salaire-brut', 2800);
+      rh.cdi.chargesPatronalesPercent = fnum('rh-cdi-charges-patron', 42);
+      rh.cdi.primesAnnuelles          = fnum('rh-cdi-primes', 1000);
+      rh.cdi.coutRecrutement          = fnum('rh-cdi-recrutement', 3000);
+      rh.cdi.avantagesNature          = fnum('rh-cdi-avantages', 0);
+    }
+
     /** Synchronise l'intégralité du state depuis les valeurs DOM */
     function syncAllFromDOM() {
       syncScalarsFromDOM();
@@ -1433,6 +1684,8 @@ Views.Settings = {
       syncCoutJourneeFromDOM();
       syncCapaciteFromDOM();
       syncEntrepriseFromDOM();
+      syncPaiementFromDOM();
+      syncRHFromDOM();
     }
 
     /* ----------------------------------------------------------
@@ -1490,6 +1743,29 @@ Views.Settings = {
         const demiPoncEl   = $('#pc-ponctuel-demi-prix');
         if (demiPoncEl) demiPoncEl.textContent = Engine.fmt(Engine.round2(tarifBase * firstCoeff * demiCoeff));
 
+        // Validation overlap paliers min/max
+        const maxjInputs = Array.from($$('.palier-maxj'));
+        const minjInputs = Array.from($$('.palier-minj'));
+        maxjInputs.forEach((maxEl, idx) => {
+          const nextMinEl = minjInputs[idx + 1];
+          const warnEl    = maxEl.parentElement.querySelector('.palier-overlap-warn');
+          if (nextMinEl) {
+            const maxV  = parseInt(maxEl.value, 10) || 0;
+            const minV  = parseInt(nextMinEl.value, 10) || 0;
+            const clash = maxV >= minV;
+            maxEl.style.borderColor = clash ? '#d32f2f' : '';
+            if (warnEl) {
+              warnEl.style.display = clash ? '' : 'none';
+            } else if (clash) {
+              const div = document.createElement('div');
+              div.className = 'palier-overlap-warn';
+              div.style.cssText = 'color:#d32f2f;font-size:0.75rem;white-space:nowrap;';
+              div.textContent = '⚠ Chevauchement';
+              maxEl.parentElement.appendChild(div);
+            }
+          }
+        });
+
         // Mettre à jour la marge brute dans le récapitulatif coût journée
         refreshCoutJourneeRecap();
       }
@@ -1499,6 +1775,7 @@ Views.Settings = {
       if (pcBaseEl) pcBaseEl.addEventListener('input', refreshPricingCatalogCalcs);
       if (pcDemiEl) pcDemiEl.addEventListener('input', refreshPricingCatalogCalcs);
       $$('.palier-coeff').forEach(inp => inp.addEventListener('input', refreshPricingCatalogCalcs));
+      $$('.palier-minj, .palier-maxj').forEach(inp => inp.addEventListener('input', refreshPricingCatalogCalcs));
 
       // Segment F : GC / B2B / B2C
       $$('.gc-tarif-jour, #pc-b2b-journee, #pc-b2b-demi, #pc-b2c-2h, #pc-b2c-3h, #pc-b2c-4h, #pc-b2c-groupe').forEach(inp => {
@@ -1509,6 +1786,52 @@ Views.Settings = {
       $$('.cj-field').forEach(inp => {
         inp.addEventListener('input', refreshCoutJourneeRecap);
       });
+
+      /* --- Simulateur CDI/Freelance : recalcul en temps réel --- */
+      function refreshRHSimulator() {
+        syncRHFromDOM();
+        const sliderEl = $('#rh-sim-jours');
+        const nbJours  = sliderEl ? parseInt(sliderEl.value, 10) || 1 : 1;
+
+        const dispEl = $('#rh-sim-jours-display');
+        if (dispEl) dispEl.textContent = nbJours + 'j';
+
+        const sim = Engine.calculateComparaisonRH(state, nbJours);
+        const bgC = sim.recommandation === 'CDI' ? 'rgba(45,212,160,0.08)' : 'rgba(59,130,246,0.08)';
+        const recoClass = sim.recommandation === 'CDI' ? 'tag-green' : 'tag-blue';
+
+        const resDiv = $('#rh-sim-result');
+        if (resDiv) resDiv.style.background = bgC;
+
+        function setText(id, val) { const el = $('#' + id); if (el) el.textContent = val; }
+        setText('rh-r-jours',          nbJours);
+        setText('rh-r-freelance-j',    Engine.fmt(sim.coutJourFreelance) + '/j');
+        setText('rh-r-freelance-nb',   nbJours);
+        setText('rh-r-freelance-total',Engine.fmt(sim.totalFreelance));
+        setText('rh-r-cdi-annuel',     Engine.fmt(sim.coutCDIAnnuel) + '/an');
+        setText('rh-r-cdi-total',      Engine.fmt(sim.coutCDIPourNbJours));
+        setText('rh-r-bascule',        sim.pointBasculejours);
+        setText('rh-r-economie',       Engine.fmt(sim.economie));
+
+        const recoEl = $('#rh-r-reco');
+        if (recoEl) { recoEl.textContent = sim.recommandation; recoEl.className = 'tag ' + recoClass; }
+      }
+
+      const sliderRH = $('#rh-sim-jours');
+      if (sliderRH) sliderRH.addEventListener('input', refreshRHSimulator);
+      $$('.rh-cdi-field').forEach(inp => inp.addEventListener('input', refreshRHSimulator));
+
+      /* --- Bouton sauvegarde CDI --- */
+      const btnSaveRHCdi = $('#btn-save-rh-cdi');
+      if (btnSaveRHCdi) {
+        btnSaveRHCdi.addEventListener('click', () => {
+          syncRHFromDOM();
+          const current = DB.settings.get();
+          current.rh = state.rh;
+          DB.settings.set(current);
+          Toast.show('Paramètres CDI sauvegardés.', 'success');
+        });
+      }
     }
 
     /* ----------------------------------------------------------
@@ -1701,7 +2024,9 @@ Views.Settings = {
           pricingCatalog:              state.pricingCatalog,
           coutJournee:                 state.coutJournee,
           capacite:                    state.capacite,
-          entreprise:                  state.entreprise
+          entreprise:                  state.entreprise,
+          paiement:                    state.paiement,
+          rh:                          state.rh
         };
 
         DB.settings.update(update);

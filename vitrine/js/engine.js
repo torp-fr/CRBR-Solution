@@ -1602,6 +1602,66 @@ const Engine = (() => {
     };
   }
 
+  /* ----------------------------------------------------------
+     MOTEUR CDI vs FREELANCE — Simulation et point de bascule
+     ---------------------------------------------------------- */
+
+  /**
+   * Compare le coût entreprise CDI vs Freelance pour un volume annuel donné.
+   * Retourne le point de bascule, la recommandation et l'économie estimée.
+   *
+   * @param {object} s — paramètres (DB.settings.get())
+   * @param {number} nbJours — volume annuel de jours simulé
+   * @returns {object}
+   */
+  function calculateComparaisonRH(s, nbJours) {
+    var settings = s || DB.settings.get();
+    var cj  = settings.coutJournee || {};
+    var cdi = (settings.rh && settings.rh.cdi) || {};
+
+    // --- Coût freelance ---
+    var coutJourFreelance = cj.coutOperateurJour || 500;
+    var freelanceResult   = netToCompanyCost(coutJourFreelance, 'freelance', settings);
+    var coutEntrepriseFreelance = freelanceResult.companyCost || coutJourFreelance;
+    var totalFreelance    = round2(coutEntrepriseFreelance * nbJours);
+
+    // --- Coût CDI annuel ---
+    var salaireBrut        = cdi.salaireBrutMensuel || 2800;
+    var chargesPatron      = (cdi.chargesPatronalesPercent || 42) / 100;
+    var coutSalarialAnnuel = round2(salaireBrut * 12 * (1 + chargesPatron)
+                              + (cdi.primesAnnuelles || 0)
+                              + (cdi.avantagesNature || 0));
+
+    // Recrutement amorti sur 3 ans
+    var recrutementAmorti = round2((cdi.coutRecrutement || 0) / 3);
+    var coutCDIAnnuel     = round2(coutSalarialAnnuel + recrutementAmorti);
+
+    // Coût CDI proratisé sur nbJours (base 220 jours ouvrés/an)
+    var joursOuvresAn        = 220;
+    var coutCDIPourNbJours   = round2(coutCDIAnnuel * (nbJours / joursOuvresAn));
+
+    // Point de bascule : nb jours à partir duquel CDI < Freelance
+    var pointBasculejours = coutEntrepriseFreelance > 0
+      ? Math.ceil(coutCDIAnnuel / coutEntrepriseFreelance)
+      : 0;
+
+    // Économie : totalFreelance - coutCDIPourNbJours
+    // > 0 → CDI moins cher ; < 0 → Freelance moins cher
+    var delta = round2(totalFreelance - coutCDIPourNbJours);
+
+    return {
+      nbJours,
+      coutJourFreelance:   round2(coutEntrepriseFreelance),
+      totalFreelance:      totalFreelance,
+      coutCDIAnnuel:       coutCDIAnnuel,
+      coutCDIPourNbJours:  coutCDIPourNbJours,
+      pointBasculejours:   pointBasculejours,
+      delta:               delta,
+      recommandation:      nbJours >= pointBasculejours ? 'CDI' : 'FREELANCE',
+      economie:            Math.abs(delta)
+    };
+  }
+
   /* --- API publique --- */
   return {
     netToCompanyCost,
@@ -1637,6 +1697,8 @@ const Engine = (() => {
     compareHoraireJournalier,
     // Capacité opérationnelle
     calculateTauxUtilisation,
-    calculateBesoinsInvestissement
+    calculateBesoinsInvestissement,
+    // CDI vs Freelance
+    calculateComparaisonRH
   };
 })();

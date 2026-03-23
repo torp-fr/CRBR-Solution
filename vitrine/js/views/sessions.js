@@ -316,7 +316,7 @@ Views.Sessions = (() => {
                 <tr>
                   <td>${_formatDateFr(s.date)}${s.time ? '<br><small class="text-muted">' + _esc(s.time) + '</small>' : ''}</td>
                   <td><strong>${_esc(s.label || '—')}</strong>${s.devisRef ? ' <span class="tag tag-blue" style="font-size:0.7rem;">&#128196;&nbsp;' + _esc(s.devisRef) + '</span>' : ''}${s.adresseIntervention ? '<br><small class="text-muted">📍 ' + _esc(s.adresseIntervention) + '</small>' : ''}</td>
-                  <td>${_clientName(s.clientIds)}</td>
+                  <td>${_clientName(s.clientIds)}${_clientHasFactureEnRetard(s.clientIds) ? ' <span class="tag tag-red" style="font-size:0.7rem;" title="Ce client a une facture en retard de paiement">⚠ Impayé</span>' : ''}</td>
                   <td><small>${_moduleNames(s.moduleIds)}</small></td>
                   <td><small>${_operatorNames(s.operatorIds)}</small></td>
                   <td class="num">${Engine.fmt(s.price || 0)}${s.encaissement ? ' <span style="color:var(--color-success);font-weight:600;">✓</span>' : ' <span style="color:var(--text-muted);">○</span>'}</td>
@@ -950,6 +950,20 @@ Views.Sessions = (() => {
       const c = DB.clients.getById(id);
       return c ? (c.name || c.id) : '\u2014';
     }).join(', ');
+  }
+
+  /** Retourne true si le client a au moins une facture en retard */
+  function _clientHasFactureEnRetard(clientIds) {
+    if (!clientIds || clientIds.length === 0) return false;
+    const settings = DB.settings.get();
+    if (!(settings.paiement && settings.paiement.blocageSessionSiImpaye)) return false;
+    const now = new Date();
+    const factures = DB.factures ? DB.factures.getAll() : [];
+    return factures.some(f => {
+      if (f.statut === 'soldee' || f.statut === 'annulee') return false;
+      if (!clientIds.includes(f.clientId)) return false;
+      return f.dateLimitePaiement && new Date(f.dateLimitePaiement) < now;
+    });
   }
 
   function _moduleNames(ids) {

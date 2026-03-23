@@ -695,6 +695,28 @@ a:hover { color: #7da8d4; text-decoration: none; }
   color: var(--text-muted);
 }
 
+/* Input compact — paliers tarifaires et autres inputs inline */
+.input-sm {
+  width: 60px;
+  padding: 4px 8px;
+  font-size: 12px;
+  border-radius: 4px;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  text-align: center;
+  -moz-appearance: textfield;
+}
+.input-sm:focus {
+  outline: none;
+  border-color: rgba(230,57,70,0.4);
+}
+.input-sm::-webkit-outer-spin-button,
+.input-sm::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
 /* Remove number input spinners for free input */
 .form-control[type="number"] {
   -moz-appearance: textfield;
