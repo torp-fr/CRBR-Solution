@@ -805,7 +805,7 @@
   </script>
 
 <script>
-(function(){try{var s=JSON.parse(localStorage.getItem('dst_config_settings')||'{}');var logoTexte=s.entreprise&&s.entreprise.logoTexteBase64;var logoEl=document.getElementById('portail-logo');if(logoEl&&logoTexte){logoEl.innerHTML='<img src="'+logoTexte+'" style="max-height:48px;max-width:200px;object-fit:contain;">';}}catch(e){}})();
+(function(){try{var s=JSON.parse(localStorage.getItem('dst_config_settings')||'{}');var logoTexte=s.entreprise&&s.entreprise.logoTexteBase64;var logoEl=document.getElementById('portail-logo');if(!logoEl)return;if(logoTexte){logoEl.innerHTML='<img src="'+logoTexte+'" style="max-height:48px;max-width:200px;object-fit:contain;">';}else{var img=document.createElement('img');img.src='../img/DST-Light.png';img.style.cssText='max-height:48px;max-width:200px;object-fit:contain;';img.onerror=function(){logoEl.innerHTML='<span style="font-size:18px;font-weight:700;letter-spacing:1px;">DST System</span>';};logoEl.innerHTML='';logoEl.appendChild(img);}}catch(e){}})();
 </script>
 </body>
 </html>

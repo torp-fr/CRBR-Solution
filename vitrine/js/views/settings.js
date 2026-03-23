@@ -70,7 +70,9 @@ Views.Settings = {
         const hasImg = !!opts.base64;
         const imgHtml = hasImg
           ? `<img src="${escapeAttr(opts.base64)}" style="${opts.imgStyle}">`
-          : `<span style="color:var(--text-muted);font-size:0.82rem;">Aucun logo</span>`;
+          : opts.defaultSrc
+            ? `<img src="${opts.defaultSrc}" style="${opts.imgStyle}" onerror="this.outerHTML='<span style=\\'color:var(--text-muted);font-size:0.82rem;\\'>Aucun logo</span>'">`
+            : `<span style="color:var(--text-muted);font-size:0.82rem;">Aucun logo</span>`;
         return `
           <div style="margin-bottom:20px;">
             <div style="font-weight:600;font-size:0.86rem;margin-bottom:8px;color:var(--text-heading);">${opts.label}</div>
@@ -155,7 +157,8 @@ Views.Settings = {
             imgStyle:  'max-height:80px;max-width:200px;',
             base64:    e.logoPrincipalBase64 || '',
             keyB64:    'logoPrincipalBase64',
-            keyMime:   'logoPrincipalMime'
+            keyMime:   'logoPrincipalMime',
+            defaultSrc: '../img/logo%20principal%20DST.png'
           })}
           ${logoZone({
             label:     'Logo texte \u2014 Header et communications',
@@ -165,7 +168,8 @@ Views.Settings = {
             imgStyle:  'max-height:60px;max-width:300px;',
             base64:    e.logoTexteBase64 || '',
             keyB64:    'logoTexteBase64',
-            keyMime:   'logoTexteMime'
+            keyMime:   'logoTexteMime',
+            defaultSrc: '../img/DST-Light.png'
           })}
           ${logoZone({
             label:     'Favicon \u2014 Ic\u00f4ne onglet navigateur',
@@ -175,7 +179,8 @@ Views.Settings = {
             imgStyle:  'width:32px;height:32px;image-rendering:pixelated;',
             base64:    e.faviconBase64 || '',
             keyB64:    'faviconBase64',
-            keyMime:   'faviconMime'
+            keyMime:   'faviconMime',
+            defaultSrc: '../img/DST-Light-transparent.png'
           })}
 
           <h3 style="margin:20px 0 14px;font-size:0.88rem;color:var(--text-heading);">C. Mentions l\u00e9gales documents</h3>
@@ -1541,28 +1546,31 @@ Views.Settings = {
       // Délégation générique pour les 3 zones de logo
       const logoConfigs = [
         {
-          inputId:   'logo-principal-input',
-          previewId: 'logo-principal-preview',
-          keyB64:    'logoPrincipalBase64',
-          keyMime:   'logoPrincipalMime',
-          maxSize:   512000,
-          imgStyle:  'max-height:80px;max-width:200px;'
+          inputId:    'logo-principal-input',
+          previewId:  'logo-principal-preview',
+          keyB64:     'logoPrincipalBase64',
+          keyMime:    'logoPrincipalMime',
+          maxSize:    512000,
+          imgStyle:   'max-height:80px;max-width:200px;',
+          defaultSrc: '../img/logo%20principal%20DST.png'
         },
         {
-          inputId:   'logo-texte-input',
-          previewId: 'logo-texte-preview',
-          keyB64:    'logoTexteBase64',
-          keyMime:   'logoTexteMime',
-          maxSize:   307200,
-          imgStyle:  'max-height:60px;max-width:300px;'
+          inputId:    'logo-texte-input',
+          previewId:  'logo-texte-preview',
+          keyB64:     'logoTexteBase64',
+          keyMime:    'logoTexteMime',
+          maxSize:    307200,
+          imgStyle:   'max-height:60px;max-width:300px;',
+          defaultSrc: '../img/DST-Light.png'
         },
         {
-          inputId:   'favicon-input',
-          previewId: 'favicon-preview',
-          keyB64:    'faviconBase64',
-          keyMime:   'faviconMime',
-          maxSize:   204800,
-          imgStyle:  'width:32px;height:32px;image-rendering:pixelated;'
+          inputId:    'favicon-input',
+          previewId:  'favicon-preview',
+          keyB64:     'faviconBase64',
+          keyMime:    'faviconMime',
+          maxSize:    204800,
+          imgStyle:   'width:32px;height:32px;image-rendering:pixelated;',
+          defaultSrc: '../img/DST-Light-transparent.png'
         }
       ];
 
@@ -1606,11 +1614,27 @@ Views.Settings = {
           const preview = $('#' + btn.dataset.preview);
           state.entreprise[keyB64]  = '';
           state.entreprise[keyMime] = '';
-          if (preview) preview.innerHTML = '<span style="color:var(--text-muted);font-size:0.82rem;">Aucun logo</span>';
+          const cfg = logoConfigs.find(c => c.keyB64 === keyB64);
+          if (preview) {
+            if (cfg && cfg.defaultSrc) {
+              var fbImg = document.createElement('img');
+              fbImg.src = cfg.defaultSrc;
+              fbImg.style.cssText = cfg.imgStyle;
+              fbImg.onerror = function() {
+                preview.innerHTML = '<span style="color:var(--text-muted);font-size:0.82rem;">Aucun logo</span>';
+              };
+              preview.innerHTML = '';
+              preview.appendChild(fbImg);
+            } else {
+              preview.innerHTML = '<span style="color:var(--text-muted);font-size:0.82rem;">Aucun logo</span>';
+            }
+          }
           btn.style.display = 'none';
           // Réinitialiser l'input file correspondant
-          const cfg = logoConfigs.find(c => c.keyB64 === keyB64);
           if (cfg) { const inp = $('#' + cfg.inputId); if (inp) inp.value = ''; }
+          // Sauvegarder immédiatement et appliquer globalement
+          DB.settings.update({ entreprise: state.entreprise });
+          if (window._applyEntrepriseGlobale) _applyEntrepriseGlobale();
         });
       });
     }

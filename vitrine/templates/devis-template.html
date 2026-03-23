@@ -417,8 +417,15 @@
         if (ent.logoPrincipalBase64) {
           logoContainer.innerHTML = '<img src="' + ent.logoPrincipalBase64 + '" style="max-height:70px;max-width:250px;">';
         } else {
-          logoContainer.innerHTML = '<div style="font-size:14pt;font-weight:700;color:#1a1a2e;">' + esc(ent.nom || 'DST System') + '</div>' +
-            '<div style="font-size:9pt;color:#555;">' + esc(ent.formeJuridique || 'SASU') + '</div>';
+          var fbImg = document.createElement('img');
+          fbImg.src = '../img/logo%20principal%20DST.png';
+          fbImg.style.cssText = 'max-height:70px;max-width:250px;';
+          fbImg.onerror = function() {
+            logoContainer.innerHTML = '<div style="font-size:14pt;font-weight:700;color:#1a1a2e;">' + esc(ent.nom || 'DST System') + '</div>' +
+              '<div style="font-size:9pt;color:#555;">' + esc(ent.formeJuridique || 'SASU') + '</div>';
+          };
+          logoContainer.innerHTML = '';
+          logoContainer.appendChild(fbImg);
         }
       }
 

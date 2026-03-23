@@ -188,16 +188,24 @@ const App = (() => {
     if (!container) return;
 
     if (ent.logoTexteBase64) {
+      // Priorité 1 : logo texte uploadé
       container.innerHTML =
-        '<img src="' + ent.logoTexteBase64 + '" style="max-height:40px;max-width:160px;object-fit:contain;">';
+        '<img src="' + ent.logoTexteBase64 +
+        '" style="max-height:40px;max-width:160px;object-fit:contain;">';
     } else {
-      container.innerHTML =
-        '<div style="display:flex;flex-direction:column;">' +
+      // Priorité 2 : logo statique + fallback texte
+      var fallbackDiv =
+        '<div style="display:none;flex-direction:column;">' +
           '<span style="font-size:14px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-primary);line-height:1.1;">' +
             (ent.nom || 'DST SYSTEM') +
           '</span>' +
           '<span style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--text-muted);margin-top:2px;">DRILL &amp; SKILLS TRAINING</span>' +
         '</div>';
+      container.innerHTML =
+        '<img src="../img/DST-Light.png"' +
+        ' onerror="this.style.display=\'none\';this.nextSibling.style.display=\'flex\';"' +
+        ' style="max-height:40px;max-width:160px;object-fit:contain;">' +
+        fallbackDiv;
     }
   }
   window._initSidebarBrand = _initSidebarBrand;
