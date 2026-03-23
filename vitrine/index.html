@@ -658,10 +658,52 @@
     <div class="footer__bottom">
       <p>© 2026 DST System — Drill &amp; Skills Training. Tous droits réservés.</p>
       <p>Programme d'entraînement opérationnel</p>
+      <p style="font-size:12px;color:#6b7280;margin-top:8px;">
+        <a href="/mentions-legales.html" style="color:#6b7280;text-decoration:none;">Mentions légales</a>
+        &nbsp;·&nbsp;
+        <a href="/confidentialite.html" style="color:#6b7280;text-decoration:none;">Politique de confidentialité</a>
+        &nbsp;·&nbsp;
+        <a href="/cgv.html" style="color:#6b7280;text-decoration:none;">CGV</a>
+      </p>
     </div>
   </div>
 </footer>
 
 <script src="js/main.js"></script>
+
+<!-- BANDEAU COOKIES -->
+<div id="cookie-banner"
+     style="position:fixed;bottom:0;left:0;right:0;
+            background:#1a1a2e;color:#e8eaf0;
+            padding:14px 24px;
+            display:flex;align-items:center;
+            justify-content:space-between;
+            font-size:13px;z-index:9999;
+            border-top:1px solid rgba(255,255,255,0.08);
+            gap:16px;">
+  <span>
+    Ce site utilise des cookies techniques nécessaires
+    à son fonctionnement (formulaires, espaces personnels).
+    <a href="/confidentialite.html"
+       style="color:#ff6b74;text-decoration:none;">
+      En savoir plus
+    </a>
+  </span>
+  <button onclick="
+    document.getElementById('cookie-banner')
+      .style.display='none';
+    localStorage.setItem('cookies_accepted','1');"
+    style="background:#e63946;color:#fff;border:none;
+           padding:8px 16px;border-radius:4px;
+           font-size:12px;font-weight:600;cursor:pointer;
+           white-space:nowrap;">
+    Accepter
+  </button>
+</div>
+<script>
+  if (localStorage.getItem('cookies_accepted')) {
+    document.getElementById('cookie-banner').style.display = 'none';
+  }
+</script>
 </body>
 </html>

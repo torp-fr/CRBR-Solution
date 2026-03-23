@@ -17,9 +17,6 @@ Views.Settings = {
        État local mutable — copie de travail des paramètres
        ---------------------------------------------------------- */
     const state = {
-      fixedCosts:      JSON.parse(JSON.stringify(settings.fixedCosts || [])),
-      equipmentAmortization: JSON.parse(JSON.stringify(settings.equipmentAmortization || [])),
-      defaultSessionVariableCosts: JSON.parse(JSON.stringify(settings.defaultSessionVariableCosts || [])),
       clientTypes:     [...(settings.clientTypes || [])],
       operatorStatuses: [...(settings.operatorStatuses || [])],
       offerTypes:      [...(settings.offerTypes || [])],
@@ -59,153 +56,39 @@ Views.Settings = {
     };
 
     /* ----------------------------------------------------------
-       Fonctions utilitaires de calcul
-       ---------------------------------------------------------- */
-
-    /** Total des coûts fixes annuels */
-    function totalFixed() {
-      return state.fixedCosts.reduce((s, c) => s + (parseFloat(c.amount) || 0), 0);
-    }
-
-    /** Total amortissement annuel */
-    function totalAmortization() {
-      return state.equipmentAmortization.reduce((s, a) => {
-        const years = Math.max(parseFloat(a.durationYears) || 1, 1);
-        return s + ((parseFloat(a.amount) || 0) / years);
-      }, 0);
-    }
-
-    /** Quote-part coûts fixes par session */
-    function fixedPerSession() {
-      const est = Math.max(state.estimatedAnnualSessions, 1);
-      return (totalFixed() + totalAmortization()) / est;
-    }
-
-    /* ----------------------------------------------------------
        Génération du HTML
        ---------------------------------------------------------- */
 
     /** Carte récapitulative KPI en haut de page */
     function renderSummary() {
-      const tf = totalFixed();
-      const ta = totalAmortization();
-      const fps = fixedPerSession();
+      const seuilPlancher = Engine.calculateSeuilPlancher(state);
+      const tarifBase     = state.pricingCatalog.tarifJourneeBase || 0;
+      const ok            = tarifBase > 0 && tarifBase >= seuilPlancher;
+      const capaciteTotale = (state.capacite.nbUnites || 1) * (state.capacite.joursMaxParUniteParAn || 150);
       return `
         <div class="kpi-grid">
           <div class="kpi-card">
-            <div class="kpi-label">Coûts fixes / an</div>
-            <div class="kpi-value text-mono">${Engine.fmt(tf)}</div>
+            <div class="kpi-label">Seuil plancher</div>
+            <div class="kpi-value text-mono">${Engine.fmt(seuilPlancher)}</div>
           </div>
           <div class="kpi-card">
-            <div class="kpi-label">Amortissements / an</div>
-            <div class="kpi-value text-mono">${Engine.fmt(ta)}</div>
-          </div>
-          <div class="kpi-card">
-            <div class="kpi-label">Charge fixe / session</div>
-            <div class="kpi-value text-mono">${Engine.fmt(Engine.round2(fps))}</div>
-            <div class="kpi-detail">Sur base de ${state.estimatedAnnualSessions} sessions/an</div>
+            <div class="kpi-label">Tarif journée</div>
+            <div class="kpi-value text-mono">${Engine.fmt(tarifBase)}</div>
+            <div class="kpi-detail">${ok ? 'Couvert ✓' : '⚠ Insuffisant'}</div>
           </div>
           <div class="kpi-card">
             <div class="kpi-label">Marge cible</div>
             <div class="kpi-value">${state.targetMarginPercent} %</div>
           </div>
-        </div>`;
-    }
-
-    /** Section 1 — Coûts fixes annuels */
-    function renderFixedCosts() {
-      const rows = state.fixedCosts.map((c, i) => `
-        <div class="form-inline mb-8" data-section="fixed" data-index="${i}">
-          <div class="form-group" style="flex:2;margin-bottom:0">
-            <input type="text" class="form-control fc-label" value="${escapeAttr(c.label)}" placeholder="Libellé">
-          </div>
-          <div class="form-group" style="flex:1;margin-bottom:0">
-            <input type="number" class="form-control fc-amount text-mono" value="${c.amount || 0}" min="0" step="any" placeholder="Montant">
-          </div>
-          <button class="btn btn-sm btn-ghost fc-remove" title="Supprimer">&times;</button>
-        </div>`).join('');
-
-      return `
-        <div class="card" id="section-fixed">
-          <div class="card-header">
-            <h2>Coûts fixes annuels</h2>
-            <button class="btn btn-sm" id="btn-add-fixed">+ Ajouter</button>
-          </div>
-          ${rows}
-          <div class="flex-between mt-16" style="border-top:1px solid var(--border-color);padding-top:12px">
-            <span class="text-muted">Total coûts fixes</span>
-            <span class="font-bold text-mono" id="total-fixed">${Engine.fmt(totalFixed())}</span>
+          <div class="kpi-card">
+            <div class="kpi-label">Capacité</div>
+            <div class="kpi-value">${capaciteTotale} j/an</div>
+            <div class="kpi-detail">${state.capacite.nbUnites || 1} simulateur(s)</div>
           </div>
         </div>`;
     }
 
-    /** Section 2 — Amortissements matériels */
-    function renderAmortization() {
-      const rows = state.equipmentAmortization.map((a, i) => {
-        const years = Math.max(parseFloat(a.durationYears) || 1, 1);
-        const annual = (parseFloat(a.amount) || 0) / years;
-        return `
-        <div class="form-inline mb-8" data-section="amort" data-index="${i}">
-          <div class="form-group" style="flex:2;margin-bottom:0">
-            <input type="text" class="form-control am-label" value="${escapeAttr(a.label)}" placeholder="Libellé">
-          </div>
-          <div class="form-group" style="flex:1;margin-bottom:0">
-            <input type="number" class="form-control am-amount text-mono" value="${a.amount || 0}" min="0" step="any" placeholder="Montant achat">
-          </div>
-          <div class="form-group" style="flex:0.5;margin-bottom:0">
-            <input type="number" class="form-control am-duration" value="${a.durationYears || 1}" min="1" step="any" placeholder="Années">
-          </div>
-          <span class="text-mono text-muted" style="min-width:90px;text-align:right" title="Amortissement annuel">${Engine.fmt(Engine.round2(annual))}/an</span>
-          <button class="btn btn-sm btn-ghost am-remove" title="Supprimer">&times;</button>
-        </div>`;
-      }).join('');
-
-      return `
-        <div class="card" id="section-amort">
-          <div class="card-header">
-            <h2>Amortissements matériels</h2>
-            <button class="btn btn-sm" id="btn-add-amort">+ Ajouter</button>
-          </div>
-          <div class="form-inline mb-8 text-muted" style="font-size:0.75rem">
-            <span style="flex:2">Libellé</span>
-            <span style="flex:1">Montant achat</span>
-            <span style="flex:0.5">Durée (ans)</span>
-            <span style="min-width:90px;text-align:right">Amort./an</span>
-            <span style="width:36px"></span>
-          </div>
-          ${rows}
-          <div class="flex-between mt-16" style="border-top:1px solid var(--border-color);padding-top:12px">
-            <span class="text-muted">Total amortissement annuel</span>
-            <span class="font-bold text-mono" id="total-amort">${Engine.fmt(Engine.round2(totalAmortization()))}</span>
-          </div>
-        </div>`;
-    }
-
-    /** Section 3 — Coûts variables par défaut (par session) */
-    function renderVariableCosts() {
-      const rows = state.defaultSessionVariableCosts.map((v, i) => `
-        <div class="form-inline mb-8" data-section="var" data-index="${i}">
-          <div class="form-group" style="flex:2;margin-bottom:0">
-            <input type="text" class="form-control vc-label" value="${escapeAttr(v.label)}" placeholder="Libellé">
-          </div>
-          <div class="form-group" style="flex:1;margin-bottom:0">
-            <input type="number" class="form-control vc-amount text-mono" value="${v.amount || 0}" min="0" step="any" placeholder="Montant par défaut">
-          </div>
-          <button class="btn btn-sm btn-ghost vc-remove" title="Supprimer">&times;</button>
-        </div>`).join('');
-
-      return `
-        <div class="card" id="section-variable">
-          <div class="card-header">
-            <h2>Coûts variables par défaut (par session)</h2>
-            <button class="btn btn-sm" id="btn-add-var">+ Ajouter</button>
-          </div>
-          <p class="form-help mb-16">Ces coûts seront pré-remplis lors de la création d'une nouvelle session.</p>
-          ${rows}
-        </div>`;
-    }
-
-    /** Section 4 — Paramètres RH */
+    /** Section — Paramètres RH */
     function renderHR() {
       return `
         <div class="card" id="section-rh">
@@ -1044,26 +927,19 @@ Views.Settings = {
         <span>Les modifications ne sont prises en compte qu'après avoir cliqué sur <strong>Enregistrer</strong>.</span>
       </div>
 
-      <div class="grid-2">
-        <div>
-          ${renderFixedCosts()}
-          ${renderAmortization()}
-          ${renderVariableCosts()}
-        </div>
-        <div>
-          ${renderHR()}
-          ${renderEconomic()}
-          ${renderTypes()}
-        </div>
-      </div>
-
       ${renderCoutJournee()}
-
-      ${renderCapacite()}
 
       ${renderPricingCatalog()}
 
+      ${renderCapacite()}
+
+      ${renderHR()}
+
+      ${renderEconomic()}
+
       ${renderChargesSociales()}
+
+      ${renderTypes()}
 
       ${renderData()}
 
@@ -1103,24 +979,12 @@ Views.Settings = {
        Fonctions de mise à jour partielle (sans re-render complet)
        ---------------------------------------------------------- */
 
-    /** Met à jour les totaux affichés et les KPI du résumé */
+    /** Met à jour les KPI du résumé */
     function refreshTotals() {
-      const elFixed = $('#total-fixed');
-      const elAmort = $('#total-amort');
-      if (elFixed) elFixed.textContent = Engine.fmt(totalFixed());
-      if (elAmort) elAmort.textContent = Engine.fmt(Engine.round2(totalAmortization()));
-
-      /* KPI résumé */
       const kpis = $$('.kpi-card .kpi-value');
-      if (kpis.length >= 4) {
-        kpis[0].textContent = Engine.fmt(totalFixed());
-        kpis[1].textContent = Engine.fmt(Engine.round2(totalAmortization()));
-        kpis[2].textContent = Engine.fmt(Engine.round2(fixedPerSession()));
-        kpis[3].textContent = state.targetMarginPercent + ' %';
+      if (kpis.length >= 3) {
+        kpis[2].textContent = state.targetMarginPercent + ' %';
       }
-      /* Détail sous la charge fixe/session */
-      const detail = container.querySelector('.kpi-card:nth-child(3) .kpi-detail');
-      if (detail) detail.textContent = 'Sur base de ' + state.estimatedAnnualSessions + ' sessions/an';
     }
 
     /** Recharge une section de liste éditable et réattache les listeners */
@@ -1138,31 +1002,6 @@ Views.Settings = {
     /* ----------------------------------------------------------
        Collecte des valeurs depuis le DOM → state
        ---------------------------------------------------------- */
-
-    function syncFixedCostsFromDOM() {
-      const rows = $$('[data-section="fixed"]');
-      state.fixedCosts = Array.from(rows).map(row => ({
-        label:  row.querySelector('.fc-label').value.trim(),
-        amount: parseFloat(row.querySelector('.fc-amount').value) || 0
-      }));
-    }
-
-    function syncAmortFromDOM() {
-      const rows = $$('[data-section="amort"]');
-      state.equipmentAmortization = Array.from(rows).map(row => ({
-        label:         row.querySelector('.am-label').value.trim(),
-        amount:        parseFloat(row.querySelector('.am-amount').value) || 0,
-        durationYears: parseInt(row.querySelector('.am-duration').value, 10) || 1
-      }));
-    }
-
-    function syncVariableCostsFromDOM() {
-      const rows = $$('[data-section="var"]');
-      state.defaultSessionVariableCosts = Array.from(rows).map(row => ({
-        label:  row.querySelector('.vc-label').value.trim(),
-        amount: parseFloat(row.querySelector('.vc-amount').value) || 0
-      }));
-    }
 
     function syncScalarsFromDOM() {
       state.employerChargeRate       = parseFloat($('#rh-employer-charge').value) || 0;
@@ -1405,9 +1244,6 @@ Views.Settings = {
 
     /** Synchronise l'intégralité du state depuis les valeurs DOM */
     function syncAllFromDOM() {
-      syncFixedCostsFromDOM();
-      syncAmortFromDOM();
-      syncVariableCostsFromDOM();
       syncScalarsFromDOM();
       syncPricingCatalogFromDOM();
       syncCoutJourneeFromDOM();
@@ -1423,66 +1259,6 @@ Views.Settings = {
       /* --- Capacité : mise à jour temps réel --- */
       $$('.cap-field').forEach(input => {
         input.addEventListener('input', () => syncCapaciteFromDOM());
-      });
-
-      /* --- Coûts fixes : modification en temps réel --- */
-      $$('[data-section="fixed"] .fc-label, [data-section="fixed"] .fc-amount').forEach(input => {
-        input.addEventListener('input', () => {
-          syncFixedCostsFromDOM();
-          refreshTotals();
-        });
-      });
-
-      /* --- Coûts fixes : suppression d'une ligne --- */
-      $$('.fc-remove').forEach(btn => {
-        btn.addEventListener('click', () => {
-          syncFixedCostsFromDOM();
-          const idx = parseInt(btn.closest('[data-section="fixed"]').dataset.index, 10);
-          state.fixedCosts.splice(idx, 1);
-          reRenderSection('fixed', renderFixedCosts);
-        });
-      });
-
-      /* --- Amortissements : modification en temps réel --- */
-      $$('[data-section="amort"] .am-label, [data-section="amort"] .am-amount, [data-section="amort"] .am-duration').forEach(input => {
-        input.addEventListener('input', () => {
-          syncAmortFromDOM();
-          /* Mettre à jour les affichages annuels par ligne sans re-rendre */
-          $$('[data-section="amort"]').forEach(row => {
-            const amt = parseFloat(row.querySelector('.am-amount').value) || 0;
-            const dur = Math.max(parseInt(row.querySelector('.am-duration').value, 10) || 1, 1);
-            const annualSpan = row.querySelector('.text-mono.text-muted');
-            if (annualSpan) annualSpan.textContent = Engine.fmt(Engine.round2(amt / dur)) + '/an';
-          });
-          refreshTotals();
-        });
-      });
-
-      /* --- Amortissements : suppression d'une ligne --- */
-      $$('.am-remove').forEach(btn => {
-        btn.addEventListener('click', () => {
-          syncAmortFromDOM();
-          const idx = parseInt(btn.closest('[data-section="amort"]').dataset.index, 10);
-          state.equipmentAmortization.splice(idx, 1);
-          reRenderSection('amort', renderAmortization);
-        });
-      });
-
-      /* --- Coûts variables : modification en temps réel --- */
-      $$('[data-section="var"] .vc-label, [data-section="var"] .vc-amount').forEach(input => {
-        input.addEventListener('input', () => {
-          syncVariableCostsFromDOM();
-        });
-      });
-
-      /* --- Coûts variables : suppression d'une ligne --- */
-      $$('.vc-remove').forEach(btn => {
-        btn.addEventListener('click', () => {
-          syncVariableCostsFromDOM();
-          const idx = parseInt(btn.closest('[data-section="var"]').dataset.index, 10);
-          state.defaultSessionVariableCosts.splice(idx, 1);
-          reRenderSection('variable', renderVariableCosts);
-        });
       });
 
       /* --- Types clients : suppression --- */
@@ -1556,46 +1332,6 @@ Views.Settings = {
 
     function attachAddButtons() {
 
-      /* Ajout coût fixe */
-      const btnAddFixed = $('#btn-add-fixed');
-      if (btnAddFixed) {
-        btnAddFixed.addEventListener('click', () => {
-          syncFixedCostsFromDOM();
-          state.fixedCosts.push({ label: '', amount: 0 });
-          reRenderSection('fixed', renderFixedCosts);
-          attachAddButtons();
-          /* Focus sur le dernier champ ajouté */
-          const inputs = $$('[data-section="fixed"] .fc-label');
-          if (inputs.length) inputs[inputs.length - 1].focus();
-        });
-      }
-
-      /* Ajout amortissement */
-      const btnAddAmort = $('#btn-add-amort');
-      if (btnAddAmort) {
-        btnAddAmort.addEventListener('click', () => {
-          syncAmortFromDOM();
-          state.equipmentAmortization.push({ label: '', amount: 0, durationYears: 3 });
-          reRenderSection('amort', renderAmortization);
-          attachAddButtons();
-          const inputs = $$('[data-section="amort"] .am-label');
-          if (inputs.length) inputs[inputs.length - 1].focus();
-        });
-      }
-
-      /* Ajout coût variable */
-      const btnAddVar = $('#btn-add-var');
-      if (btnAddVar) {
-        btnAddVar.addEventListener('click', () => {
-          syncVariableCostsFromDOM();
-          state.defaultSessionVariableCosts.push({ label: '', amount: 0 });
-          reRenderSection('variable', renderVariableCosts);
-          attachAddButtons();
-          const inputs = $$('[data-section="var"] .vc-label');
-          if (inputs.length) inputs[inputs.length - 1].focus();
-        });
-      }
-
       /* Ajout type client */
       const btnAddCT = $('#btn-add-client-type');
       if (btnAddCT) {
@@ -1659,9 +1395,6 @@ Views.Settings = {
 
         /* Construire l'objet de mise à jour */
         const update = {
-          fixedCosts:                  state.fixedCosts,
-          equipmentAmortization:       state.equipmentAmortization,
-          defaultSessionVariableCosts: state.defaultSessionVariableCosts,
           clientTypes:                 state.clientTypes,
           employerChargeRate:          state.employerChargeRate,
           interimCoefficient:          state.interimCoefficient,

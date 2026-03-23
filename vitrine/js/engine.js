@@ -908,19 +908,7 @@ const Engine = (() => {
   /** Calcule le seuil plancher journalier auto-calculé */
   function calculateSeuilPlancher(settings) {
     const s = settings || DB.settings.get();
-    const cj = s.coutJournee;
-
-    // FALLBACK : ancienne logique si coutJournee absent ou coutOperateurJour = 0
-    if (!cj || !cj.coutOperateurJour) {
-      const totalFixed = (s.fixedCosts || []).reduce((sum, c) => sum + (c.amount || 0), 0);
-      const totalAmort = (s.equipmentAmortization || []).reduce((sum, a) => {
-        const years = Math.max(a.durationYears || 1, 1);
-        return sum + ((a.amount || 0) / years);
-      }, 0);
-      const nbJours = Math.max(s.nbJoursObjectifAnnuel || 50, 1);
-      const totalVarDefaut = (s.defaultSessionVariableCosts || []).reduce((sum, v) => sum + (v.amount || 0), 0);
-      return round2(((totalFixed + totalAmort) / nbJours) + totalVarDefaut);
-    }
+    const cj = s.coutJournee || {};
 
     const nb = Math.max(cj.nbJoursFacturesAn || 100, 1);
 

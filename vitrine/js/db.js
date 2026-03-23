@@ -169,16 +169,6 @@ const DB = (() => {
 
   /* --- Paramètres économiques --- */
   const DEFAULT_SETTINGS = {
-    // Coûts fixes annuels
-    fixedCosts: [
-      { label: 'Loyer / locaux', amount: 0 },
-      { label: 'Assurances', amount: 0 },
-      { label: 'Comptabilité / juridique', amount: 0 },
-      { label: 'Logiciels / licences', amount: 0 },
-      { label: 'Véhicules', amount: 0 },
-      { label: 'Communication / marketing', amount: 0 },
-      { label: 'Autres charges fixes', amount: 0 }
-    ],
     // Taux charges patronales global (legacy, conservé pour rétrocompat)
     employerChargeRate: 45,
 
@@ -261,25 +251,12 @@ const DB = (() => {
     vatRate: 20,
     // Heures de travail par jour (pour calcul taux horaire → journalier)
     hoursPerDay: 7,
-    // Amortissements matériels annuels
-    equipmentAmortization: [
-      { label: 'Simulateurs laser', amount: 0, durationYears: 5 },
-      { label: 'Matériel pédagogique', amount: 0, durationYears: 3 },
-      { label: 'Équipements de protection', amount: 0, durationYears: 3 },
-      { label: 'Informatique / serveurs', amount: 0, durationYears: 4 }
-    ],
     // Nombre estimé de sessions annuelles (pour répartition coûts fixes)
     estimatedAnnualSessions: 100,
     // Nombre de jours objectif annuels (pour seuil plancher)
     nbJoursObjectifAnnuel: 50,
     // Nombre d'opérateurs estimés par session (pour calcul seuil plancher)
     estimatedOperatorsPerSession: 1,
-    // Coûts variables par défaut par session
-    defaultSessionVariableCosts: [
-      { label: 'Consommables', amount: 0 },
-      { label: 'Transport / déplacement', amount: 0 },
-      { label: 'Location matériel', amount: 0 }
-    ],
     // Types de clients (extensible)
     clientTypes: ['Collectivité', 'Police / Gendarmerie', 'Armée', 'Entreprise privée', 'Sécurité privée', 'Particulier', 'Association', 'Autre'],
     // Statuts opérateurs (extensible)
