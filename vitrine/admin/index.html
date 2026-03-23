@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>DST System — Administration</title>
+  <link rel="icon" href="../../img/DST-Light-transparent.png">
+  <link rel="stylesheet" href="../../css/styles.css?v=3">
+
+  <!-- Vérification session admin AVANT tout chargement -->
+  <script>
+    (function() {
+      const session = sessionStorage.getItem('dst_admin_auth');
+      if (session !== 'granted') {
+        window.location.replace('../connexion.html?redirect=admin');
+      }
+    })();
+  </script>
+</head>
+<body>
+  <div id="app-shell">
+    <aside id="sidebar"></aside>
+    <main id="main-area">
+      <header id="header"></header>
+      <section id="content"></section>
+    </main>
+  </div>
+
+  <!-- Scripts (chemins relatifs depuis vitrine/admin/ → repo root) -->
+  <script src="../../js/db.js"></script>
+  <script src="../../js/engine.js"></script>
+  <script src="../../js/views/dashboard.js"></script>
+  <script src="../../js/views/clients.js"></script>
+  <script src="../../js/views/offers.js"></script>
+  <script src="../../js/views/sessions.js"></script>
+  <script src="../../js/views/operators.js"></script>
+  <script src="../../js/views/modules.js"></script>
+  <script src="../../js/views/locations.js"></script>
+  <script src="../../js/views/regions.js"></script>
+  <script src="../../js/views/simulateurs.js"></script>
+  <script src="../../js/views/prospects.js"></script>
+  <script src="../../js/views/devis.js"></script>
+  <script src="../../js/views/factures.js"></script>
+  <script src="../../js/views/settings.js"></script>
+  <script src="../../js/app.js"></script>
+
+  <script>
+    function logoutAdmin() {
+      sessionStorage.removeItem('dst_admin_auth');
+      window.location.replace('../connexion.html');
+    }
+
+    /* Injecter le bouton déconnexion dans le footer sidebar
+       après que app.js ait construit la sidebar (DOMContentLoaded) */
+    document.addEventListener('DOMContentLoaded', function() {
+      var footer = document.querySelector('.sidebar-footer');
+      if (footer) {
+        var btn = document.createElement('button');
+        btn.textContent = 'Déconnexion';
+        btn.onclick = logoutAdmin;
+        btn.style.cssText = 'display:block;margin-top:10px;font-size:11px;' +
+          'color:var(--text-muted);background:none;border:none;cursor:pointer;' +
+          'text-decoration:underline;padding:0;';
+        footer.appendChild(btn);
+      }
+    });
+  </script>
+</body>
+</html>

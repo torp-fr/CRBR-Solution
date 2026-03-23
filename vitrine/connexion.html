@@ -250,6 +250,7 @@
 
     var input   = document.getElementById('token-input');
     var errorEl = document.getElementById('error-msg');
+    var _adminMode = false;
 
     function showError(msg) {
       errorEl.textContent = msg;
@@ -262,6 +263,64 @@
       input.classList.remove('input-error');
     }
 
+    /* --- Passer en mode saisie mot de passe admin --- */
+    function _switchToAdminMode() {
+      _adminMode = true;
+      input.type = 'password';
+      input.placeholder = 'Mot de passe administrateur';
+      input.value = '';
+      input.autocomplete = 'current-password';
+      var lbl = document.querySelector('label[for="token-input"]');
+      if (lbl) lbl.textContent = 'Mot de passe';
+      var sub = document.querySelector('.connexion-subtitle');
+      if (sub) sub.textContent = 'Accès réservé à l\'équipe DST System';
+      var btn = document.getElementById('btn-access');
+      if (btn) btn.textContent = 'Valider →';
+      clearError();
+      input.focus();
+    }
+
+    /* --- Vérification mot de passe admin via Edge Function --- */
+    async function handleAdminLogin(password) {
+      if (!password) {
+        showError('Veuillez saisir le mot de passe.');
+        return;
+      }
+
+      // 1. Hasher côté client (SHA-256)
+      var encoder = new TextEncoder();
+      var data = encoder.encode(password);
+      var hashBuffer = await crypto.subtle.digest('SHA-256', data);
+      var hashArray = Array.from(new Uint8Array(hashBuffer));
+      var passwordHash = hashArray
+        .map(function(b) { return b.toString(16).padStart(2, '0'); })
+        .join('');
+
+      // 2. Vérifier via Edge Function Supabase
+      try {
+        var resp = await fetch(
+          'https://uhpvshugtpmxgsztbovi.supabase.co/functions/v1/verify-admin',
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ passwordHash: passwordHash })
+          }
+        );
+        var result = await resp.json();
+
+        if (result.success) {
+          sessionStorage.setItem('dst_admin_auth', 'granted');
+          window.location.href = './admin/';
+        } else {
+          showError('Mot de passe incorrect.');
+          input.value = '';
+          input.focus();
+        }
+      } catch (e) {
+        showError('Erreur de connexion. Réessayez.');
+      }
+    }
+
     window.handleAccess = function () {
       clearError();
       var val = input.value.trim();
@@ -269,6 +328,12 @@
       if (!val) {
         showError('Veuillez entrer votre token d\'accès ou identifiant.');
         input.focus();
+        return;
+      }
+
+      // Si déjà en mode admin → valider le mot de passe
+      if (_adminMode) {
+        handleAdminLogin(val);
         return;
       }
 
@@ -302,15 +367,8 @@
         }
       }
 
-      // 4. Identifiant admin
-      if (val === 'admin' || val === 'dst-admin') {
-        window.location.href = '../index.html';
-        return;
-      }
-
-      // 5. Non reconnu
-      showError('Token non reconnu. Vérifiez votre email ou contactez DST System.');
-      input.focus();
+      // 4. Aucun token reconnu → basculer en mode saisie mot de passe admin
+      _switchToAdminMode();
     };
 
     // Soumission via touche Entrée
@@ -322,6 +380,16 @@
 
     // Effacer erreur à la saisie
     input.addEventListener('input', clearError);
+
+    // Auto-détecter ?redirect=admin (depuis vitrine/admin/index.html)
+    (function() {
+      try {
+        var params = new URLSearchParams(window.location.search);
+        if (params.get('redirect') === 'admin') {
+          _switchToAdminMode();
+        }
+      } catch (e) { /* ignore */ }
+    })();
 
   })();
   </script>
