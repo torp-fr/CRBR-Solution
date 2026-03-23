@@ -412,6 +412,7 @@ Views.Devis = (() => {
       }
     }
 
+    const settings = DB.settings.get();
     const payload = {
       numero:        d.numero,
       titre:         d.titre,
@@ -425,7 +426,8 @@ Views.Devis = (() => {
       tauxTVA:       d.tauxTVA,
       totalTVA:      d.totalTVA,
       totalTTC:      d.totalTTC,
-      livrables:     d.livrables || []
+      livrables:     d.livrables || [],
+      entreprise:    settings.entreprise || {}
     };
 
     const encoded = encodeURIComponent(JSON.stringify(payload));

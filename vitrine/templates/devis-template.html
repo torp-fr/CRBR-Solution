@@ -305,13 +305,8 @@
     <!-- EN-TÊTE -->
     <header class="header">
       <div class="header-left">
-        <img class="logo" src="../img/DST-Light-transparent.png" alt="DST System" onerror="this.style.display='none'" />
-        <div class="company-name">DST System</div>
-        <div class="company-sub">Drill &amp; Skills Training</div>
-        <div style="margin-top:6px;font-size:8.5pt;color:#555;">
-          <div id="hdr-email">dst-system@hotmail.com</div>
-          <div id="hdr-phone">06 65 44 52 26</div>
-        </div>
+        <div id="logo-container"></div>
+        <div id="coords-entreprise" style="margin-top:6px;font-size:8.5pt;color:#555;"></div>
       </div>
       <div class="header-right">
         <div class="devis-title">DEVIS</div>
@@ -388,12 +383,9 @@
 
     <!-- PIED DE PAGE -->
     <footer class="footer">
-      <div class="footer-mentions">
-        Devis valable <strong id="ftr-validite">30</strong> jours &agrave; compter de la date d&apos;&eacute;mission.<br>
-        En cas d&apos;acceptation, retourner le devis sign&eacute; avec la mention <em>&laquo;&nbsp;Bon pour accord&nbsp;&raquo;</em>.
-      </div>
-      <div class="footer-legal">
-        <span>DST System &mdash; SASU &mdash; SIRET&nbsp;: [&agrave; compl&eacute;ter]</span>
+      <div id="mentions-devis" style="font-size:9px;color:#777;"></div>
+      <div class="footer-legal" style="margin-top:6px;">
+        <span id="ftr-legal-info"></span>
         <span id="ftr-page">Page 1/1</span>
       </div>
     </footer>
@@ -416,7 +408,30 @@
       catch (e) { console.error('Erreur parsing JSON devis :', e); return; }
 
       /* ---- Titre de l'onglet ---- */
-      if (d.numero) document.title = 'Devis ' + d.numero + ' — DST System';
+      var ent = d.entreprise || {};
+      if (d.numero) document.title = 'Devis ' + d.numero + ' \u2014 ' + (ent.nom || 'DST System');
+
+      /* ---- Logo ---- */
+      var logoContainer = document.getElementById('logo-container');
+      if (logoContainer) {
+        if (ent.logoBase64) {
+          logoContainer.innerHTML = '<img src="' + ent.logoBase64 + '" style="max-height:70px;max-width:250px;">';
+        } else {
+          logoContainer.innerHTML = '<div style="font-size:14pt;font-weight:700;color:#1a1a2e;">' + esc(ent.nom || 'DST System') + '</div>' +
+            '<div style="font-size:9pt;color:#555;">' + esc(ent.formeJuridique || 'SASU') + '</div>';
+        }
+      }
+
+      /* ---- Coordonnées entreprise ---- */
+      var coordsEl = document.getElementById('coords-entreprise');
+      if (coordsEl) {
+        var addrParts = [];
+        if (ent.adresse)   addrParts.push(esc(ent.adresse));
+        if (ent.codePostal || ent.ville) addrParts.push(esc((ent.codePostal || '') + ' ' + (ent.ville || '')).trim());
+        if (ent.telephone) addrParts.push(esc(ent.telephone));
+        if (ent.email)     addrParts.push(esc(ent.email));
+        coordsEl.innerHTML = addrParts.join('<br>');
+      }
 
       /* ---- En-tête ---- */
       setText('hdr-numero', d.numero);
@@ -491,6 +506,21 @@
           livList.innerHTML = items;
           livSection.style.display = '';
         }
+      }
+
+      /* ---- Mentions légales pied de page ---- */
+      var mentionsEl = document.getElementById('mentions-devis');
+      if (mentionsEl) {
+        var parts = [];
+        if (ent.mentionLegaleDevis)   parts.push('<p>' + esc(ent.mentionLegaleDevis) + '</p>');
+        if (ent.mentionRGPD)          parts.push('<p>' + esc(ent.mentionRGPD) + '</p>');
+        if (ent.conditionsAnnulation) parts.push('<p>' + esc(ent.conditionsAnnulation) + '</p>');
+        mentionsEl.innerHTML = parts.join('');
+      }
+      var legalEl = document.getElementById('ftr-legal-info');
+      if (legalEl) {
+        legalEl.textContent = (ent.nom || 'DST System') + ' \u2014 ' + (ent.formeJuridique || 'SASU') +
+          ' \u2014 SIRET\u00a0: ' + (ent.siret || '[\u00e0 compl\u00e9ter]');
       }
 
       /* ---- Helpers ---- */

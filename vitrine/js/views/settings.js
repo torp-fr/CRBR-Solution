@@ -52,12 +52,122 @@ Views.Settings = {
       )),
       capacite: JSON.parse(JSON.stringify(
         settings.capacite || DB.settings.getDefaults().capacite || {}
+      )),
+      entreprise: JSON.parse(JSON.stringify(
+        settings.entreprise || DB.settings.getDefaults().entreprise || {}
       ))
     };
 
     /* ----------------------------------------------------------
        Génération du HTML
        ---------------------------------------------------------- */
+
+    /** Section Identité & Documents */
+    function renderEntreprise() {
+      const e = state.entreprise || {};
+      const logoHtml = e.logoBase64
+        ? `<img src="${escapeAttr(e.logoBase64)}" style="max-height:80px;max-width:300px;">`
+        : '<span style="color:var(--text-muted);font-size:0.85rem;">Aucun logo</span>';
+
+      return `
+        <div class="card" id="section-entreprise">
+          <div class="card-header"><h2>Identit\u00e9 &amp; Documents</h2></div>
+
+          <h3 style="margin:0 0 14px;font-size:0.88rem;color:var(--text-heading);">A. Informations entreprise</h3>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="ent-nom">Nom de la soci\u00e9t\u00e9</label>
+              <input type="text" id="ent-nom" class="form-control" value="${escapeAttr(e.nom || 'DST System')}">
+            </div>
+            <div class="form-group">
+              <label for="ent-forme">Forme juridique</label>
+              <input type="text" id="ent-forme" class="form-control" value="${escapeAttr(e.formeJuridique || 'SASU')}">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="ent-siren">SIREN</label>
+              <input type="text" id="ent-siren" class="form-control" value="${escapeAttr(e.siren || '')}">
+            </div>
+            <div class="form-group">
+              <label for="ent-siret">SIRET</label>
+              <input type="text" id="ent-siret" class="form-control" value="${escapeAttr(e.siret || '')}">
+            </div>
+            <div class="form-group">
+              <label for="ent-rcs">RCS</label>
+              <input type="text" id="ent-rcs" class="form-control" value="${escapeAttr(e.rcs || '')}">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group" style="flex:1 1 100%;">
+              <label for="ent-adresse">Adresse</label>
+              <input type="text" id="ent-adresse" class="form-control" value="${escapeAttr(e.adresse || '')}">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="ent-cp">Code postal</label>
+              <input type="text" id="ent-cp" class="form-control" value="${escapeAttr(e.codePostal || '')}">
+            </div>
+            <div class="form-group">
+              <label for="ent-ville">Ville</label>
+              <input type="text" id="ent-ville" class="form-control" value="${escapeAttr(e.ville || '')}">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="ent-tel">T\u00e9l\u00e9phone</label>
+              <input type="text" id="ent-tel" class="form-control" value="${escapeAttr(e.telephone || '06 65 44 52 26')}">
+            </div>
+            <div class="form-group">
+              <label for="ent-email">Email</label>
+              <input type="email" id="ent-email" class="form-control" value="${escapeAttr(e.email || 'dst-system@hotmail.com')}">
+            </div>
+            <div class="form-group">
+              <label for="ent-web">Site web</label>
+              <input type="text" id="ent-web" class="form-control" value="${escapeAttr(e.siteWeb || 'www.dst-system.fr')}">
+            </div>
+          </div>
+
+          <h3 style="margin:20px 0 14px;font-size:0.88rem;color:var(--text-heading);">B. Logo de l\u2019entreprise</h3>
+          <div class="logo-upload-zone" style="border:2px dashed var(--border-color);border-radius:6px;padding:16px;max-width:440px;">
+            <div id="logo-preview" style="margin-bottom:12px;min-height:40px;">${logoHtml}</div>
+            <input type="file" id="logo-file-input" accept="image/png,image/jpeg,image/svg+xml" style="display:none">
+            <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:8px;">
+              <button type="button" id="btn-choose-logo" class="btn btn-ghost btn-sm">\uD83D\uDCC1 Choisir un logo</button>
+              <button type="button" id="btn-remove-logo" class="btn btn-ghost btn-sm" style="${e.logoBase64 ? '' : 'display:none;'}">\uD83D\uDDD1 Supprimer</button>
+            </div>
+            <small style="color:var(--text-muted);">Formats accept\u00e9s\u00a0: PNG, JPG, SVG \u2014 Taille recommand\u00e9e\u00a0: 400\u00d7120\u00a0px max 500\u00a0Ko</small>
+          </div>
+
+          <h3 style="margin:20px 0 14px;font-size:0.88rem;color:var(--text-heading);">C. Mentions l\u00e9gales documents</h3>
+          <div class="form-row">
+            <div class="form-group" style="flex:1 1 100%;">
+              <label for="ent-mention-devis">Mention bas de page \u2014 Devis</label>
+              <textarea id="ent-mention-devis" class="form-control" rows="2">${escapeHTML(e.mentionLegaleDevis || '')}</textarea>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group" style="flex:1 1 100%;">
+              <label for="ent-mention-facture">Mention bas de page \u2014 Factures</label>
+              <textarea id="ent-mention-facture" class="form-control" rows="2">${escapeHTML(e.mentionLegaleFacture || '')}</textarea>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group" style="flex:1 1 100%;">
+              <label for="ent-rgpd">Mention RGPD</label>
+              <input type="text" id="ent-rgpd" class="form-control" value="${escapeAttr(e.mentionRGPD || '')}">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group" style="flex:1 1 100%;">
+              <label for="ent-annulation">Conditions d\u2019annulation</label>
+              <textarea id="ent-annulation" class="form-control" rows="2">${escapeHTML(e.conditionsAnnulation || '')}</textarea>
+            </div>
+          </div>
+          <p class="form-help" style="margin-top:6px;">Ces mentions s\u2019appliquent automatiquement sur tous vos devis et factures g\u00e9n\u00e9r\u00e9s.</p>
+        </div>`;
+    }
 
     /** Carte récapitulative KPI en haut de page */
     function renderSummary() {
@@ -920,6 +1030,8 @@ Views.Settings = {
         </div>
       </div>
 
+      ${renderEntreprise()}
+
       ${renderSummary()}
 
       <div class="alert alert-warning mb-16">
@@ -1242,12 +1354,34 @@ Views.Settings = {
       if (rco) rco.textContent = (cap.coutSimulateurNouveauHT + cap.coutRecrutementOperateur).toLocaleString('fr-FR') + '\u00a0€';
     }
 
+    function syncEntrepriseFromDOM() {
+      const e   = state.entreprise;
+      const fstr = (id) => { const el = $('#' + id); return el ? el.value.trim() : ''; };
+      e.nom                  = fstr('ent-nom');
+      e.formeJuridique       = fstr('ent-forme');
+      e.siren                = fstr('ent-siren');
+      e.siret                = fstr('ent-siret');
+      e.rcs                  = fstr('ent-rcs');
+      e.adresse              = fstr('ent-adresse');
+      e.codePostal           = fstr('ent-cp');
+      e.ville                = fstr('ent-ville');
+      e.telephone            = fstr('ent-tel');
+      e.email                = fstr('ent-email');
+      e.siteWeb              = fstr('ent-web');
+      e.mentionLegaleDevis   = fstr('ent-mention-devis');
+      e.mentionLegaleFacture = fstr('ent-mention-facture');
+      e.mentionRGPD          = fstr('ent-rgpd');
+      e.conditionsAnnulation = fstr('ent-annulation');
+      // logoBase64 / logoMimeType mis à jour directement par FileReader
+    }
+
     /** Synchronise l'intégralité du state depuis les valeurs DOM */
     function syncAllFromDOM() {
       syncScalarsFromDOM();
       syncPricingCatalogFromDOM();
       syncCoutJourneeFromDOM();
       syncCapaciteFromDOM();
+      syncEntrepriseFromDOM();
     }
 
     /* ----------------------------------------------------------
@@ -1361,6 +1495,47 @@ Views.Settings = {
     }
 
     /* ----------------------------------------------------------
+       Listeners — Logo et identité entreprise
+       ---------------------------------------------------------- */
+
+    function attachEntrepriseListeners() {
+      const fileInput = $('#logo-file-input');
+      const btnChoose = $('#btn-choose-logo');
+      const btnRemove = $('#btn-remove-logo');
+      const preview   = $('#logo-preview');
+
+      if (btnChoose && fileInput) {
+        btnChoose.addEventListener('click', () => fileInput.click());
+      }
+
+      if (fileInput) {
+        fileInput.addEventListener('change', function(e) {
+          const file = e.target.files && e.target.files[0];
+          if (!file) return;
+          if (file.size > 512000) { alert('Logo trop lourd (max 500\u00a0Ko)'); return; }
+          const reader = new FileReader();
+          reader.onload = function(ev) {
+            const base64 = ev.target.result;
+            if (preview) preview.innerHTML = '<img src="' + base64 + '" style="max-height:80px;max-width:300px;">';
+            state.entreprise.logoBase64   = base64;
+            state.entreprise.logoMimeType = file.type;
+            if (btnRemove) btnRemove.style.display = 'inline-block';
+          };
+          reader.readAsDataURL(file);
+        });
+      }
+
+      if (btnRemove) {
+        btnRemove.addEventListener('click', () => {
+          state.entreprise.logoBase64   = '';
+          state.entreprise.logoMimeType = '';
+          if (preview) preview.innerHTML = '<span style="color:var(--text-muted);font-size:0.85rem;">Aucun logo</span>';
+          btnRemove.style.display = 'none';
+        });
+      }
+    }
+
+    /* ----------------------------------------------------------
        Listeners — Paramètres scalaires (RH + éco) : rafraîchir KPI
        ---------------------------------------------------------- */
 
@@ -1414,10 +1589,12 @@ Views.Settings = {
           chargesConfig:               state.chargesConfig,
           pricingCatalog:              state.pricingCatalog,
           coutJournee:                 state.coutJournee,
-          capacite:                    state.capacite
+          capacite:                    state.capacite,
+          entreprise:                  state.entreprise
         };
 
         DB.settings.update(update);
+        if (window._initSidebarBrand) _initSidebarBrand();
 
         /* Confirmation visuelle */
         showFeedback('Paramètres enregistrés avec succès.', 'success');
@@ -1588,6 +1765,7 @@ Views.Settings = {
     attachScalarListeners();
     attachSaveButton();
     attachDataActions();
+    attachEntrepriseListeners();
 
     /* ----------------------------------------------------------
        Badge "Modifications non sauvegardées"

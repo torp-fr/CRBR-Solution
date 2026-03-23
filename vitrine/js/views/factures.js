@@ -424,6 +424,7 @@ Views.Factures = (() => {
     const acomptePct = parseFloat(f.acomptePercent) || 0;
     const acompte    = _round2(ttc * acomptePct / 100);
 
+    const settings = DB.settings.get();
     const payload = {
       numero:              f.numero,
       titre:               f.titre,
@@ -440,7 +441,8 @@ Views.Factures = (() => {
       acomptePercent:      acomptePct,
       acompteMontant:      acompte,
       soldeRestant:        solde,
-      paiementDelaiJours:  f.paiementDelaiJours || 30
+      paiementDelaiJours:  f.paiementDelaiJours || 30,
+      entreprise:          settings.entreprise || {}
     };
 
     const encoded = encodeURIComponent(JSON.stringify(payload));
