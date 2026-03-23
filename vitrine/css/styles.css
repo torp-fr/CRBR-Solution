@@ -1705,3 +1705,65 @@ textarea.form-control {
   font-weight: 600;
   font-size: 12px;
 }
+
+/* --- Analytics — grilles layout --- */
+.analytics-grid-3 {
+  display: grid;
+  grid-template-columns: 40% 30% 30%;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+.analytics-grid-equal {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-bottom: 16px;
+}
+.analytics-grid-split {
+  display: grid;
+  grid-template-columns: 60% 40%;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+/* --- Analytics — sparkline vide --- */
+.analytics-empty-spark {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 0;
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+/* --- Analytics — actions SEO --- */
+.seo-action {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 6px;
+  margin-bottom: 6px;
+  font-size: 12px;
+  line-height: 1.4;
+}
+.seo-action.high {
+  background: rgba(211,47,47,0.12);
+  border-left: 3px solid #d32f2f;
+}
+.seo-action.medium {
+  background: rgba(255,160,0,0.10);
+  border-left: 3px solid #ffa000;
+}
+.seo-action.low {
+  background: rgba(255,255,255,0.04);
+  border-left: 3px solid rgba(255,255,255,0.15);
+}
+.seo-action-icon {
+  flex-shrink: 0;
+  font-size: 14px;
+  margin-top: 1px;
+}
+.seo-action-text {
+  color: var(--text-secondary);
+}
