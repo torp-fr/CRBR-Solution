@@ -15,9 +15,9 @@
     return;
   }
 
-  /* --- Config Supabase --- */
-  const SUPABASE_URL = 'https://uhpvshugtpmxgsztbovi.supabase.co';
-  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVocHZzaHVndHBteGdzenRib3ZpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQxNzY3NjgsImV4cCI6MjA4OTc1Mjc2OH0.5pQGfqzP4YlzciqGJeMbIn14G6D5wr4fy7tINMVp9xE';
+  /* --- Config Supabase (hardcodé — indépendant de supabase-config.js) --- */
+  const _SB_URL = 'https://uhpvshugtpmxgsztbovi.supabase.co';
+  const _SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVocHZzaHVndHBteGdzenRib3ZpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQxNzY3NjgsImV4cCI6MjA4OTc1Mjc2OH0.5pQGfqzP4YlzciqGJeMbIn14G6D5wr4fy7tINMVp9xE';
 
   /* --- A. Session ID anonyme --- */
   const sid = sessionStorage.getItem('dst_sid') ||
@@ -82,12 +82,12 @@
     duration_s: null
   };
 
-  fetch(SUPABASE_URL + '/rest/v1/page_views', {
+  fetch(_SB_URL + '/rest/v1/page_views', {
     method: 'POST',
     headers: {
       'Content-Type':  'application/json',
-      'apikey':        SUPABASE_KEY,
-      'Authorization': 'Bearer ' + SUPABASE_KEY,
+      'apikey':        _SB_KEY,
+      'Authorization': 'Bearer ' + _SB_KEY,
       'Prefer':        'return=representation'
     },
     body: JSON.stringify(payload)
@@ -96,16 +96,21 @@
   .then(function (data) {
     if (data[0] && data[0].id) {
       sessionStorage.setItem('dst_last_pv_id', data[0].id);
+      console.log('[DST Track] pv_id:', data[0].id);
+    } else {
+      console.warn('[DST Track] pas d\'ID retourné:', data);
     }
   })
-  .catch(function () {});
+  .catch(function (err) {
+    console.warn('[DST Track] erreur fetch:', err);
+  });
 
   /* --- I. Track durée de visite --- */
   window.addEventListener('beforeunload', function () {
     const pvId = sessionStorage.getItem('dst_last_pv_id');
     if (!pvId) return;
     const duration = Math.round((Date.now() - t0) / 1000);
-    const url = SUPABASE_URL + '/rest/v1/page_views?id=eq.' + pvId;
+    const url = _SB_URL + '/rest/v1/page_views?id=eq.' + pvId;
     navigator.sendBeacon(
       url,
       new Blob(
@@ -118,12 +123,12 @@
   /* --- J. DSTTrack exposé globalement --- */
   window.DSTTrack = {
     event: function (type, label) {
-      fetch(SUPABASE_URL + '/rest/v1/page_events', {
+      fetch(_SB_URL + '/rest/v1/page_events', {
         method: 'POST',
         headers: {
           'Content-Type':  'application/json',
-          'apikey':        SUPABASE_KEY,
-          'Authorization': 'Bearer ' + SUPABASE_KEY
+          'apikey':        _SB_KEY,
+          'Authorization': 'Bearer ' + _SB_KEY
         },
         body: JSON.stringify({
           event_type:  type,
