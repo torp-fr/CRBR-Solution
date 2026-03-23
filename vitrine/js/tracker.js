@@ -63,15 +63,11 @@
   var ref = document.referrer || null;
   if (ref && ref.indexOf('dst-system.fr') !== -1) ref = null;
 
-  // Timestamp de début pour durée
-  var t0 = Date.now();
-
   // Headers Supabase
   var headers = {
     'Content-Type': 'application/json',
     'apikey': _SB_KEY,
-    'Authorization': 'Bearer ' + _SB_KEY,
-    'Prefer': 'return=representation'
+    'Authorization': 'Bearer ' + _SB_KEY
   };
 
   // POST page_view
@@ -91,31 +87,19 @@
       duration_s: null
     })
   })
-  .then(function(r) { return r.json(); })
-  .then(function(data) {
-    if (data && data[0] && data[0].id) {
-      sessionStorage.setItem('dst_last_pv_id',
-        String(data[0].id));
-      console.log('[DST Track] OK - pv_id:', data[0].id);
+  .then(function(r) {
+    if (r.ok || r.status === 201) {
+      sessionStorage.setItem('dst_last_pv_id_ts',
+        Date.now().toString());
+      console.log('[DST Track] OK - status:', r.status);
     } else {
-      console.warn('[DST Track] pas d\'ID:', data);
+      r.text().then(function(t) {
+        console.warn('[DST Track] erreur', r.status, t);
+      });
     }
   })
   .catch(function(err) {
-    console.warn('[DST Track] erreur:', err);
-  });
-
-  // Durée via sendBeacon au départ
-  window.addEventListener('beforeunload', function() {
-    var pvId = sessionStorage.getItem('dst_last_pv_id');
-    if (!pvId) return;
-    var duration = Math.round((Date.now() - t0) / 1000);
-    var url = _SB_URL + '/rest/v1/page_views?id=eq.' + pvId;
-    var blob = new Blob(
-      [JSON.stringify({ duration_s: duration })],
-      { type: 'application/json' }
-    );
-    navigator.sendBeacon(url, blob);
+    console.warn('[DST Track] erreur fetch:', err);
   });
 
   // Tracking events exposé globalement
