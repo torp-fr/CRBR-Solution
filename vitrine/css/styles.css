@@ -1635,6 +1635,7 @@ textarea.form-control {
   height: 80px;
   padding: 8px 0;
   margin: 12px 0;
+  position: relative;
 }
 .spark-bar {
   flex: 1;
@@ -1646,3 +1647,61 @@ textarea.form-control {
   cursor: pointer;
 }
 .spark-bar:hover { opacity: 1; }
+
+/* --- Analytics — barres proportionnelles --- */
+.analytics-bar-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+  font-size: 12px;
+}
+.analytics-bar-label {
+  width: 140px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--text-secondary);
+}
+.analytics-bar-track {
+  flex: 1;
+  height: 6px;
+  background: rgba(255,255,255,0.06);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.analytics-bar-fill {
+  height: 100%;
+  border-radius: 3px;
+  background: var(--accent-red);
+  transition: width 0.4s ease;
+}
+.analytics-bar-value {
+  width: 40px;
+  text-align: right;
+  color: var(--text-muted);
+  font-size: 11px;
+}
+
+/* --- Analytics — Score indicateurs --- */
+.score-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  font-size: 13px;
+}
+.score-indicator:last-of-type {
+  border-bottom: none;
+}
+.score-label {
+  color: var(--text-secondary);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.score-value {
+  font-weight: 600;
+  font-size: 12px;
+}
