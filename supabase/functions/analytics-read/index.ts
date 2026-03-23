@@ -19,6 +19,21 @@ function getCorsHeaders(origin: string) {
   }
 }
 
+// Retourne true si la ligne vient de Vercel preview ou localhost
+function isInternal(referrer: string | null | undefined): boolean {
+  if (!referrer) return false
+  return referrer.includes('vercel.app') || referrer.includes('localhost')
+}
+
+// Filtre JS post-fetch : préserve les referrer null (trafic direct)
+function applyFilter<T extends { referrer?: string | null }>(
+  data: T[] | null,
+  suppress: boolean
+): T[] {
+  if (!suppress || !data) return data ?? []
+  return data.filter((row) => !isInternal(row.referrer))
+}
+
 serve(async (req) => {
   const origin = req.headers.get('origin') || ''
   const corsHeaders = getCorsHeaders(origin)
@@ -50,44 +65,33 @@ serve(async (req) => {
   const days = periodMap[period] || 30
   const since = new Date(now.getTime() - days * 86400000).toISOString()
 
-  // Helper : applique le filtre trafic interne si demandé
-  function filtered(q: any): any {
-    if (!suppressInternal) return q
-    return q
-      .not('referrer', 'ilike', '%vercel.app%')
-      .not('referrer', 'ilike', '%localhost%')
-  }
+  // 1. Total page views + visiteurs uniques
+  //    On fetch referrer pour pouvoir filtrer en JS
+  const { data: sessionData } = await supabase
+    .from('page_views')
+    .select('session_id, referrer')
+    .gte('created_at', since)
 
-  // 1. Total page views
-  const { count: totalViews } = await filtered(
-    supabase.from('page_views')
-      .select('*', { count: 'exact', head: true })
-      .gte('created_at', since)
-  )
-
-  // 2. Visiteurs uniques (session_id distincts)
-  const { data: sessions } = await filtered(
-    supabase.from('page_views')
-      .select('session_id')
-      .gte('created_at', since)
-  )
+  const filteredSessionData = applyFilter(sessionData, suppressInternal)
+  const totalViews = filteredSessionData.length
   const uniqueVisitors = new Set(
-    sessions?.map((s: any) => s.session_id) ?? []
+    filteredSessionData.map((s) => s.session_id)
   ).size
 
   // Pages par session
   const pagesPerSession = uniqueVisitors > 0
-    ? Math.round(((totalViews ?? 0) / uniqueVisitors) * 10) / 10
+    ? Math.round((totalViews / uniqueVisitors) * 10) / 10
     : 0
 
-  // 3. Pages les plus vues
-  const { data: allViews } = await filtered(
-    supabase.from('page_views')
-      .select('page')
-      .gte('created_at', since)
-  )
+  // 2. Pages les plus vues
+  const { data: allViewsRaw } = await supabase
+    .from('page_views')
+    .select('page, referrer')
+    .gte('created_at', since)
+
+  const allViews = applyFilter(allViewsRaw, suppressInternal)
   const pageCount: Record<string, number> = {}
-  allViews?.forEach((v: any) => {
+  allViews.forEach((v) => {
     pageCount[v.page] = (pageCount[v.page] || 0) + 1
   })
   const topPages = Object.entries(pageCount)
@@ -95,14 +99,15 @@ serve(async (req) => {
     .slice(0, 10)
     .map(([page, views]) => ({ page, views }))
 
-  // 4. Sources de trafic
-  const { data: refViews } = await filtered(
-    supabase.from('page_views')
-      .select('referrer')
-      .gte('created_at', since)
-  )
+  // 3. Sources de trafic
+  const { data: refViewsRaw } = await supabase
+    .from('page_views')
+    .select('referrer')
+    .gte('created_at', since)
+
+  const refViews = applyFilter(refViewsRaw, suppressInternal)
   const refCount: Record<string, number> = {}
-  refViews?.forEach((v: any) => {
+  refViews.forEach((v) => {
     const ref = v.referrer || 'Direct'
     refCount[ref] = (refCount[ref] || 0) + 1
   })
@@ -111,35 +116,38 @@ serve(async (req) => {
     .slice(0, 8)
     .map(([referrer, views]) => ({ referrer, views }))
 
-  // 5. Devices
-  const { data: devViews } = await filtered(
-    supabase.from('page_views')
-      .select('device')
-      .gte('created_at', since)
-  )
+  // 4. Devices
+  const { data: devViewsRaw } = await supabase
+    .from('page_views')
+    .select('device, referrer')
+    .gte('created_at', since)
+
+  const devViews = applyFilter(devViewsRaw, suppressInternal)
   const devCount: Record<string, number> = {}
-  devViews?.forEach((v: any) => {
+  devViews.forEach((v: any) => {
     const d = v.device || 'unknown'
     devCount[d] = (devCount[d] || 0) + 1
   })
 
-  // 6. Navigateurs
-  const { data: browserViews } = await filtered(
-    supabase.from('page_views')
-      .select('browser')
-      .gte('created_at', since)
-  )
+  // 5. Navigateurs
+  const { data: browserViewsRaw } = await supabase
+    .from('page_views')
+    .select('browser, referrer')
+    .gte('created_at', since)
+
+  const browserViews = applyFilter(browserViewsRaw, suppressInternal)
   const browserCount: Record<string, number> = {}
-  browserViews?.forEach((v: any) => {
+  browserViews.forEach((v: any) => {
     const b = v.browser || 'Other'
     browserCount[b] = (browserCount[b] || 0) + 1
   })
 
-  // 7. Events
+  // 6. Events (pas de referrer sur page_events, pas de filtrage)
   const { data: events } = await supabase
     .from('page_events')
     .select('event_type, event_label')
     .gte('created_at', since)
+
   const eventCount: Record<string, number> = {}
   events?.forEach((e: any) => {
     const k = e.event_type + ':' + (e.event_label || '')
@@ -152,41 +160,44 @@ serve(async (req) => {
       return { type, label, count }
     })
 
-  // 8. Durée moyenne
-  const { data: durData } = await filtered(
-    supabase.from('page_views')
-      .select('duration_s')
-      .gte('created_at', since)
-      .not('duration_s', 'is', null)
-  )
-  const durations = durData?.map((d: any) => d.duration_s) ?? []
+  // 7. Durée moyenne
+  const { data: durDataRaw } = await supabase
+    .from('page_views')
+    .select('duration_s, referrer')
+    .gte('created_at', since)
+    .not('duration_s', 'is', null)
+
+  const durData = applyFilter(durDataRaw, suppressInternal)
+  const durations = durData.map((d: any) => d.duration_s)
   const avgDuration = durations.length > 0
     ? Math.round(durations.reduce((a: number, b: number) => a + b, 0) / durations.length)
     : 0
 
-  // 9. Vues par jour (sparkline)
-  const { data: dailyData } = await filtered(
-    supabase.from('page_views')
-      .select('created_at')
-      .gte('created_at', since)
-      .order('created_at')
-  )
+  // 8. Vues par jour (sparkline)
+  const { data: dailyDataRaw } = await supabase
+    .from('page_views')
+    .select('created_at, referrer')
+    .gte('created_at', since)
+    .order('created_at')
+
+  const dailyData = applyFilter(dailyDataRaw, suppressInternal)
   const dailyCount: Record<string, number> = {}
-  dailyData?.forEach((v: any) => {
+  dailyData.forEach((v: any) => {
     const day = v.created_at.slice(0, 10)
     dailyCount[day] = (dailyCount[day] || 0) + 1
   })
   const dailyViews = Object.entries(dailyCount)
     .map(([date, views]) => ({ date, views }))
 
-  // 10. Dernières visites
-  const { data: recentVisits } = await filtered(
-    supabase.from('page_views')
-      .select('page, device, browser, os, referrer, created_at')
-      .gte('created_at', since)
-      .order('created_at', { ascending: false })
-      .limit(10)
-  )
+  // 9. Dernières visites
+  const { data: recentRaw } = await supabase
+    .from('page_views')
+    .select('page, device, browser, os, referrer, created_at')
+    .gte('created_at', since)
+    .order('created_at', { ascending: false })
+    .limit(suppressInternal ? 50 : 10) // marge pour filtrage JS
+
+  const recentVisits = applyFilter(recentRaw, suppressInternal).slice(0, 10)
 
   return new Response(
     JSON.stringify({
@@ -194,7 +205,7 @@ serve(async (req) => {
       avgDuration, topPages, topReferrers,
       devices: devCount, browsers: browserCount,
       topEvents, dailyViews,
-      recentVisits: recentVisits ?? []
+      recentVisits
     }),
     { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
   )
