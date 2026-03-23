@@ -55,6 +55,10 @@ Views.Regions = (() => {
   /* --- État courant (liste vs fiche) --- */
   let _currentRegionId = null;
 
+  /* --- État des filtres liste --- */
+  let _searchTerm  = '';
+  let _filterStatut = '';
+
   /* ============================================================
      RENDER PRINCIPAL
      ============================================================ */
@@ -72,13 +76,28 @@ Views.Regions = (() => {
     const seuilAlerte   = (settings.capacite && settings.capacite.seuilAlerteJours)   || 120;
     const seuilCritique = (settings.capacite && settings.capacite.seuilCritiqueJours) || 140;
 
-    let rowsHTML = '';
-    if (regions.length === 0) {
-      rowsHTML = `<tr><td colspan="9" class="text-center text-muted" style="padding:32px">
-        Aucune région définie.<br>Cliquez sur <strong>+ Nouvelle région</strong> pour commencer.
-      </td></tr>`;
-    } else {
-      regions.forEach(r => {
+    function buildRows() {
+      const filtered = regions.filter(r => {
+        if (_searchTerm) {
+          const q = _searchTerm.toLowerCase();
+          if (!((r.nom || '').toLowerCase().includes(q) || (r.code || '').toLowerCase().includes(q))) return false;
+        }
+        if (_filterStatut && r.statut !== _filterStatut) return false;
+        return true;
+      });
+
+      if (regions.length === 0) {
+        return `<tr><td colspan="9" class="text-center text-muted" style="padding:32px">
+          Aucune région définie.<br>Cliquez sur <strong>+ Nouvelle région</strong> pour commencer.
+        </td></tr>`;
+      }
+      if (filtered.length === 0) {
+        return `<tr><td colspan="9" class="text-center text-muted" style="padding:32px">
+          Aucune région ne correspond aux filtres.
+        </td></tr>`;
+      }
+
+      return filtered.map(r => {
         const statut    = STATUTS[r.statut] || STATUTS.nationale;
         const nbOps     = (r.operateurIds || []).length;
         const nbSims    = DB.simulateurs.getAll().filter(s => s.regionId === r.id).length;
@@ -90,7 +109,7 @@ Views.Regions = (() => {
           ? 'text-warning' : 'text-success';
         const deps = (r.departements || []).join(', ') || '—';
 
-        rowsHTML += `
+        return `
           <tr>
             <td><a href="#" class="link-primary region-fiche" data-id="${escapeHTML(r.id)}">${escapeHTML(r.nom)}</a></td>
             <td><strong>${escapeHTML(r.code || '—')}</strong></td>
@@ -105,7 +124,16 @@ Views.Regions = (() => {
               <button class="btn btn-sm btn-danger btn-delete-region" data-id="${escapeHTML(r.id)}" title="Supprimer">✕</button>
             </td>
           </tr>`;
-      });
+      }).join('');
+    }
+
+    function bindRowEvents() {
+      container.querySelectorAll('.btn-edit-region').forEach(btn =>
+        btn.addEventListener('click', () => _openModal(container, btn.dataset.id)));
+      container.querySelectorAll('.btn-delete-region').forEach(btn =>
+        btn.addEventListener('click', () => _deleteRegion(container, btn.dataset.id)));
+      container.querySelectorAll('.region-fiche').forEach(a =>
+        a.addEventListener('click', (e) => { e.preventDefault(); _renderFiche(container, a.dataset.id); }));
     }
 
     container.innerHTML = `
@@ -118,6 +146,20 @@ Views.Regions = (() => {
       </div>
 
       <div class="card">
+        <div style="display:flex;gap:12px;align-items:center;padding:12px 0 16px;">
+          <div style="flex:1;">
+            <input type="text" class="form-input" id="filter-region-search"
+                   placeholder="Rechercher une région..." value="${escapeHTML(_searchTerm)}" style="width:100%;">
+          </div>
+          <div>
+            <select class="form-input" id="filter-region-statut" style="min-width:200px;">
+              <option value="">Tous les statuts</option>
+              <option value="nationale" ${_filterStatut === 'nationale' ? 'selected' : ''}>Phase 1 — National</option>
+              <option value="attribuee" ${_filterStatut === 'attribuee' ? 'selected' : ''}>Région attribuée</option>
+              <option value="renforcee" ${_filterStatut === 'renforcee' ? 'selected' : ''}>Renforcée</option>
+            </select>
+          </div>
+        </div>
         <table class="data-table">
           <thead>
             <tr>
@@ -132,20 +174,31 @@ Views.Regions = (() => {
               <th>Actions</th>
             </tr>
           </thead>
-          <tbody>${rowsHTML}</tbody>
+          <tbody id="regions-tbody">${buildRows()}</tbody>
         </table>
       </div>
 
       <div id="region-modal-container"></div>`;
 
-    // Events
+    // Events — nouveau région
     container.querySelector('#btn-new-region').addEventListener('click', () => _openModal(container));
-    container.querySelectorAll('.btn-edit-region').forEach(btn =>
-      btn.addEventListener('click', () => _openModal(container, btn.dataset.id)));
-    container.querySelectorAll('.btn-delete-region').forEach(btn =>
-      btn.addEventListener('click', () => _deleteRegion(container, btn.dataset.id)));
-    container.querySelectorAll('.region-fiche').forEach(a =>
-      a.addEventListener('click', (e) => { e.preventDefault(); _renderFiche(container, a.dataset.id); }));
+
+    // Events — filtres (re-render tbody uniquement)
+    const searchInput  = container.querySelector('#filter-region-search');
+    const statutSelect = container.querySelector('#filter-region-statut');
+
+    searchInput.addEventListener('input', () => {
+      _searchTerm = searchInput.value;
+      container.querySelector('#regions-tbody').innerHTML = buildRows();
+      bindRowEvents();
+    });
+    statutSelect.addEventListener('change', () => {
+      _filterStatut = statutSelect.value;
+      container.querySelector('#regions-tbody').innerHTML = buildRows();
+      bindRowEvents();
+    });
+
+    bindRowEvents();
   }
 
   /* ============================================================

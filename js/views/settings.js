@@ -1032,6 +1032,7 @@ Views.Settings = {
       <div class="page-header">
         <h1>Paramètres</h1>
         <div class="actions">
+          <span id="settings-dirty-badge" class="tag tag-yellow" style="display:none;">&#9888; Modifications non sauvegardées</span>
           <button class="btn btn-primary" id="btn-save-settings">Enregistrer les paramètres</button>
         </div>
       </div>
@@ -1854,5 +1855,24 @@ Views.Settings = {
     attachScalarListeners();
     attachSaveButton();
     attachDataActions();
+
+    /* ----------------------------------------------------------
+       Badge "Modifications non sauvegardées"
+       ---------------------------------------------------------- */
+    const _dirtyBadge = container.querySelector('#settings-dirty-badge');
+    function _showDirty() { if (_dirtyBadge) _dirtyBadge.style.display = ''; }
+    function _hideDirty() { if (_dirtyBadge) _dirtyBadge.style.display = 'none'; }
+
+    container.addEventListener('input',  _showDirty);
+    container.addEventListener('change', _showDirty);
+
+    /* Masquer le badge après sauvegarde réussie */
+    const _btnSave = container.querySelector('#btn-save-settings');
+    if (_btnSave) {
+      _btnSave.addEventListener('click', function onSaved() {
+        /* Exécuté après le handler principal (même tick, ordre d'ajout) */
+        setTimeout(_hideDirty, 0);
+      });
+    }
   }
 };

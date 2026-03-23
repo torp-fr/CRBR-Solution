@@ -70,6 +70,11 @@ Views.Simulateurs = (() => {
     return diff;
   }
 
+  /* --- État des filtres liste --- */
+  let _simSearch       = '';
+  let _simFilterEtat   = '';
+  let _simFilterRegion = '';
+
   /* ============================================================
      RENDER PRINCIPAL
      ============================================================ */
@@ -100,13 +105,32 @@ Views.Simulateurs = (() => {
       </div>`;
     }
 
-    let rowsHTML = '';
-    if (sims.length === 0) {
-      rowsHTML = `<tr><td colspan="9" class="text-center text-muted" style="padding:32px">
-        Aucun simulateur enregistré.<br>Cliquez sur <strong>+ Nouveau simulateur</strong> pour commencer.
-      </td></tr>`;
-    } else {
-      sims.forEach(s => {
+    function buildRows() {
+      const filtered = sims.filter(s => {
+        if (_simSearch) {
+          const q = _simSearch.toLowerCase();
+          if (!((s.nom || '').toLowerCase().includes(q) || (s.modele || '').toLowerCase().includes(q))) return false;
+        }
+        if (_simFilterEtat && s.etat !== _simFilterEtat) return false;
+        if (_simFilterRegion) {
+          const region = regions.find(r => r.id === s.regionId);
+          if (!region || region.nom !== _simFilterRegion) return false;
+        }
+        return true;
+      });
+
+      if (sims.length === 0) {
+        return `<tr><td colspan="8" class="text-center text-muted" style="padding:32px">
+          Aucun simulateur enregistré.<br>Cliquez sur <strong>+ Nouveau simulateur</strong> pour commencer.
+        </td></tr>`;
+      }
+      if (filtered.length === 0) {
+        return `<tr><td colspan="8" class="text-center text-muted" style="padding:32px">
+          Aucun simulateur ne correspond aux filtres.
+        </td></tr>`;
+      }
+
+      return filtered.map(s => {
         const etat       = ETATS[s.etat] || ETATS.inactif;
         const region     = regions.find(r => r.id === s.regionId);
         const joursMax   = s.joursMaxParAn || 150;
@@ -117,7 +141,7 @@ Views.Simulateurs = (() => {
         const maintClass = jMaint !== null && jMaint <= 30 ? 'text-danger' : jMaint !== null && jMaint <= 60 ? 'text-warning' : '';
         const maintTxt   = s.prochaineMaintenance ? `${formatDate(s.prochaineMaintenance)}${jMaint !== null ? ` (J-${jMaint})` : ''}` : '—';
 
-        rowsHTML += `
+        return `
           <tr>
             <td><strong>${escapeHTML(s.nom)}</strong>${s.numeroSerie ? `<br><small class="text-muted">${escapeHTML(s.numeroSerie)}</small>` : ''}</td>
             <td>${escapeHTML(s.modele || '—')}</td>
@@ -131,8 +155,19 @@ Views.Simulateurs = (() => {
               <button class="btn btn-sm btn-danger btn-delete-sim" data-id="${escapeHTML(s.id)}" title="Supprimer">✕</button>
             </td>
           </tr>`;
-      });
+      }).join('');
     }
+
+    function bindRowEvents() {
+      container.querySelectorAll('.btn-edit-sim').forEach(btn =>
+        btn.addEventListener('click', () => _openModal(container, btn.dataset.id)));
+      container.querySelectorAll('.btn-delete-sim').forEach(btn =>
+        btn.addEventListener('click', () => _deleteSim(container, btn.dataset.id)));
+    }
+
+    const regionOptions = regions.map(r =>
+      `<option value="${escapeHTML(r.nom)}" ${_simFilterRegion === r.nom ? 'selected' : ''}>${escapeHTML(r.nom)}</option>`
+    ).join('');
 
     container.innerHTML = `
       <div class="view-header">
@@ -146,6 +181,26 @@ Views.Simulateurs = (() => {
       ${alertHTML}
 
       <div class="card">
+        <div style="display:flex;gap:12px;align-items:center;padding:12px 0 16px;flex-wrap:wrap;">
+          <div style="flex:2;min-width:180px;">
+            <input type="text" class="form-input" id="filter-sim-search"
+                   placeholder="Rechercher un simulateur..." value="${escapeHTML(_simSearch)}" style="width:100%;">
+          </div>
+          <div style="flex:1;min-width:140px;">
+            <select class="form-input" id="filter-sim-etat" style="width:100%;">
+              <option value="">Tous les états</option>
+              <option value="actif"       ${_simFilterEtat === 'actif'       ? 'selected' : ''}>Actif</option>
+              <option value="maintenance" ${_simFilterEtat === 'maintenance' ? 'selected' : ''}>En maintenance</option>
+              <option value="inactif"     ${_simFilterEtat === 'inactif'     ? 'selected' : ''}>Inactif</option>
+            </select>
+          </div>
+          <div style="flex:1;min-width:140px;">
+            <select class="form-input" id="filter-sim-region" style="width:100%;">
+              <option value="">Toutes les régions</option>
+              ${regionOptions}
+            </select>
+          </div>
+        </div>
         <table class="data-table">
           <thead>
             <tr>
@@ -159,17 +214,36 @@ Views.Simulateurs = (() => {
               <th>Actions</th>
             </tr>
           </thead>
-          <tbody>${rowsHTML}</tbody>
+          <tbody id="sims-tbody">${buildRows()}</tbody>
         </table>
       </div>
 
       <div id="sim-modal-container"></div>`;
 
     container.querySelector('#btn-new-sim').addEventListener('click', () => _openModal(container));
-    container.querySelectorAll('.btn-edit-sim').forEach(btn =>
-      btn.addEventListener('click', () => _openModal(container, btn.dataset.id)));
-    container.querySelectorAll('.btn-delete-sim').forEach(btn =>
-      btn.addEventListener('click', () => _deleteSim(container, btn.dataset.id)));
+
+    // Filtres — re-render tbody uniquement
+    const searchInput  = container.querySelector('#filter-sim-search');
+    const etatSelect   = container.querySelector('#filter-sim-etat');
+    const regionSelect = container.querySelector('#filter-sim-region');
+
+    searchInput.addEventListener('input', () => {
+      _simSearch = searchInput.value;
+      container.querySelector('#sims-tbody').innerHTML = buildRows();
+      bindRowEvents();
+    });
+    etatSelect.addEventListener('change', () => {
+      _simFilterEtat = etatSelect.value;
+      container.querySelector('#sims-tbody').innerHTML = buildRows();
+      bindRowEvents();
+    });
+    regionSelect.addEventListener('change', () => {
+      _simFilterRegion = regionSelect.value;
+      container.querySelector('#sims-tbody').innerHTML = buildRows();
+      bindRowEvents();
+    });
+
+    bindRowEvents();
   }
 
   /* ============================================================

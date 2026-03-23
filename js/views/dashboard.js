@@ -143,6 +143,26 @@ Views.Dashboard = {
       });
     }
 
+    /* Alertes maintenance simulateur */
+    const _simulateurs = DB.simulateurs.getAll();
+    const _dans30j = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
+    _simulateurs.forEach(function(sim) {
+      if (sim.etat === 'actif' && sim.prochaineMaintenance) {
+        const dateMaint = new Date(sim.prochaineMaintenance);
+        if (dateMaint <= _dans30j) {
+          alerts.push({
+            level:   dateMaint < now ? 'critical' : 'warning',
+            context: 'Mat\u00e9riel',
+            message: sim.nom + ' \u2014 maintenance ' + (
+              dateMaint < now
+                ? 'en retard depuis le '
+                : 'pr\u00e9vue le '
+            ) + dateMaint.toLocaleDateString('fr-FR')
+          });
+        }
+      }
+    });
+
     /* AMÉLIORATION P1 — Seuil plancher auto-calculé */
     const seuilPlancher = Engine.calculateSeuilPlancher(settings);
 
