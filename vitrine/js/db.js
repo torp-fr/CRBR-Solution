@@ -604,6 +604,7 @@ const DB = (() => {
     nbJours:      1,
     notes:        '',
     devisRef:     '',
+    adresseIntervention: '',
     variableCosts: []
   };
 

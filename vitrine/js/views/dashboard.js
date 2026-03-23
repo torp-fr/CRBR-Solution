@@ -46,8 +46,9 @@ Views.Dashboard = {
 
     /* Prospects KPI */
     const _allProspects = DB.prospects.getAll();
-    const _prospectsActifs  = _allProspects.filter(p => p.statut !== 'converti' && p.statut !== 'perdu').length;
+    const _prospectsActifs   = _allProspects.filter(p => p.statut !== 'converti' && p.statut !== 'perdu').length;
     const _prospectsNouveaux = _allProspects.filter(p => p.statut === 'nouveau').length;
+    const _prospectsNego     = _allProspects.filter(p => p.statut === 'negociation').length;
 
     /* Facturation KPI */
     const _allFactures = DB.factures ? DB.factures.getAll() : [];
@@ -276,10 +277,10 @@ Views.Dashboard = {
           <div class="kpi-value text-mono">${Engine.fmt(tresorerie.tresorerie)}</div>
           <div class="kpi-detail">CA ${Engine.fmt(tresorerie.caRealise)} — Charges ${Engine.fmt(tresorerie.chargesProrata)}</div>
         </div>
-        <div class="kpi-card ${_prospectsNouveaux > 0 ? 'kpi-warning' : ''}" style="cursor:pointer;" onclick="App.navigate('prospects')">
-          <div class="kpi-label">Prospects actifs <span class="tag tag-blue" style="margin-left:4px;font-size:0.6rem;">CRM</span></div>
-          <div class="kpi-value">${_prospectsActifs}</div>
-          <div class="kpi-detail">${_prospectsNouveaux > 0 ? _prospectsNouveaux + ' \u00e0 traiter' : 'Aucun nouveau'}</div>
+        <div class="kpi-card ${_prospectsNouveaux > 0 ? 'kpi-warning' : ''}" style="cursor:pointer;" onclick="App.navigate('pipeline')">
+          <div class="kpi-label">PIPELINE CRM <span class="tag tag-blue" style="margin-left:4px;font-size:0.6rem;">CRM</span></div>
+          <div class="kpi-value">${_prospectsActifs + _allClients.length}</div>
+          <div class="kpi-detail">${_prospectsNouveaux} nouveau(x) \u00b7 ${_prospectsNego} en n\u00e9go. \u00b7 ${_allClients.length} clients</div>
         </div>
         <div class="kpi-card ${_devisSansReponse > 0 ? 'kpi-warning' : ''}" style="cursor:pointer;" onclick="App.navigate('devis')">
           <div class="kpi-label">Devis en attente <span class="tag tag-blue" style="margin-left:4px;font-size:0.6rem;">CRM</span></div>

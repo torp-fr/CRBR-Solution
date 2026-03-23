@@ -13,6 +13,7 @@ const App = (() => {
   /* --- Routes disponibles --- */
   const routes = {
     dashboard:  { label: 'Dashboard dirigeant', icon: '⬡',    view: () => Views.Dashboard },
+    pipeline:   { label: 'Pipeline CRM',        icon: '🔀',   view: () => Views.Pipeline },
     prospects:  { label: 'Prospects',           icon: '🎯',   view: () => Views.Prospects },
     devis:      { label: 'Devis',               icon: '📄',   view: () => Views.Devis },
     factures:   { label: 'Factures',            icon: '🧾',   view: () => Views.Factures },
@@ -136,11 +137,11 @@ const App = (() => {
     if (!sidebar) return;
 
     const navSections = [
-      { title: 'Pilotage', items: ['dashboard'] },
-      { title: 'CRM', items: ['prospects', 'devis', 'factures'] },
-      { title: 'Gestion opérationnelle', items: ['clients', 'offers', 'sessions'] },
-      { title: 'Ressources', items: ['operators', 'modules', 'locations', 'regions', 'simulateurs'] },
-      { title: 'Configuration', items: ['settings'] }
+      { title: 'Pilotage',       items: ['dashboard'] },
+      { title: 'CRM',            items: ['pipeline', 'devis', 'factures'] },
+      { title: 'Opérationnel',   items: ['sessions', 'offers'] },
+      { title: 'Équipe',         items: ['operators', 'regions', 'simulateurs'] },
+      { title: 'Configuration',  items: ['settings'] }
     ];
 
     let html = `

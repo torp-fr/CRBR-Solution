@@ -1008,6 +1008,27 @@ Views.Factures = (() => {
      API PUBLIQUE
      ---------------------------------------------------------- */
 
-  return { render, creerDepuisDevis };
+  /* --- API publique : ouvre le modal de création avec client pré-sélectionné --- */
+  function openNewModal(clientId) {
+    _openModal(null, null);
+    if (!clientId) return;
+    setTimeout(function() {
+      var overlay = document.getElementById('facture-modal-overlay');
+      if (!overlay) return;
+      var radio = overlay.querySelector('[name="fac-dest-mode"][value="client"]');
+      if (radio) {
+        radio.checked = true;
+        radio.dispatchEvent(new Event('change', { bubbles: true }));
+        var destClient = overlay.querySelector('#fac-dest-client');
+        var destProspect = overlay.querySelector('#fac-dest-prospect');
+        if (destClient) destClient.style.display = '';
+        if (destProspect) destProspect.style.display = 'none';
+      }
+      var sel = overlay.querySelector('#fac-client');
+      if (sel) sel.value = clientId;
+    }, 60);
+  }
+
+  return { render, creerDepuisDevis, openNewModal };
 
 })();

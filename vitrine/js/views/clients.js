@@ -284,7 +284,11 @@ Views.Clients = (() => {
       <div class="card mt-16" id="detail-card">
         <div class="card-header">
           <h2>Fiche client : ${_escapeHtml(client.name)}</h2>
-          <button class="btn btn-sm" id="btn-close-detail">Fermer</button>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <button class="btn btn-sm btn-ghost" id="btn-client-new-devis">&#128196; Nouveau devis</button>
+            <button class="btn btn-sm btn-ghost" id="btn-client-new-facture">&#129534; Nouvelle facture</button>
+            <button class="btn btn-sm" id="btn-close-detail">Fermer</button>
+          </div>
         </div>
 
         <!-- KPI client -->
@@ -334,6 +338,22 @@ Views.Clients = (() => {
     });
 
     panel.querySelector('#btn-close-detail').addEventListener('click', () => _toggleDetail(clientId));
+
+    /* Boutons devis / facture rapides */
+    const btnNewDevis = panel.querySelector('#btn-client-new-devis');
+    if (btnNewDevis) {
+      btnNewDevis.addEventListener('click', () => {
+        App.navigate('devis');
+        setTimeout(() => { if (Views.Devis && Views.Devis.openNewModal) Views.Devis.openNewModal(clientId, null); }, 300);
+      });
+    }
+    const btnNewFacture = panel.querySelector('#btn-client-new-facture');
+    if (btnNewFacture) {
+      btnNewFacture.addEventListener('click', () => {
+        App.navigate('factures');
+        setTimeout(() => { if (Views.Factures && Views.Factures.openNewModal) Views.Factures.openNewModal(clientId); }, 300);
+      });
+    }
 
     /* Navigation vers le module Lieux */
     const btnGotoLoc = panel.querySelector('#btn-goto-locations');

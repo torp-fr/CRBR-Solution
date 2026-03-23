@@ -535,6 +535,13 @@ Views.Settings = {
               ${offerTags}
             </div>
           </div>
+
+          <div style="margin-top:20px;padding:12px;background:var(--bg-secondary);border-radius:6px;">
+            <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-muted);margin-bottom:8px;">RÉFÉRENTIELS</div>
+            <button class="btn btn-ghost btn-sm" onclick="App.navigate('modules')">&#127891; Gérer le catalogue de compétences</button>
+            <button class="btn btn-ghost btn-sm" onclick="App.navigate('locations')" style="margin-left:8px;">&#128205; Gérer les lieux enregistrés</button>
+            <small style="display:block;margin-top:8px;color:var(--text-muted);">Ces référentiels sont utilisés dans les sessions et les offres mais n'apparaissent pas dans la navigation principale.</small>
+          </div>
         </div>`;
     }
 

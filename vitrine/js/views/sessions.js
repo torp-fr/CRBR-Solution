@@ -315,7 +315,7 @@ Views.Sessions = (() => {
               ${filtered.map(s => `
                 <tr>
                   <td>${_formatDateFr(s.date)}${s.time ? '<br><small class="text-muted">' + _esc(s.time) + '</small>' : ''}</td>
-                  <td><strong>${_esc(s.label || '—')}</strong>${s.devisRef ? ' <span class="tag tag-blue" style="font-size:0.7rem;">&#128196;&nbsp;' + _esc(s.devisRef) + '</span>' : ''}</td>
+                  <td><strong>${_esc(s.label || '—')}</strong>${s.devisRef ? ' <span class="tag tag-blue" style="font-size:0.7rem;">&#128196;&nbsp;' + _esc(s.devisRef) + '</span>' : ''}${s.adresseIntervention ? '<br><small class="text-muted">📍 ' + _esc(s.adresseIntervention) + '</small>' : ''}</td>
                   <td>${_clientName(s.clientIds)}</td>
                   <td><small>${_moduleNames(s.moduleIds)}</small></td>
                   <td><small>${_operatorNames(s.operatorIds)}</small></td>
@@ -375,6 +375,7 @@ Views.Sessions = (() => {
                   <div><strong>Module(s) :</strong> ${_moduleNames(s.moduleIds)}</div>
                   <div><strong>Opérateur(s) :</strong> ${_operatorNames(s.operatorIds)}</div>
                   ${s.locationId ? `<div><strong>Lieu :</strong> ${_esc(_locationName(s.locationId))}</div>` : ''}
+                  ${s.adresseIntervention ? `<div><strong>Adresse :</strong> ${_esc(s.adresseIntervention)}</div>` : ''}
                   ${client && client.contactName ? `<div><strong>Contact :</strong> ${_esc(client.contactName)}${client.phone ? ' • ' + _esc(client.phone) : ''}</div>` : ''}
                   ${s.devisRef ? `<div><strong>Origine devis :</strong> <span class="tag tag-blue" style="font-size:0.7rem;">&#128196;&nbsp;${_esc(s.devisRef)}</span></div>` : ''}
                 </div>
@@ -614,6 +615,15 @@ Views.Sessions = (() => {
             </select>
           </div>
 
+          <!-- Adresse d'intervention -->
+          <div class="form-group">
+            <label for="fm-adresse-intervention">Adresse d'intervention <span style="font-size:0.75rem;color:var(--text-muted);">(si différent)</span></label>
+            <input type="text" class="form-control" id="fm-adresse-intervention"
+              value="${_escAttr(s.adresseIntervention || '')}"
+              placeholder="Adresse complète, bâtiment, accès..." />
+            <div style="font-size:0.72rem;color:var(--text-muted);margin-top:4px;">Laissez vide si l'adresse est celle du client</div>
+          </div>
+
           <!-- Offre liée -->
           <div class="form-group">
             <label for="fm-offer">Offre liée</label>
@@ -777,8 +787,9 @@ Views.Sessions = (() => {
         clientIds:   [clientId],
         moduleIds:   moduleCheckboxes.map(cb => cb.value),
         operatorIds: operatorCheckboxes.map(cb => cb.value),
-        locationId:  overlay.querySelector('#fm-location').value || '',
-        offerId:     overlay.querySelector('#fm-offer').value || '',
+        locationId:           overlay.querySelector('#fm-location').value || '',
+        adresseIntervention:  overlay.querySelector('#fm-adresse-intervention').value.trim(),
+        offerId:              overlay.querySelector('#fm-offer').value || '',
         price:       price,
         encaissement: overlay.querySelector('#fm-encaissement').checked,
         notes:       overlay.querySelector('#fm-notes').value.trim(),

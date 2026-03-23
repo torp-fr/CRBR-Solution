@@ -1357,5 +1357,26 @@ Views.Devis = (() => {
      API PUBLIQUE
      ---------------------------------------------------------- */
 
-  return { render };
+  /* --- API publique : ouvre le modal de création avec destinataire pré-sélectionné --- */
+  function openNewModal(clientId, prospectId) {
+    _openModal(null);
+    if (!clientId && !prospectId) return;
+    setTimeout(function() {
+      var overlay = document.getElementById('devis-modal-overlay');
+      if (!overlay) return;
+      if (clientId) {
+        var radio = overlay.querySelector('[name="dv-dest-mode"][value="client"]');
+        if (radio) { radio.checked = true; radio.dispatchEvent(new Event('change', { bubbles: true })); }
+        var sel = overlay.querySelector('#dv-client');
+        if (sel) sel.value = clientId;
+      } else if (prospectId) {
+        var radio2 = overlay.querySelector('[name="dv-dest-mode"][value="prospect"]');
+        if (radio2) { radio2.checked = true; radio2.dispatchEvent(new Event('change', { bubbles: true })); }
+        var sel2 = overlay.querySelector('#dv-prospect');
+        if (sel2) sel2.value = prospectId;
+      }
+    }, 60);
+  }
+
+  return { render, openNewModal };
 })();
