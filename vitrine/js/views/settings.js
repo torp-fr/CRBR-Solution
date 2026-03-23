@@ -65,9 +65,26 @@ Views.Settings = {
     /** Section Identité & Documents */
     function renderEntreprise() {
       const e = state.entreprise || {};
-      const logoHtml = e.logoBase64
-        ? `<img src="${escapeAttr(e.logoBase64)}" style="max-height:80px;max-width:300px;">`
-        : '<span style="color:var(--text-muted);font-size:0.85rem;">Aucun logo</span>';
+
+      function logoZone(opts) {
+        const hasImg = !!opts.base64;
+        const imgHtml = hasImg
+          ? `<img src="${escapeAttr(opts.base64)}" style="${opts.imgStyle}">`
+          : `<span style="color:var(--text-muted);font-size:0.82rem;">Aucun logo</span>`;
+        return `
+          <div style="margin-bottom:20px;">
+            <div style="font-weight:600;font-size:0.86rem;margin-bottom:8px;color:var(--text-heading);">${opts.label}</div>
+            <div class="logo-upload-zone" style="border:2px dashed var(--border-color);border-radius:6px;padding:14px;max-width:420px;">
+              <div id="${opts.previewId}" style="margin-bottom:10px;min-height:36px;">${imgHtml}</div>
+              <input type="file" id="${opts.inputId}" accept="image/png,image/jpeg,image/svg+xml" style="display:none">
+              <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:6px;">
+                <button type="button" class="btn btn-ghost btn-sm logo-choose-btn" data-input="${opts.inputId}">\uD83D\uDCC1 Choisir</button>
+                <button type="button" class="logo-remove-btn btn btn-ghost btn-sm" data-preview="${opts.previewId}" data-key-b64="${opts.keyB64}" data-key-mime="${opts.keyMime}" style="${hasImg ? '' : 'display:none;'}">\uD83D\uDDD1 Supprimer</button>
+              </div>
+              <small style="color:var(--text-muted);">${opts.info}</small>
+            </div>
+          </div>`;
+      }
 
       return `
         <div class="card" id="section-entreprise">
@@ -129,16 +146,37 @@ Views.Settings = {
             </div>
           </div>
 
-          <h3 style="margin:20px 0 14px;font-size:0.88rem;color:var(--text-heading);">B. Logo de l\u2019entreprise</h3>
-          <div class="logo-upload-zone" style="border:2px dashed var(--border-color);border-radius:6px;padding:16px;max-width:440px;">
-            <div id="logo-preview" style="margin-bottom:12px;min-height:40px;">${logoHtml}</div>
-            <input type="file" id="logo-file-input" accept="image/png,image/jpeg,image/svg+xml" style="display:none">
-            <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:8px;">
-              <button type="button" id="btn-choose-logo" class="btn btn-ghost btn-sm">\uD83D\uDCC1 Choisir un logo</button>
-              <button type="button" id="btn-remove-logo" class="btn btn-ghost btn-sm" style="${e.logoBase64 ? '' : 'display:none;'}">\uD83D\uDDD1 Supprimer</button>
-            </div>
-            <small style="color:var(--text-muted);">Formats accept\u00e9s\u00a0: PNG, JPG, SVG \u2014 Taille recommand\u00e9e\u00a0: 400\u00d7120\u00a0px max 500\u00a0Ko</small>
-          </div>
+          <h3 style="margin:20px 0 14px;font-size:0.88rem;color:var(--text-heading);">B. Logos &amp; Identit\u00e9 visuelle</h3>
+          ${logoZone({
+            label:     'Logo principal \u2014 Documents officiels',
+            info:      'Utilis\u00e9 sur les devis, factures et plaquette. Format PNG fond transparent recommand\u00e9. Dimensions\u00a0: 400\u00d7400\u00a0px max, 500\u00a0Ko.',
+            previewId: 'logo-principal-preview',
+            inputId:   'logo-principal-input',
+            imgStyle:  'max-height:80px;max-width:200px;',
+            base64:    e.logoPrincipalBase64 || '',
+            keyB64:    'logoPrincipalBase64',
+            keyMime:   'logoPrincipalMime'
+          })}
+          ${logoZone({
+            label:     'Logo texte \u2014 Header et communications',
+            info:      'Utilis\u00e9 dans les headers du site, portails et emails. Format PNG ou SVG recommand\u00e9. Dimensions\u00a0: 400\u00d7120\u00a0px max, 300\u00a0Ko.',
+            previewId: 'logo-texte-preview',
+            inputId:   'logo-texte-input',
+            imgStyle:  'max-height:60px;max-width:300px;',
+            base64:    e.logoTexteBase64 || '',
+            keyB64:    'logoTexteBase64',
+            keyMime:   'logoTexteMime'
+          })}
+          ${logoZone({
+            label:     'Favicon \u2014 Ic\u00f4ne onglet navigateur',
+            info:      'Affich\u00e9 dans l\u2019onglet du navigateur. Format PNG 32\u00d732 ou 64\u00d764\u00a0px recommand\u00e9.',
+            previewId: 'favicon-preview',
+            inputId:   'favicon-input',
+            imgStyle:  'width:32px;height:32px;image-rendering:pixelated;',
+            base64:    e.faviconBase64 || '',
+            keyB64:    'faviconBase64',
+            keyMime:   'faviconMime'
+          })}
 
           <h3 style="margin:20px 0 14px;font-size:0.88rem;color:var(--text-heading);">C. Mentions l\u00e9gales documents</h3>
           <div class="form-row">
@@ -1372,7 +1410,8 @@ Views.Settings = {
       e.mentionLegaleFacture = fstr('ent-mention-facture');
       e.mentionRGPD          = fstr('ent-rgpd');
       e.conditionsAnnulation = fstr('ent-annulation');
-      // logoBase64 / logoMimeType mis à jour directement par FileReader
+      // logoPrincipalBase64/Mime, logoTexteBase64/Mime, faviconBase64/Mime
+      // mis à jour directement par les FileReaders
     }
 
     /** Synchronise l'intégralité du state depuis les valeurs DOM */
@@ -1499,40 +1538,81 @@ Views.Settings = {
        ---------------------------------------------------------- */
 
     function attachEntrepriseListeners() {
-      const fileInput = $('#logo-file-input');
-      const btnChoose = $('#btn-choose-logo');
-      const btnRemove = $('#btn-remove-logo');
-      const preview   = $('#logo-preview');
+      // Délégation générique pour les 3 zones de logo
+      const logoConfigs = [
+        {
+          inputId:   'logo-principal-input',
+          previewId: 'logo-principal-preview',
+          keyB64:    'logoPrincipalBase64',
+          keyMime:   'logoPrincipalMime',
+          maxSize:   512000,
+          imgStyle:  'max-height:80px;max-width:200px;'
+        },
+        {
+          inputId:   'logo-texte-input',
+          previewId: 'logo-texte-preview',
+          keyB64:    'logoTexteBase64',
+          keyMime:   'logoTexteMime',
+          maxSize:   307200,
+          imgStyle:  'max-height:60px;max-width:300px;'
+        },
+        {
+          inputId:   'favicon-input',
+          previewId: 'favicon-preview',
+          keyB64:    'faviconBase64',
+          keyMime:   'faviconMime',
+          maxSize:   204800,
+          imgStyle:  'width:32px;height:32px;image-rendering:pixelated;'
+        }
+      ];
 
-      if (btnChoose && fileInput) {
-        btnChoose.addEventListener('click', () => fileInput.click());
-      }
+      logoConfigs.forEach(function(cfg) {
+        const fileInput = $('#' + cfg.inputId);
+        const preview   = $('#' + cfg.previewId);
+        if (!fileInput) return;
 
-      if (fileInput) {
-        fileInput.addEventListener('change', function(e) {
-          const file = e.target.files && e.target.files[0];
+        fileInput.addEventListener('change', function(ev) {
+          const file = ev.target.files && ev.target.files[0];
           if (!file) return;
-          if (file.size > 512000) { alert('Logo trop lourd (max 500\u00a0Ko)'); return; }
+          if (file.size > cfg.maxSize) {
+            alert('Fichier trop lourd (max ' + Math.round(cfg.maxSize / 1024) + '\u00a0Ko)');
+            return;
+          }
           const reader = new FileReader();
-          reader.onload = function(ev) {
-            const base64 = ev.target.result;
-            if (preview) preview.innerHTML = '<img src="' + base64 + '" style="max-height:80px;max-width:300px;">';
-            state.entreprise.logoBase64   = base64;
-            state.entreprise.logoMimeType = file.type;
-            if (btnRemove) btnRemove.style.display = 'inline-block';
+          reader.onload = function(re) {
+            const base64 = re.target.result;
+            if (preview) preview.innerHTML = '<img src="' + base64 + '" style="' + cfg.imgStyle + '">';
+            state.entreprise[cfg.keyB64]  = base64;
+            state.entreprise[cfg.keyMime] = file.type;
+            // Afficher le bouton Supprimer correspondant
+            const removeBtn = container.querySelector('.logo-remove-btn[data-key-b64="' + cfg.keyB64 + '"]');
+            if (removeBtn) removeBtn.style.display = 'inline-block';
           };
           reader.readAsDataURL(file);
         });
-      }
+      });
 
-      if (btnRemove) {
-        btnRemove.addEventListener('click', () => {
-          state.entreprise.logoBase64   = '';
-          state.entreprise.logoMimeType = '';
-          if (preview) preview.innerHTML = '<span style="color:var(--text-muted);font-size:0.85rem;">Aucun logo</span>';
-          btnRemove.style.display = 'none';
+      // Boutons "Choisir" — délégation par data-input
+      $$('.logo-choose-btn').forEach(function(btn) {
+        const inputEl = $('#' + btn.dataset.input);
+        if (inputEl) btn.addEventListener('click', () => inputEl.click());
+      });
+
+      // Boutons "Supprimer" — délégation par data-key-b64
+      $$('.logo-remove-btn').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          const keyB64  = btn.dataset.keyB64;
+          const keyMime = btn.dataset.keyMime;
+          const preview = $('#' + btn.dataset.preview);
+          state.entreprise[keyB64]  = '';
+          state.entreprise[keyMime] = '';
+          if (preview) preview.innerHTML = '<span style="color:var(--text-muted);font-size:0.82rem;">Aucun logo</span>';
+          btn.style.display = 'none';
+          // Réinitialiser l'input file correspondant
+          const cfg = logoConfigs.find(c => c.keyB64 === keyB64);
+          if (cfg) { const inp = $('#' + cfg.inputId); if (inp) inp.value = ''; }
         });
-      }
+      });
     }
 
     /* ----------------------------------------------------------
@@ -1594,7 +1674,7 @@ Views.Settings = {
         };
 
         DB.settings.update(update);
-        if (window._initSidebarBrand) _initSidebarBrand();
+        if (window._applyEntrepriseGlobale) _applyEntrepriseGlobale();
 
         /* Confirmation visuelle */
         showFeedback('Paramètres enregistrés avec succès.', 'success');

@@ -67,7 +67,7 @@ const App = (() => {
   function init() {
     _initDefaultData();
     renderSidebar();
-    _initSidebarBrand();
+    _applyEntrepriseGlobale();
     renderHeader();
 
     // Écouter le hash pour navigation
@@ -181,15 +181,15 @@ const App = (() => {
     });
   }
 
-  /* --- Sidebar brand dynamique (logo ou nom entreprise depuis settings) --- */
+  /* --- Sidebar brand dynamique (logo texte ou nom entreprise) --- */
   function _initSidebarBrand() {
     const ent = (DB.settings.get().entreprise) || {};
     const container = document.getElementById('sidebar-logo-container');
     if (!container) return;
 
-    if (ent.logoBase64) {
+    if (ent.logoTexteBase64) {
       container.innerHTML =
-        '<img src="' + ent.logoBase64 + '" style="max-height:40px;max-width:140px;object-fit:contain;">';
+        '<img src="' + ent.logoTexteBase64 + '" style="max-height:40px;max-width:160px;object-fit:contain;">';
     } else {
       container.innerHTML =
         '<div style="display:flex;flex-direction:column;">' +
@@ -201,6 +201,32 @@ const App = (() => {
     }
   }
   window._initSidebarBrand = _initSidebarBrand;
+
+  /* --- Application globale des paramètres entreprise --- */
+  function _applyEntrepriseGlobale() {
+    const ent = (DB.settings.get().entreprise) || {};
+
+    // 1. Sidebar (logo texte ou nom)
+    _initSidebarBrand();
+
+    // 2. Favicon dynamique
+    if (ent.faviconBase64) {
+      var link = document.querySelector("link[rel*='icon']");
+      if (!link) {
+        link = document.createElement('link');
+        link.rel = 'icon';
+        document.head.appendChild(link);
+      }
+      link.href = ent.faviconBase64;
+      link.type = ent.faviconMime || 'image/png';
+    }
+
+    // 3. Titre de la page
+    if (ent.nom) {
+      document.title = ent.nom + ' \u2014 Administration';
+    }
+  }
+  window._applyEntrepriseGlobale = _applyEntrepriseGlobale;
 
   /* --- Header --- */
   function renderHeader() {

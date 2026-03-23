@@ -277,7 +277,7 @@
 <body>
 
   <header>
-    <div class="header-logo">DST<span>·</span>SYSTEM</div>
+    <div id="portail-logo" class="header-logo"><span style="font-size:18px;font-weight:700;letter-spacing:1px;">DST System</span></div>
     <div class="header-op" id="header-op-name">Espace instructeur</div>
   </header>
 
@@ -804,5 +804,8 @@
   })();
   </script>
 
+<script>
+(function(){try{var s=JSON.parse(localStorage.getItem('dst_config_settings')||'{}');var logoTexte=s.entreprise&&s.entreprise.logoTexteBase64;var logoEl=document.getElementById('portail-logo');if(logoEl&&logoTexte){logoEl.innerHTML='<img src="'+logoTexte+'" style="max-height:48px;max-width:200px;object-fit:contain;">';}}catch(e){}})();
+</script>
 </body>
 </html>

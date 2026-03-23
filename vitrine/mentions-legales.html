@@ -9,6 +9,9 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
+<script>
+(function(){try{var s=JSON.parse(localStorage.getItem('dst_config_settings')||'{}');var fav=s.entreprise&&s.entreprise.faviconBase64;if(fav){var l=document.querySelector("link[rel*='icon']")||document.createElement('link');l.rel='icon';l.href=fav;l.type=(s.entreprise&&s.entreprise.faviconMime)||'image/png';if(!l.parentNode)document.head.appendChild(l);}}catch(e){}})();
+</script>
 </head>
 <body>
 
@@ -49,11 +52,12 @@
   <section style="margin-bottom:40px;">
     <h2 style="font-size:1.1rem;font-weight:700;margin-bottom:16px;color:#e8eaf0;">Éditeur du site</h2>
     <p style="color:#a0a8b8;line-height:1.8;">
-      DST System — Drill &amp; Skills Training<br>
+      <span id="ml-nom">DST System</span> — Drill &amp; Skills Training<br>
       Société par Actions Simplifiée Unipersonnelle (SASU)<br>
       Capital social : [à compléter]<br>
-      SIREN : [à compléter]<br>
-      Siège social : [adresse à compléter]<br>
+      SIREN : <span id="ml-siren">[à compléter]</span><br>
+      SIRET : <span id="ml-siret">[à compléter]</span><br>
+      Siège social : <span id="ml-adresse">[adresse à compléter]</span><br>
       Directeur de la publication : [nom du fondateur]
     </p>
   </section>
@@ -129,5 +133,8 @@
 </footer>
 
 <script src="js/main.js"></script>
+<script>
+(function(){try{var s=JSON.parse(localStorage.getItem('dst_config_settings')||'{}');var ent=s.entreprise;if(!ent)return;function set(id,val){if(val){var el=document.getElementById(id);if(el)el.textContent=val;}}set('ml-nom',ent.nom);set('ml-siren',ent.siren);set('ml-siret',ent.siret);var addr=[ent.adresse,(ent.codePostal||'')+(ent.ville?' '+ent.ville:'')].filter(Boolean).join(', ');set('ml-adresse',addr||null);}catch(e){}})();
+</script>
 </body>
 </html>

@@ -421,8 +421,12 @@ const DB = (() => {
       telephone:        '06 65 44 52 26',
       email:            'dst-system@hotmail.com',
       siteWeb:          'www.dst-system.fr',
-      logoBase64:       '',
-      logoMimeType:     '',
+      logoPrincipalBase64:  '',   // Emblème/blason — devis, factures, docs
+      logoPrincipalMime:    '',
+      logoTexteBase64:      '',   // Logo texte — headers digitaux, portails
+      logoTexteMime:        '',
+      faviconBase64:        '',   // Favicon onglet navigateur (32×32 min)
+      faviconMime:          '',
       mentionLegaleDevis:    'Devis valable 30 jours. TVA applicable selon taux en vigueur. En cas d\'acceptation, retourner signé avec la mention "Bon pour accord".',
       mentionLegaleFacture:  'Paiement à 30 jours. Tout retard entraîne des pénalités au taux légal + indemnité forfaitaire de 40 €. SASU au capital de [compléter] €.',
       mentionRGPD:           'Données traitées conformément au RGPD. Contact : dst-system@hotmail.com',

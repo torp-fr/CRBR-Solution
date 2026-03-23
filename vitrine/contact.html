@@ -16,6 +16,9 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
   <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
+<script>
+(function(){try{var s=JSON.parse(localStorage.getItem('dst_config_settings')||'{}');var fav=s.entreprise&&s.entreprise.faviconBase64;if(fav){var l=document.querySelector("link[rel*='icon']")||document.createElement('link');l.rel='icon';l.href=fav;l.type=(s.entreprise&&s.entreprise.faviconMime)||'image/png';if(!l.parentNode)document.head.appendChild(l);}}catch(e){}})();
+</script>
 </head>
 <body>
 
@@ -224,7 +227,7 @@
             </div>
             <div>
               <h4>E-mail</h4>
-              <a href="mailto:dst-system@hotmail.com">dst-system@hotmail.com</a>
+              <a href="mailto:dst-system@hotmail.com" id="contact-email-link"><span id="contact-email">dst-system@hotmail.com</span></a>
               <p>Réponse sous 48h ouvrées</p>
             </div>
           </div>
@@ -234,7 +237,7 @@
             </div>
             <div>
               <h4>Téléphone</h4>
-              <a href="tel:+33665445226">06 65 44 52 26</a>
+              <a href="tel:+33665445226" id="contact-tel-link"><span id="contact-tel">06 65 44 52 26</span></a>
               <p>Lundi – Vendredi, 9h à 18h</p>
             </div>
           </div>
@@ -420,6 +423,9 @@ function sendMail(e) {
     btn.innerHTML = 'Envoyer la demande <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>';
   });
 }
+</script>
+<script>
+(function(){try{var s=JSON.parse(localStorage.getItem('dst_config_settings')||'{}');var ent=s.entreprise;if(ent&&ent.email){var em=document.getElementById('contact-email');var emL=document.getElementById('contact-email-link');if(em)em.textContent=ent.email;if(emL)emL.href='mailto:'+ent.email;}if(ent&&ent.telephone){var tel=document.getElementById('contact-tel');var telL=document.getElementById('contact-tel-link');if(tel)tel.textContent=ent.telephone;if(telL)telL.href='tel:'+ent.telephone.replace(/\s/g,'');}}catch(e){}})();
 </script>
 </body>
 </html>
