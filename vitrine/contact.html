@@ -292,7 +292,7 @@
         <!-- Documents disponibles -->
         <div style="margin-top: 24px; padding: 24px; border: 1px solid var(--bd-light-md); border-radius: var(--radius-lg);">
           <h4 style="font-size: 0.87rem; margin-bottom: 12px;">Documents disponibles</h4>
-          <a href="plaquette.html" target="_blank" style="display: flex; align-items: center; gap: 10px; padding: 10px 14px; background: var(--red-muted); border: 1px solid var(--red-border); border-radius: var(--radius-sm); margin-bottom: 12px; text-decoration: none;">
+          <a href="plaquette.html" target="_blank" onclick="DSTTrack?.event('download', 'plaquette_pdf')" style="display: flex; align-items: center; gap: 10px; padding: 10px 14px; background: var(--red-muted); border: 1px solid var(--red-border); border-radius: var(--radius-sm); margin-bottom: 12px; text-decoration: none;">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
             <span>
               <span style="display: block; font-size: 0.84rem; font-weight: 600; color: var(--text-l1);">Plaquette de présentation</span>
@@ -359,7 +359,7 @@
           <li><a href="offres.html">Déploiement</a></li>
           <li><a href="a-propos.html">À propos</a></li>
           <li><a href="contact.html">Contact</a></li>
-          <li><a href="plaquette.html" target="_blank">Plaquette PDF</a></li>
+          <li><a href="plaquette.html" target="_blank" onclick="DSTTrack?.event('download', 'plaquette_pdf')">Plaquette PDF</a></li>
         </ul>
       </div>
       <div class="footer__col">
@@ -382,6 +382,7 @@
 </footer>
 
 <script src="js/main.js"></script>
+<script src="js/tracker.js" defer></script>
 <script>
 (function(){
   emailjs.init("CgTXrA6V-AGhtlJvz");
@@ -409,6 +410,7 @@ function sendMail(e) {
     message:       document.getElementById('message').value
   })
   .then(function() {
+    DSTTrack?.event('form_submit', 'contact');
     alert("Message envoyé avec succès");
     notice.textContent = "Votre demande a bien été envoyée. Nous vous répondons sous 48h.";
     notice.style.color = "green";

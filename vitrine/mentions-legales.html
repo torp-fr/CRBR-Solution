@@ -111,7 +111,7 @@
           <li><a href="offres.html">Déploiement</a></li>
           <li><a href="a-propos.html">À propos</a></li>
           <li><a href="contact.html">Contact</a></li>
-          <li><a href="plaquette.html" target="_blank">Plaquette PDF</a></li>
+          <li><a href="plaquette.html" target="_blank" onclick="DSTTrack?.event('download', 'plaquette_pdf')">Plaquette PDF</a></li>
         </ul>
       </div>
       <div class="footer__col">
@@ -133,6 +133,7 @@
 </footer>
 
 <script src="js/main.js"></script>
+<script src="js/tracker.js" defer></script>
 <script>
 (function(){try{var s=JSON.parse(localStorage.getItem('dst_config_settings')||'{}');var ent=s.entreprise;if(!ent)return;function set(id,val){if(val){var el=document.getElementById(id);if(el)el.textContent=val;}}set('ml-nom',ent.nom);set('ml-siren',ent.siren);set('ml-siret',ent.siret);var addr=[ent.adresse,(ent.codePostal||'')+(ent.ville?' '+ent.ville:'')].filter(Boolean).join(', ');set('ml-adresse',addr||null);}catch(e){}})();
 </script>

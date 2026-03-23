@@ -25,7 +25,8 @@ const App = (() => {
     locations:  { label: 'Lieux',               icon: '📍',   view: () => Views.Locations },
     regions:    { label: 'Régions',             icon: '🗺',   view: () => Views.Regions },
     simulateurs:{ label: 'Simulateurs',         icon: '📡',   view: () => Views.Simulateurs },
-    settings:   { label: 'Paramètres',          icon: '⚙️',   view: () => Views.Settings }
+    settings:   { label: 'Paramètres',          icon: '⚙️',   view: () => Views.Settings },
+    analytics:  { label: 'Analytics',           icon: '📊',   view: () => Views.Analytics }
   };
 
   /* --- Initialisation des données par défaut --- */
@@ -137,7 +138,7 @@ const App = (() => {
     if (!sidebar) return;
 
     const navSections = [
-      { title: 'Pilotage',       items: ['dashboard'] },
+      { title: 'Pilotage',       items: ['dashboard', 'analytics'] },
       { title: 'CRM',            items: ['pipeline', 'devis', 'factures'] },
       { title: 'Opérationnel',   items: ['sessions', 'offers'] },
       { title: 'Équipe',         items: ['operators', 'regions', 'simulateurs'] },

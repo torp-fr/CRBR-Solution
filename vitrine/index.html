@@ -64,7 +64,7 @@
       </p>
       <div class="hero__cta">
         <div>
-          <a href="contact.html?objet=presentation" class="btn btn--red btn--lg">Demander une présentation du dispositif</a>
+          <a href="contact.html?objet=presentation" class="btn btn--red btn--lg" onclick="DSTTrack?.event('cta_click','demande_presentation')">Demander une présentation du dispositif</a>
           <div class="cta-micro">
             <span>
               <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
@@ -76,7 +76,7 @@
             </span>
           </div>
         </div>
-        <a href="contact.html?objet=initier" class="btn btn--ghost btn--lg">Initier un projet de déploiement</a>
+        <a href="contact.html?objet=initier" class="btn btn--ghost btn--lg" onclick="DSTTrack?.event('cta_click','initier_projet')">Initier un projet de déploiement</a>
       </div>
       <div class="hero__trust">
         <div class="hero__trust-item">
@@ -611,7 +611,7 @@
       <div class="btn-group" style="justify-content: center;">
         <a href="contact.html?objet=presentation" class="btn btn--red btn--lg">Demander une présentation du dispositif</a>
         <a href="contact.html?objet=evaluation" class="btn btn--ghost btn--lg">Évaluer un déploiement sur votre territoire</a>
-        <a href="contact.html?objet=initier" class="btn btn--ghost btn--lg">Initier un projet de déploiement</a>
+        <a href="contact.html?objet=initier" class="btn btn--ghost btn--lg" onclick="DSTTrack?.event('cta_click','initier_projet')">Initier un projet de déploiement</a>
       </div>
       <div class="cta-micro" style="justify-content: center; margin-top: 16px;">
         <span>
@@ -650,7 +650,7 @@
           <li><a href="offres.html">Niveaux de déploiement</a></li>
           <li><a href="a-propos.html">À propos</a></li>
           <li><a href="contact.html">Contact</a></li>
-          <li><a href="plaquette.html" target="_blank">Plaquette PDF</a></li>
+          <li><a href="plaquette.html" target="_blank" onclick="DSTTrack?.event('download', 'plaquette_pdf')">Plaquette PDF</a></li>
         </ul>
       </div>
       <div class="footer__col">
@@ -673,6 +673,7 @@
 </footer>
 
 <script src="js/main.js"></script>
+<script src="js/tracker.js" defer></script>
 
 <!-- BANDEAU COOKIES -->
 <div id="cookie-banner"

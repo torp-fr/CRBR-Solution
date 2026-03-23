@@ -1626,3 +1626,23 @@ textarea.form-control {
   right: 2px;
   box-shadow: 0 0 2px rgba(0,0,0,0.4);
 }
+
+/* --- Analytics — Sparkline --- */
+.sparkline-chart {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 80px;
+  padding: 8px 0;
+  margin: 12px 0;
+}
+.spark-bar {
+  flex: 1;
+  min-width: 4px;
+  background: var(--color-primary, var(--accent-red));
+  border-radius: 2px 2px 0 0;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+  cursor: pointer;
+}
+.spark-bar:hover { opacity: 1; }

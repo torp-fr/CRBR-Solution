@@ -352,7 +352,7 @@
           <li><a href="offres.html">Déploiement</a></li>
           <li><a href="a-propos.html">À propos</a></li>
           <li><a href="contact.html">Contact</a></li>
-          <li><a href="plaquette.html" target="_blank">Plaquette PDF</a></li>
+          <li><a href="plaquette.html" target="_blank" onclick="DSTTrack?.event('download', 'plaquette_pdf')">Plaquette PDF</a></li>
         </ul>
       </div>
       <div class="footer__col">
@@ -375,5 +375,6 @@
 </footer>
 
 <script src="js/main.js"></script>
+<script src="js/tracker.js" defer></script>
 </body>
 </html>
