@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /client/
+Disallow: /operateur/
+Disallow: /data/
+Disallow: /templates/
+
+Sitemap: https://dst-system.fr/sitemap.xml
