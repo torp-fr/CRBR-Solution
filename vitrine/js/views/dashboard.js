@@ -538,10 +538,10 @@ Views.Dashboard = {
 
     function buildEconomicSummaryHTML() {
       /* Calcul des coûts fixes annuels totaux */
-      const totalFixedAnnual = settings.fixedCosts.reduce((sum, c) => sum + (c.amount || 0), 0);
+      const totalFixedAnnual = (settings.fixedCosts || []).reduce((sum, c) => sum + (c.amount || 0), 0);
 
       /* Calcul des amortissements annuels totaux */
-      const totalAmortAnnual = settings.equipmentAmortization.reduce((sum, a) => {
+      const totalAmortAnnual = (settings.equipmentAmortization || []).reduce((sum, a) => {
         const years = Math.max(a.durationYears || 1, 1);
         return sum + ((a.amount || 0) / years);
       }, 0);

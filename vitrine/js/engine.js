@@ -522,12 +522,12 @@ const Engine = (() => {
     }
 
     // 4. Quote-part coûts fixes annuels
-    const totalFixedAnnual = s.fixedCosts.reduce((sum, c) => sum + (c.amount || 0), 0);
+    const totalFixedAnnual = (s.fixedCosts || []).reduce((sum, c) => sum + (c.amount || 0), 0);
     const estSessions = Math.max(s.estimatedAnnualSessions, 1);
     result.fixedCostShare = round2(totalFixedAnnual / estSessions);
 
     // 5. Quote-part amortissements
-    const totalAmort = s.equipmentAmortization.reduce((sum, a) => {
+    const totalAmort = (s.equipmentAmortization || []).reduce((sum, a) => {
       const years = Math.max(a.durationYears || 1, 1);
       return sum + ((a.amount || 0) / years);
     }, 0);
@@ -616,12 +616,12 @@ const Engine = (() => {
     }
 
     // 2. Quote-part coûts fixes annuels
-    const totalFixedAnnual = s.fixedCosts.reduce((sum, c) => sum + (c.amount || 0), 0);
+    const totalFixedAnnual = (s.fixedCosts || []).reduce((sum, c) => sum + (c.amount || 0), 0);
     const fixedShare = round2(totalFixedAnnual / estSessions);
     costPerSession += fixedShare;
 
     // 3. Quote-part amortissements
-    const totalAmort = s.equipmentAmortization.reduce((sum, a) => {
+    const totalAmort = (s.equipmentAmortization || []).reduce((sum, a) => {
       const years = Math.max(a.durationYears || 1, 1);
       return sum + ((a.amount || 0) / years);
     }, 0);
@@ -960,8 +960,8 @@ const Engine = (() => {
   function calculatePointMort() {
     const s = DB.settings.get();
     const sessions = DB.sessions.getAll();
-    const totalFixed = s.fixedCosts.reduce((sum, c) => sum + (c.amount || 0), 0);
-    const totalAmort = s.equipmentAmortization.reduce((sum, a) => {
+    const totalFixed = (s.fixedCosts || []).reduce((sum, c) => sum + (c.amount || 0), 0);
+    const totalAmort = (s.equipmentAmortization || []).reduce((sum, a) => {
       const years = Math.max(a.durationYears || 1, 1);
       return sum + ((a.amount || 0) / years);
     }, 0);
@@ -1009,8 +1009,8 @@ const Engine = (() => {
       .filter(sess => new Date(sess.date) < now && sess.status !== 'annulee' && new Date(sess.date).getFullYear() === currentYear)
       .reduce((sum, sess) => sum + (sess.price || 0), 0);
 
-    const totalFixed = s.fixedCosts.reduce((sum, c) => sum + (c.amount || 0), 0);
-    const totalAmort = s.equipmentAmortization.reduce((sum, a) => {
+    const totalFixed = (s.fixedCosts || []).reduce((sum, c) => sum + (c.amount || 0), 0);
+    const totalAmort = (s.equipmentAmortization || []).reduce((sum, a) => {
       const years = Math.max(a.durationYears || 1, 1);
       return sum + ((a.amount || 0) / years);
     }, 0);
@@ -1161,28 +1161,6 @@ const Engine = (() => {
     return round2(ht * (1 + tauxTVA / 100));
   }
 
-  /**
-   * Convertit un montant TTC en HT.
-   * @param {number} ttc — montant toutes taxes comprises
-   * @param {number} [tauxTVA] — taux de TVA en % (défaut : settings.vatRate)
-   * @returns {number} montant HT
-   */
-  function computeHT(ttc, tauxTVA) {
-    if (tauxTVA === undefined) {
-      tauxTVA = (DB.settings.get().vatRate || 20);
-    }
-    return round2(ttc / (1 + tauxTVA / 100));
-  }
-
-  /**
-   * Retourne le montant de TVA sur un montant HT.
-   */
-  function computeMontantTVA(ht, tauxTVA) {
-    if (tauxTVA === undefined) {
-      tauxTVA = (DB.settings.get().vatRate || 20);
-    }
-    return round2(ht * tauxTVA / 100);
-  }
 
   /* ----------------------------------------------------------
      FREELANCE TJM SUR FACTURE
@@ -1413,11 +1391,11 @@ const Engine = (() => {
         costPerSession += defaultVariableCosts;
 
         // Coûts fixes et amortissement
-        const totalFixed = settings.fixedCosts.reduce((sum, c) => sum + (c.amount || 0), 0);
+        const totalFixed = setting(s.fixedCosts || []).reduce((sum, c) => sum + (c.amount || 0), 0);
         const estSessions = Math.max(settings.estimatedAnnualSessions, 1);
         const fixedShare = round2(totalFixed / estSessions);
 
-        const totalAmort = settings.equipmentAmortization.reduce((sum, a) => {
+        const totalAmort = setting(s.equipmentAmortization || []).reduce((sum, a) => {
           const years = Math.max(a.durationYears || 1, 1);
           return sum + ((a.amount || 0) / years);
         }, 0);
@@ -1652,8 +1630,6 @@ const Engine = (() => {
     offerTypeLabel,
     // TVA
     computeTTC,
-    computeHT,
-    computeMontantTVA,
     // Freelance TJM sur facture
     freelanceTjmFacture,
     // Taux horaire

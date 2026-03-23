@@ -554,7 +554,6 @@ const DB = (() => {
     city:               '',
     postalCode:         '',
     siret:              '',
-    paymentTerms:       'net30',
     priority:           'normal',
     active:             true,
     notes:              '',
@@ -580,9 +579,7 @@ const DB = (() => {
     nbJours:      1,
     notes:        '',
     devisRef:     '',
-    variableCosts: [],
-    encaissement: false,
-    prixFactureHT: 0
+    variableCosts: []
   };
 
   /* --- API publique --- */
