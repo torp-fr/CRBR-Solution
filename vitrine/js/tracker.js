@@ -1,40 +1,36 @@
-/* ============================================================
-   DST-SYSTEM — Tracker analytics maison (Supabase)
-   Léger, autonome, sans dépendance externe.
-   ============================================================ */
-(function () {
-  'use strict';
-
-  /* --- Guard : ne rien exécuter sur localhost ou /admin/ --- */
+(function() {
+  // Guard : ne pas tracker en local ni dans l'admin
   if (
     location.hostname === 'localhost' ||
     location.hostname === '127.0.0.1' ||
-    location.pathname.includes('/admin/')
+    location.pathname.startsWith('/admin')
   ) {
-    window.DSTTrack = { event: function () {} };
+    window.DSTTrack = { event: function() {} };
     return;
   }
 
-  /* --- Config Supabase (hardcodé — indépendant de supabase-config.js) --- */
-  const _SB_URL = 'https://uhpvshugtpmxgsztbovi.supabase.co';
-  const _SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVocHZzaHVndHBteGdzenRib3ZpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQxNzY3NjgsImV4cCI6MjA4OTc1Mjc2OH0.5pQGfqzP4YlzciqGJeMbIn14G6D5wr4fy7tINMVp9xE';
+  var _SB_URL = 'https://uhpvshugtpmxgsztbovi.supabase.co';
+  var _SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVocHZzaHVndHBteGdzenRib3ZpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQxNzY3NjgsImV4cCI6MjA4OTc1Mjc2OH0.5pQGfqzP4YlzciqGJeMbIn14G6D5wr4fy7tINMVp9xE';
 
-  /* --- A. Session ID anonyme --- */
-  const sid = sessionStorage.getItem('dst_sid') ||
-    (Math.random().toString(36).slice(2) + Date.now().toString(36));
-  sessionStorage.setItem('dst_sid', sid);
+  // Session ID anonyme
+  var sid = sessionStorage.getItem('dst_sid');
+  if (!sid) {
+    sid = Math.random().toString(36).slice(2)
+        + Date.now().toString(36);
+    sessionStorage.setItem('dst_sid', sid);
+  }
 
-  /* --- B. Détection device --- */
+  // Détection device
   function detectDevice() {
-    const ua = navigator.userAgent;
+    var ua = navigator.userAgent;
     if (/Mobi|Android/i.test(ua)) return 'mobile';
     if (/Tablet|iPad/i.test(ua)) return 'tablet';
     return 'desktop';
   }
 
-  /* --- C. Détection OS --- */
+  // Détection OS
   function detectOS() {
-    const ua = navigator.userAgent;
+    var ua = navigator.userAgent;
     if (/Windows/i.test(ua)) return 'Windows';
     if (/Mac OS X/i.test(ua)) return 'macOS';
     if (/iPhone|iPad/i.test(ua)) return 'iOS';
@@ -43,9 +39,9 @@
     return 'Other';
   }
 
-  /* --- D. Détection navigateur --- */
+  // Détection navigateur
   function detectBrowser() {
-    const ua = navigator.userAgent;
+    var ua = navigator.userAgent;
     if (/Firefox/i.test(ua)) return 'Firefox';
     if (/Edg/i.test(ua)) return 'Edge';
     if (/Chrome/i.test(ua)) return 'Chrome';
@@ -53,90 +49,88 @@
     return 'Other';
   }
 
-  /* --- E. Lecture UTM --- */
+  // UTM
   function getUTM(param) {
-    return new URLSearchParams(window.location.search).get(param) || null;
+    return new URLSearchParams(window.location.search)
+      .get(param) || null;
   }
 
-  /* --- F. Page courante --- */
-  let page = window.location.pathname;
+  // Page courante
+  var page = window.location.pathname || '/';
   if (page === '/') page = '/index.html';
 
-  /* --- G. Référent externe --- */
-  let referrer = document.referrer || null;
-  if (referrer && referrer.includes('dst-system.fr')) referrer = null;
+  // Référent (externe uniquement)
+  var ref = document.referrer || null;
+  if (ref && ref.indexOf('dst-system.fr') !== -1) ref = null;
 
-  /* --- H. Track page view --- */
-  const t0 = Date.now();
+  // Timestamp de début pour durée
+  var t0 = Date.now();
 
-  const payload = {
-    page: page,
-    referrer: referrer,
-    utm_source:   getUTM('utm_source'),
-    utm_medium:   getUTM('utm_medium'),
-    utm_campaign: getUTM('utm_campaign'),
-    device:    detectDevice(),
-    os:        detectOS(),
-    browser:   detectBrowser(),
-    session_id: sid,
-    duration_s: null
+  // Headers Supabase
+  var headers = {
+    'Content-Type': 'application/json',
+    'apikey': _SB_KEY,
+    'Authorization': 'Bearer ' + _SB_KEY,
+    'Prefer': 'return=representation'
   };
 
+  // POST page_view
   fetch(_SB_URL + '/rest/v1/page_views', {
     method: 'POST',
-    headers: {
-      'Content-Type':  'application/json',
-      'apikey':        _SB_KEY,
-      'Authorization': 'Bearer ' + _SB_KEY,
-      'Prefer':        'return=representation'
-    },
-    body: JSON.stringify(payload)
+    headers: headers,
+    body: JSON.stringify({
+      page: page,
+      referrer: ref,
+      utm_source: getUTM('utm_source'),
+      utm_medium: getUTM('utm_medium'),
+      utm_campaign: getUTM('utm_campaign'),
+      device: detectDevice(),
+      os: detectOS(),
+      browser: detectBrowser(),
+      session_id: sid,
+      duration_s: null
+    })
   })
-  .then(function (r) { return r.json(); })
-  .then(function (data) {
-    if (data[0] && data[0].id) {
-      sessionStorage.setItem('dst_last_pv_id', data[0].id);
-      console.log('[DST Track] pv_id:', data[0].id);
+  .then(function(r) { return r.json(); })
+  .then(function(data) {
+    if (data && data[0] && data[0].id) {
+      sessionStorage.setItem('dst_last_pv_id',
+        String(data[0].id));
+      console.log('[DST Track] OK - pv_id:', data[0].id);
     } else {
-      console.warn('[DST Track] pas d\'ID retourné:', data);
+      console.warn('[DST Track] pas d\'ID:', data);
     }
   })
-  .catch(function (err) {
-    console.warn('[DST Track] erreur fetch:', err);
+  .catch(function(err) {
+    console.warn('[DST Track] erreur:', err);
   });
 
-  /* --- I. Track durée de visite --- */
-  window.addEventListener('beforeunload', function () {
-    const pvId = sessionStorage.getItem('dst_last_pv_id');
+  // Durée via sendBeacon au départ
+  window.addEventListener('beforeunload', function() {
+    var pvId = sessionStorage.getItem('dst_last_pv_id');
     if (!pvId) return;
-    const duration = Math.round((Date.now() - t0) / 1000);
-    const url = _SB_URL + '/rest/v1/page_views?id=eq.' + pvId;
-    navigator.sendBeacon(
-      url,
-      new Blob(
-        [JSON.stringify({ duration_s: duration })],
-        { type: 'application/json' }
-      )
+    var duration = Math.round((Date.now() - t0) / 1000);
+    var url = _SB_URL + '/rest/v1/page_views?id=eq.' + pvId;
+    var blob = new Blob(
+      [JSON.stringify({ duration_s: duration })],
+      { type: 'application/json' }
     );
+    navigator.sendBeacon(url, blob);
   });
 
-  /* --- J. DSTTrack exposé globalement --- */
+  // Tracking events exposé globalement
   window.DSTTrack = {
-    event: function (type, label) {
+    event: function(type, label) {
       fetch(_SB_URL + '/rest/v1/page_events', {
         method: 'POST',
-        headers: {
-          'Content-Type':  'application/json',
-          'apikey':        _SB_KEY,
-          'Authorization': 'Bearer ' + _SB_KEY
-        },
+        headers: headers,
         body: JSON.stringify({
-          event_type:  type,
+          event_type: type,
           event_label: label || null,
-          page:        window.location.pathname,
-          session_id:  sid
+          page: page,
+          session_id: sid
         })
-      }).catch(function () {});
+      }).catch(function() {});
     }
   };
 
