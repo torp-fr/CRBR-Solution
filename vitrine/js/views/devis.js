@@ -414,21 +414,24 @@ Views.Devis = (() => {
 
     const settings = DB.settings.get();
     const payload = {
-      numero:        d.numero,
-      titre:         d.titre,
-      objet:         d.objet,
-      dateCreation:  d.dateCreation || d.createdAt,
-      dateExpiration: d.dateExpiration,
-      validiteJours: d.validiteJours,
-      destinataire:  dest,
-      lignes:        d.lignes || [],
-      totalHT:       d.totalHT,
-      tauxTVA:       d.tauxTVA,
-      totalTVA:      d.totalTVA,
-      totalTTC:      d.totalTTC,
-      livrables:     d.livrables || [],
-      entreprise:    settings.entreprise || {},
-      paiement:      settings.paiement || {}
+      numero:             d.numero,
+      titre:              d.titre,
+      objet:              d.objet,
+      dateCreation:       d.dateCreation || d.createdAt,
+      dateExpiration:     d.dateExpiration,
+      validiteJours:      d.validiteJours,
+      destinataire:       dest,
+      lignes:             d.lignes || [],
+      totalHT:            d.totalHT,
+      tauxTVA:            d.tauxTVA,
+      totalTVA:           d.totalTVA,
+      totalTTC:           d.totalTTC,
+      livrables:          d.livrables || [],
+      schemaPaiement:     d.schemaPaiement || '',
+      dateDebutProgramme: d.dateDebutProgramme || '',
+      echeancier:         d.echeancier || [],
+      entreprise:         settings.entreprise || {},
+      paiement:           settings.paiement || {}
     };
 
     const encoded = encodeURIComponent(JSON.stringify(payload));
@@ -629,7 +632,31 @@ Views.Devis = (() => {
           '<div id="dv-totaux" style="text-align:right;background:var(--bg-primary);border:1px solid var(--border-color);border-radius:6px;padding:12px 16px;"></div>' +
           '<div id="dv-alerte-plancher" style="margin-top:8px;"></div>' +
 
-          /* --- Section 4 : Notes --- */
+          /* --- Section 4 : Échéancier de paiement --- */
+          '<div class="section-label" style="font-size:0.72rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;margin:16px 0 8px;">\u00c9ch\u00e9ancier de paiement</div>' +
+          '<div style="background:var(--bg-primary);border:1px solid var(--border-color);border-radius:6px;padding:12px 14px;margin-bottom:12px;">' +
+            '<div class="form-row" style="align-items:flex-end;flex-wrap:wrap;gap:8px;margin-bottom:8px;">' +
+              '<div class="form-group" style="margin-bottom:0;">' +
+                '<label style="font-size:0.82rem;">Sch\u00e9ma</label>' +
+                '<select id="dv-schema-paiement" class="form-control" style="max-width:240px;">' +
+                  '<option value="">\u2014 Aucun \u00e9ch\u00e9ancier \u2014</option>' +
+                  '<option value="ponctuel"' + (v('schemaPaiement') === 'ponctuel' ? ' selected' : '') + '>Ponctuel (acompte\u00a0+\u00a0solde)</option>' +
+                  '<option value="trimestriel"' + (v('schemaPaiement') === 'trimestriel' ? ' selected' : '') + '>Trimestriel (4\u00a0\u00d7\u00a025\u00a0%)</option>' +
+                  '<option value="semestriel"' + (v('schemaPaiement') === 'semestriel' ? ' selected' : '') + '>Semestriel (2\u00a0\u00d7\u00a050\u00a0%)</option>' +
+                  '<option value="annuel"' + (v('schemaPaiement') === 'annuel' ? ' selected' : '') + '>Annuel (100\u00a0%)</option>' +
+                  '<option value="b2c"' + (v('schemaPaiement') === 'b2c' ? ' selected' : '') + '>B2C (100\u00a0% avant prestation)</option>' +
+                '</select>' +
+              '</div>' +
+              '<div class="form-group" style="margin-bottom:0;">' +
+                '<label style="font-size:0.82rem;">Date de d\u00e9but</label>' +
+                '<input type="date" id="dv-echeancier-debut" class="form-control" style="max-width:160px;" value="' + _escAttr(v('dateDebutProgramme', new Date().toISOString().slice(0, 10))) + '" />' +
+              '</div>' +
+              '<button type="button" id="dv-generer-echeancier" class="btn btn-sm" style="margin-bottom:0;">G\u00e9n\u00e9rer</button>' +
+            '</div>' +
+            '<div id="dv-echeancier-preview" style="font-size:0.83rem;"></div>' +
+          '</div>' +
+
+          /* --- Section 5 : Notes --- */
           '<div class="section-label" style="font-size:0.72rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;margin:16px 0 8px;">Notes internes</div>' +
           '<div class="form-group"><textarea id="dv-notes" class="form-control" rows="3" placeholder="Notes de suivi, conditions particuli\u00e8res\u2026 (non affich\u00e9es sur le PDF)">' + _esc(v('notes')) + '</textarea></div>' +
 
@@ -644,6 +671,55 @@ Views.Devis = (() => {
 
     /* Rendu initial des lignes */
     _renderLignes(overlay, lignes, vatRate);
+
+    /* Échéancier courant (en mémoire dans le modal) */
+    let _echeancierCourant = (isEdit && existing && Array.isArray(existing.echeancier) && existing.echeancier.length)
+      ? existing.echeancier.map(e => Object.assign({}, e))
+      : [];
+
+    function _fmtEcheancier(echeances) {
+      if (!echeances || !echeances.length) return '<p class="text-muted" style="font-size:0.82rem;">Aucun \u00e9ch\u00e9ancier g\u00e9n\u00e9r\u00e9.</p>';
+      var rows = echeances.map(function(e, i) {
+        return '<tr>' +
+          '<td style="color:var(--text-muted);">' + (i + 1) + '</td>' +
+          '<td>' + _esc(e.label) + '</td>' +
+          '<td class="text-mono" style="font-size:0.8rem;">' + (e.date ? e.date.split('T')[0] : '\u2014') + '</td>' +
+          '<td class="text-mono" style="text-align:right;">' + _fmtEur(e.montantHT) + '</td>' +
+          '<td class="text-mono" style="text-align:right;">' + _fmtEur(e.montantTTC) + '</td>' +
+          '</tr>';
+      }).join('');
+      return '<table class="data-table" style="margin-top:6px;">' +
+        '<thead><tr><th>#</th><th>\u00c9ch\u00e9ance</th><th>Date</th><th style="text-align:right;">HT</th><th style="text-align:right;">TTC</th></tr></thead>' +
+        '<tbody>' + rows + '</tbody></table>';
+    }
+
+    /* Afficher l'échéancier existant si édition */
+    if (_echeancierCourant.length) {
+      const prevDiv = overlay.querySelector('#dv-echeancier-preview');
+      if (prevDiv) prevDiv.innerHTML = _fmtEcheancier(_echeancierCourant);
+    }
+
+    /* Bouton Générer */
+    const btnGenEch = overlay.querySelector('#dv-generer-echeancier');
+    if (btnGenEch) {
+      btnGenEch.addEventListener('click', () => {
+        const schema  = (overlay.querySelector('#dv-schema-paiement') || {}).value || '';
+        const debut   = (overlay.querySelector('#dv-echeancier-debut') || {}).value || new Date().toISOString().slice(0, 10);
+        if (!schema) {
+          _echeancierCourant = [];
+          const prevDiv = overlay.querySelector('#dv-echeancier-preview');
+          if (prevDiv) prevDiv.innerHTML = '<p class="text-muted" style="font-size:0.82rem;">S\u00e9lectionnez un sch\u00e9ma pour g\u00e9n\u00e9rer l\'\u00e9ch\u00e9ancier.</p>';
+          return;
+        }
+        const lignesDom = _collectLignes(overlay);
+        const totaux    = _calculerTotaux(lignesDom, vatRate);
+        const settings  = DB.settings.get();
+        const acomptePct = (settings.paiement && settings.paiement.acomptePercent) || 30;
+        _echeancierCourant = Engine.generateEcheancier(totaux.totalHT, schema, debut, vatRate, { acomptePercent: acomptePct });
+        const prevDiv = overlay.querySelector('#dv-echeancier-preview');
+        if (prevDiv) prevDiv.innerHTML = _fmtEcheancier(_echeancierCourant);
+      });
+    }
 
     /* Événements de base */
     overlay.querySelector('#modal-close').addEventListener('click',  () => overlay.remove());
@@ -865,21 +941,24 @@ Views.Devis = (() => {
       const seuil     = _getSeuilPlancher();
 
       const data = {
-        titre:         titre,
-        objet:         ((overlay.querySelector('#dv-objet') || {}).value || '').trim(),
-        prospectId:    prospectId,
-        clientId:      clientId,
-        validiteJours: parseInt((overlay.querySelector('#dv-validite') || {}).value) || 30,
-        lignes:        lignesDom,
-        totalHT:       totaux.totalHT,
-        tauxTVA:       vatRate,
-        totalTVA:      totaux.totalTVA,
-        totalTTC:      totaux.totalTTC,
-        seuilPlancher: seuil,
-        margeEstimee:  _round2(totaux.totalHT - seuil),
-        segment:       ((overlay.querySelector('#dv-segment') || {}).value || 'institutionnel'),
-        notes:         ((overlay.querySelector('#dv-notes') || {}).value || '').trim(),
-        statut:        isEdit ? (existing.statut || 'brouillon') : 'brouillon'
+        titre:               titre,
+        objet:               ((overlay.querySelector('#dv-objet') || {}).value || '').trim(),
+        prospectId:          prospectId,
+        clientId:            clientId,
+        validiteJours:       parseInt((overlay.querySelector('#dv-validite') || {}).value) || 30,
+        lignes:              lignesDom,
+        totalHT:             totaux.totalHT,
+        tauxTVA:             vatRate,
+        totalTVA:            totaux.totalTVA,
+        totalTTC:            totaux.totalTTC,
+        seuilPlancher:       seuil,
+        margeEstimee:        _round2(totaux.totalHT - seuil),
+        segment:             ((overlay.querySelector('#dv-segment') || {}).value || 'institutionnel'),
+        notes:               ((overlay.querySelector('#dv-notes') || {}).value || '').trim(),
+        statut:              isEdit ? (existing.statut || 'brouillon') : 'brouillon',
+        schemaPaiement:      ((overlay.querySelector('#dv-schema-paiement') || {}).value || ''),
+        dateDebutProgramme:  ((overlay.querySelector('#dv-echeancier-debut') || {}).value || ''),
+        echeancier:          _echeancierCourant.map(e => Object.assign({}, e))
       };
 
       /* Livrables liés au palier sélectionné via l'assistant */

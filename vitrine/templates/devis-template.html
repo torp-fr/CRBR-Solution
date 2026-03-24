@@ -373,6 +373,33 @@
       </div>
     </div>
 
+    <!-- ÉCHÉANCIER DE PAIEMENT (affiché uniquement si devis.echeancier existe) -->
+    <div id="echeancier-section" style="display:none;margin-top:20px;">
+      <div style="font-size:10pt;font-weight:700;color:#1a1a2e;border-bottom:1px solid #ccc;padding-bottom:4px;margin-bottom:8px;">
+        &Eacute;ch&eacute;ancier de paiement
+      </div>
+      <table style="width:100%;border-collapse:collapse;font-size:9pt;">
+        <thead>
+          <tr style="background:#f4f4f6;">
+            <th style="padding:5px 8px;text-align:left;border-bottom:1px solid #ddd;">&Eacute;ch&eacute;ance</th>
+            <th style="padding:5px 8px;text-align:left;border-bottom:1px solid #ddd;">Date</th>
+            <th style="padding:5px 8px;text-align:right;border-bottom:1px solid #ddd;">Montant HT</th>
+            <th style="padding:5px 8px;text-align:right;border-bottom:1px solid #ddd;">TVA</th>
+            <th style="padding:5px 8px;text-align:right;border-bottom:1px solid #ddd;">Montant TTC</th>
+          </tr>
+        </thead>
+        <tbody id="echeancier-tbody"></tbody>
+        <tfoot>
+          <tr>
+            <td colspan="2" style="padding:5px 8px;font-weight:700;font-size:9pt;border-top:1px solid #ccc;">Total</td>
+            <td style="padding:5px 8px;text-align:right;font-weight:700;border-top:1px solid #ccc;" id="ech-total-ht"></td>
+            <td style="padding:5px 8px;text-align:right;font-weight:700;border-top:1px solid #ccc;" id="ech-total-tva"></td>
+            <td style="padding:5px 8px;text-align:right;font-weight:700;border-top:1px solid #ccc;" id="ech-total-ttc"></td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+
     <!-- LIVRABLES (affiché uniquement si le palier inclut des livrables) -->
     <div id="livrables-section" class="livrables-section" style="display:none;">
       <div class="livrables-title">Inclus dans ce programme</div>
@@ -512,6 +539,39 @@
           });
           livList.innerHTML = items;
           livSection.style.display = '';
+        }
+      }
+
+      /* ---- Échéancier de paiement ---- */
+      var echeancier = Array.isArray(d.echeancier) ? d.echeancier : [];
+      if (echeancier.length > 0) {
+        var echSection = document.getElementById('echeancier-section');
+        var echTbody   = document.getElementById('echeancier-tbody');
+        if (echSection && echTbody) {
+          var totalHT = 0; var totalTTC = 0;
+          var rows = '';
+          echeancier.forEach(function(e) {
+            var tva = e.montantTTC - e.montantHT;
+            totalHT  += e.montantHT || 0;
+            totalTTC += e.montantTTC || 0;
+            rows +=
+              '<tr>' +
+                '<td style="padding:4px 8px;">' + esc(e.label || '\u2014') + '</td>' +
+                '<td style="padding:4px 8px;">' + (e.date ? fmtDate(e.date) : '\u2014') + '</td>' +
+                '<td style="padding:4px 8px;text-align:right;">' + fmtEur(e.montantHT) + '</td>' +
+                '<td style="padding:4px 8px;text-align:right;color:#666;">' + fmtEur(tva) + '</td>' +
+                '<td style="padding:4px 8px;text-align:right;font-weight:600;">' + fmtEur(e.montantTTC) + '</td>' +
+              '</tr>';
+          });
+          echTbody.innerHTML = rows;
+          var totalTVA = totalTTC - totalHT;
+          var echHT  = document.getElementById('ech-total-ht');
+          var echTVA = document.getElementById('ech-total-tva');
+          var echTTC = document.getElementById('ech-total-ttc');
+          if (echHT)  echHT.textContent  = fmtEur(totalHT);
+          if (echTVA) echTVA.textContent = fmtEur(totalTVA);
+          if (echTTC) echTTC.textContent = fmtEur(totalTTC);
+          echSection.style.display = '';
         }
       }
 

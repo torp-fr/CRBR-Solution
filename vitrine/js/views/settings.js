@@ -998,9 +998,9 @@ Views.Settings = {
       const b2cCfg    = pc.b2c || DB.settings.getDefaults().pricingCatalog.b2c;
 
       const palierRows = paliers.map((p, i) => {
-        const prixJour  = Engine.round2(tarifBase * p.coeff);
+        const prixJour   = p.prixBase != null ? p.prixBase : Engine.round2(tarifBase * p.coeff);
         const nextPalier = paliers[i + 1];
-        const overlap   = nextPalier && (p.volumeMax >= nextPalier.volumeMin);
+        const overlap    = nextPalier && (p.volumeMax >= nextPalier.volumeMin);
         return `<tr>
           <td style="font-weight:600;">${escapeHTML(p.label)}</td>
           <td style="text-align:center;">
@@ -1020,6 +1020,12 @@ Views.Settings = {
             <input type="number" class="form-control palier-coeff" data-index="${i}"
               value="${Math.round(p.coeff * 100)}" min="0" max="100" step="1"
               style="max-width:75px;padding:4px 6px;text-align:right;display:inline-block;">&nbsp;%
+          </td>
+          <td style="text-align:right;">
+            <input type="number" class="input-sm palier-prixbase" data-palier="${i}"
+              value="${p.prixBase != null ? p.prixBase : ''}" min="0" step="1"
+              placeholder="${Engine.fmt(Engine.round2(tarifBase * p.coeff))}"
+              title="Prix/jour fixe (vide = tarif × coeff)">
           </td>
           <td style="text-align:right;font-weight:600;" class="palier-prix-jour" data-idx="${i}">${Engine.fmt(prixJour)}</td>
         </tr>`;
@@ -1083,6 +1089,7 @@ Views.Settings = {
                   <th style="text-align:center;">Min\u00a0j</th>
                   <th style="text-align:center;">Max\u00a0j</th>
                   <th style="text-align:right;">Coeff\u00a0(%)</th>
+                  <th style="text-align:right;" title="Prix fixe optionnel — remplace tarif\u00a0×\u00a0coeff">Prix fixe\u00a0\u20ac</th>
                   <th style="text-align:right;">Prix/jour\u00a0\u20ac</th>
                 </tr>
               </thead>
@@ -1183,25 +1190,69 @@ Views.Settings = {
     /** Section 7b — Conditions de règlement */
     function renderPaiement() {
       const p = state.paiement || {};
+      const schemasActifs = Array.isArray(p.schemasActifs) ? p.schemasActifs : ['ponctuel', 'trimestriel', 'semestriel', 'annuel', 'b2c'];
+      const schemaParSegment = p.schemaParSegment || { institutionnel: 'trimestriel', grand_compte: 'semestriel', b2b: 'ponctuel', b2c: 'b2c' };
+
+      const ALL_SCHEMAS = [
+        { id: 'ponctuel',     label: 'Ponctuel (acompte + solde)' },
+        { id: 'trimestriel',  label: 'Trimestriel (4 \u00d7 25\u00a0%)' },
+        { id: 'semestriel',   label: 'Semestriel (2 \u00d7 50\u00a0%)' },
+        { id: 'annuel',       label: 'Annuel (100\u00a0%)' },
+        { id: 'b2c',          label: 'B2C (100\u00a0% avant prestation)' }
+      ];
+
+      const SEGMENTS = [
+        { id: 'institutionnel', label: 'Institutionnel' },
+        { id: 'grand_compte',   label: 'Grand Compte' },
+        { id: 'b2b',            label: 'B2B' },
+        { id: 'b2c',            label: 'B2C' }
+      ];
 
       function chk(id, val) {
         return `<input type="checkbox" id="${id}" ${val ? 'checked' : ''}>`;
       }
 
+      const schemaCheckboxes = ALL_SCHEMAS.map(s => `
+        <label style="display:flex;align-items:center;gap:6px;cursor:pointer;margin-bottom:6px;">
+          <input type="checkbox" class="pai-schema-chk" data-schema="${s.id}" ${schemasActifs.includes(s.id) ? 'checked' : ''}>
+          <span>${s.label}</span>
+        </label>`).join('');
+
+      const segmentSelects = SEGMENTS.map(seg => {
+        const opts = ALL_SCHEMAS.map(s => `<option value="${s.id}" ${schemaParSegment[seg.id] === s.id ? 'selected' : ''}>${s.label}</option>`).join('');
+        return `<div class="form-group">
+          <label>Schéma par défaut — ${seg.label}</label>
+          <select id="pai-seg-${seg.id}" class="form-control pai-seg-select" data-segment="${seg.id}" style="max-width:280px;">${opts}</select>
+        </div>`;
+      }).join('');
+
       return `
         <div class="card" id="section-paiement">
           <div class="card-header">
-            <h2>Conditions de règlement</h2>
+            <h2>Conditions de r\u00e8glement</h2>
           </div>
           <p class="form-help" style="margin-bottom:16px;">
-            Ces paramètres s'appliquent automatiquement dans vos devis, factures et le planning.
+            Ces param\u00e8tres s'appliquent automatiquement dans vos devis, factures et le planning.
           </p>
 
-          <!-- A. Acompte -->
-          <h3 style="margin:0 0 10px;font-size:0.88rem;color:var(--text-heading);">A. Acompte</h3>
-          <div class="form-row" style="margin-bottom:8px;">
+          <!-- A. Sch\u00e9mas actifs -->
+          <h3 style="margin:0 0 10px;font-size:0.88rem;color:var(--text-heading);">A. Sch\u00e9mas d'\u00e9ch\u00e9ancier disponibles</h3>
+          <p class="form-help" style="margin-bottom:10px;">Cochez les sch\u00e9mas propos\u00e9s lors de la cr\u00e9ation d'un devis.</p>
+          <div style="margin-bottom:16px;">
+            ${schemaCheckboxes}
+          </div>
+
+          <!-- B. Sch\u00e9ma par d\u00e9faut selon le segment -->
+          <h3 style="margin:0 0 10px;font-size:0.88rem;color:var(--text-heading);">B. Sch\u00e9ma par d\u00e9faut par segment</h3>
+          <div class="form-row" style="flex-wrap:wrap;margin-bottom:16px;">
+            ${segmentSelects}
+          </div>
+
+          <!-- C. Acompte &amp; D\u00e9lais -->
+          <h3 style="margin:0 0 10px;font-size:0.88rem;color:var(--text-heading);">C. Acompte &amp; D\u00e9lais</h3>
+          <div class="form-row" style="flex-wrap:wrap;margin-bottom:8px;">
             <div class="form-group">
-              <label for="pai-acompte-pct">Acompte demandé (%)</label>
+              <label for="pai-acompte-pct">Acompte demand\u00e9 (%)</label>
               <input type="number" id="pai-acompte-pct" class="form-control" value="${p.acomptePercent ?? 30}" min="0" max="100" step="1" style="max-width:130px;">
             </div>
             <div class="form-group" style="align-self:flex-end;">
@@ -1209,47 +1260,45 @@ Views.Settings = {
                 ${chk('pai-acompte-oblig', p.acompteObligatoire ?? true)}
                 <span>Acompte obligatoire</span>
               </label>
-              <span class="form-help" style="margin-top:4px;">Si activé, une alerte s'affiche sur les devis sans acompte reçu et les sessions associées.</span>
-            </div>
-          </div>
-
-          <!-- B. Délais & Pénalités -->
-          <h3 style="margin:16px 0 10px;font-size:0.88rem;color:var(--text-heading);">B. Délais &amp; Pénalités</h3>
-          <div class="form-row" style="margin-bottom:8px;">
-            <div class="form-group">
-              <label for="pai-delai-sold">Délai de paiement solde (jours)</label>
-              <input type="number" id="pai-delai-sold" class="form-control" value="${p.delaiSoldJours ?? 30}" min="1" step="1" style="max-width:130px;">
             </div>
             <div class="form-group">
-              <label for="pai-penalite-pct">Taux pénalités retard (%)</label>
+              <label for="pai-delai-solde">D\u00e9lai de paiement solde (jours)</label>
+              <input type="number" id="pai-delai-solde" class="form-control" value="${p.delaiSoldeJours ?? p.delaiSoldJours ?? 30}" min="1" step="1" style="max-width:130px;">
+            </div>
+            <div class="form-group">
+              <label for="pai-penalite-pct">Taux p\u00e9nalit\u00e9s retard (%)</label>
               <input type="number" id="pai-penalite-pct" class="form-control" value="${p.penaliteRetardPercent ?? 3}" min="0" step="0.01" style="max-width:130px;">
             </div>
             <div class="form-group">
-              <label for="pai-indemnite">Indemnité forfaitaire (€)</label>
+              <label for="pai-indemnite">Indemnit\u00e9 forfaitaire (\u20ac)</label>
               <input type="number" id="pai-indemnite" class="form-control" value="${p.indemniteForfaitaire ?? 40}" min="0" step="1" style="max-width:130px;">
             </div>
           </div>
 
-          <!-- C. Blocage automatique -->
-          <h3 style="margin:16px 0 10px;font-size:0.88rem;color:var(--text-heading);">C. Blocage automatique</h3>
-          <div class="form-group" style="margin-bottom:8px;">
+          <!-- D. Blocage automatique -->
+          <h3 style="margin:16px 0 10px;font-size:0.88rem;color:var(--text-heading);">D. Blocage automatique</h3>
+          <div class="form-group" style="margin-bottom:16px;">
             <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
               ${chk('pai-blocage-impaye', p.blocageSessionSiImpaye ?? true)}
-              <span>Bloquer les sessions si impayé</span>
+              <span>Bloquer les sessions si impay\u00e9</span>
             </label>
-            <span class="form-help" style="margin-top:4px;">Si activé, toute session planifiée pour un client avec facture en retard affiche une alerte rouge dans le planning.</span>
+            <span class="form-help" style="margin-top:4px;">Si activ\u00e9, toute session planifi\u00e9e pour un client avec facture en retard affiche une alerte rouge dans le planning.</span>
           </div>
 
-          <!-- D. Messages contractuels -->
-          <h3 style="margin:16px 0 10px;font-size:0.88rem;color:var(--text-heading);">D. Messages contractuels</h3>
+          <!-- E. Messages contractuels -->
+          <h3 style="margin:0 0 10px;font-size:0.88rem;color:var(--text-heading);">E. Messages contractuels</h3>
           <p class="form-help" style="margin-bottom:12px;">Ces messages s'affichent automatiquement en bas de vos devis et factures.</p>
           <div class="form-group" style="margin-bottom:12px;">
-            <label for="pai-msg-acompte">Message conditions acompte</label>
+            <label for="pai-msg-acompte">Message acompte (institutionnel / B2B)</label>
             <textarea id="pai-msg-acompte" class="form-control" rows="3">${escapeHTML(p.messageAcompte || '')}</textarea>
           </div>
-          <div class="form-group">
+          <div class="form-group" style="margin-bottom:12px;">
             <label for="pai-msg-solde">Message conditions solde</label>
             <textarea id="pai-msg-solde" class="form-control" rows="3">${escapeHTML(p.messageSolde || '')}</textarea>
+          </div>
+          <div class="form-group">
+            <label for="pai-msg-b2c">Message paiement B2C</label>
+            <textarea id="pai-msg-b2c" class="form-control" rows="2">${escapeHTML(p.messageB2C || '')}</textarea>
           </div>
         </div>`;
     }
@@ -1474,6 +1523,13 @@ Views.Settings = {
             pc.paliers[i].volumeMax = parseInt(input.value, 10) || 9999;
           }
         });
+        $$('.palier-prixbase').forEach(input => {
+          const i = parseInt(input.dataset.palier, 10);
+          if (pc.paliers[i] !== undefined) {
+            const v = input.value.trim();
+            pc.paliers[i].prixBase = v !== '' ? (parseFloat(v) || 0) : null;
+          }
+        });
       }
 
       // Zones : surplusParJour (zone4 reste null — pas d'input)
@@ -1656,14 +1712,29 @@ Views.Settings = {
       const fnum = (id, def) => { const el = $('#' + id); return el ? (parseFloat(el.value) ?? def) : def; };
       const fchk = (id, def) => { const el = $('#' + id); return el ? el.checked : def; };
       const fstr = (id) => { const el = $('#' + id); return el ? el.value.trim() : ''; };
+
+      // A. Schémas actifs
+      p.schemasActifs = [];
+      $$('.pai-schema-chk').forEach(chk => { if (chk.checked) p.schemasActifs.push(chk.dataset.schema); });
+
+      // B. Schéma par segment
+      if (!p.schemaParSegment) p.schemaParSegment = {};
+      $$('.pai-seg-select').forEach(sel => { p.schemaParSegment[sel.dataset.segment] = sel.value; });
+
+      // C. Acompte & délais
       p.acomptePercent          = fnum('pai-acompte-pct', 30);
       p.acompteObligatoire      = fchk('pai-acompte-oblig', true);
-      p.delaiSoldJours          = fnum('pai-delai-sold', 30);
+      p.delaiSoldeJours         = fnum('pai-delai-solde', 30);
       p.penaliteRetardPercent   = fnum('pai-penalite-pct', 3);
       p.indemniteForfaitaire    = fnum('pai-indemnite', 40);
+
+      // D. Blocage
       p.blocageSessionSiImpaye  = fchk('pai-blocage-impaye', true);
+
+      // E. Messages
       p.messageAcompte          = fstr('pai-msg-acompte');
       p.messageSolde            = fstr('pai-msg-solde');
+      p.messageB2C              = fstr('pai-msg-b2c');
     }
 
     function syncRHFromDOM() {
@@ -1729,12 +1800,16 @@ Views.Settings = {
           seuilTag.textContent = 'Seuil plancher\u00a0: ' + Engine.fmt(seuilPlancher) + '\u00a0\u2014\u00a0' + (ok ? 'Couvert' : '\u26a0\u00a0Insuffisant');
         }
 
-        // Prix/jour par palier
+        // Prix/jour par palier (prixBase fixe prioritaire, sinon tarif × coeff)
         $$('.palier-coeff').forEach(input => {
           const i = parseInt(input.dataset.index, 10);
           const coeff = (parseFloat(input.value) || 0) / 100;
+          const pbEl  = container.querySelector('.palier-prixbase[data-palier="' + i + '"]');
+          const pbVal = pbEl && pbEl.value.trim() !== '' ? parseFloat(pbEl.value) : null;
+          const prix  = pbVal != null ? pbVal : Engine.round2(tarifBase * coeff);
           const prixEl = container.querySelector('.palier-prix-jour[data-idx="' + i + '"]');
-          if (prixEl) prixEl.textContent = Engine.fmt(Engine.round2(tarifBase * coeff));
+          if (prixEl) prixEl.textContent = Engine.fmt(prix);
+          if (pbEl) pbEl.placeholder = Engine.fmt(Engine.round2(tarifBase * coeff));
         });
 
         // Prix demi ponctuel
@@ -1775,7 +1850,7 @@ Views.Settings = {
       if (pcBaseEl) pcBaseEl.addEventListener('input', refreshPricingCatalogCalcs);
       if (pcDemiEl) pcDemiEl.addEventListener('input', refreshPricingCatalogCalcs);
       $$('.palier-coeff').forEach(inp => inp.addEventListener('input', refreshPricingCatalogCalcs));
-      $$('.palier-minj, .palier-maxj').forEach(inp => inp.addEventListener('input', refreshPricingCatalogCalcs));
+      $$('.palier-minj, .palier-maxj, .palier-prixbase').forEach(inp => inp.addEventListener('input', refreshPricingCatalogCalcs));
 
       // Segment F : GC / B2B / B2C
       $$('.gc-tarif-jour, #pc-b2b-journee, #pc-b2b-demi, #pc-b2c-2h, #pc-b2c-3h, #pc-b2c-4h, #pc-b2c-groupe').forEach(inp => {

@@ -1658,8 +1658,71 @@ const Engine = (() => {
       pointBasculejours:   pointBasculejours,
       delta:               delta,
       recommandation:      nbJours >= pointBasculejours ? 'CDI' : 'FREELANCE',
-      economie:            Math.abs(delta)
+      economie:            Math.abs(delta),
+      tauxRemplissage:     pointBasculejours > 0 ? round2((nbJours / pointBasculejours) * 100) : 0
     };
+  }
+
+  /* ----------------------------------------------------------
+     ECHEANCIER DE PAIEMENT — Génération des jalons
+     ---------------------------------------------------------- */
+
+  /**
+   * Génère un tableau d'échéances pour un montant HT donné.
+   *
+   * @param {number} montantHT — montant HT total
+   * @param {string} schema — 'trimestriel'|'semestriel'|'annuel'|'ponctuel'|'b2c'
+   * @param {string} dateDebut — YYYY-MM-DD
+   * @param {number} tvaRate — taux TVA en %
+   * @param {object} [opts] — { acomptePercent } pour schema ponctuel
+   * @returns {Array<{label,date,montantHT,montantTTC,pourcentage,statut,factureId}>}
+   */
+  function generateEcheancier(montantHT, schema, dateDebut, tvaRate, opts) {
+    var ht          = round2(parseFloat(montantHT) || 0);
+    var tva         = parseFloat(tvaRate) || 20;
+    var acomptePct  = (opts && opts.acomptePercent) || 30;
+    var d0          = dateDebut || new Date().toISOString().slice(0, 10);
+
+    function addMonths(iso, n) {
+      var d = new Date(iso + 'T00:00:00');
+      d.setMonth(d.getMonth() + n);
+      return d.toISOString().slice(0, 10);
+    }
+
+    function mk(label, date, pct) {
+      var mHT = round2(ht * pct / 100);
+      return { label: label, date: date, montantHT: mHT, montantTTC: round2(mHT * (1 + tva / 100)), pourcentage: pct, statut: 'en_attente', factureId: null };
+    }
+
+    var echeances = [];
+
+    switch (schema) {
+      case 'trimestriel':
+        echeances.push(mk('1er trimestre',  d0,                    25));
+        echeances.push(mk('2e trimestre',   addMonths(d0, 3),      25));
+        echeances.push(mk('3e trimestre',   addMonths(d0, 6),      25));
+        echeances.push(mk('4e trimestre',   addMonths(d0, 9),      25));
+        break;
+      case 'semestriel':
+        echeances.push(mk('1er semestre', d0,               50));
+        echeances.push(mk('2e semestre',  addMonths(d0, 6), 50));
+        break;
+      case 'annuel':
+        echeances.push(mk('Paiement annuel', d0, 100));
+        break;
+      case 'ponctuel':
+        var soldePct = round2(100 - acomptePct);
+        echeances.push(mk('Acompte\u00a0' + acomptePct + '\u00a0%', d0,               acomptePct));
+        echeances.push(mk('Solde\u00a0' + soldePct + '\u00a0%',     addMonths(d0, 1), soldePct));
+        break;
+      case 'b2c':
+        echeances.push(mk('Paiement int\u00e9gral (avant prestation)', d0, 100));
+        break;
+      default:
+        echeances.push(mk('Paiement total', d0, 100));
+    }
+
+    return echeances;
   }
 
   /* --- API publique --- */
@@ -1699,6 +1762,8 @@ const Engine = (() => {
     calculateTauxUtilisation,
     calculateBesoinsInvestissement,
     // CDI vs Freelance
-    calculateComparaisonRH
+    calculateComparaisonRH,
+    // Échéancier de paiement
+    generateEcheancier
   };
 })();

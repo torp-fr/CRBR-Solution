@@ -809,12 +809,48 @@ Views.Factures = (() => {
       data.numero        = DB.getNextNumeroFacture();
       data.statut        = 'brouillon';
       data.encaissements = [];
+      /* Copier l'échéancier du devis source si présent */
+      if (data.devisId && DB.devis) {
+        const dvSrc = DB.devis.getById(data.devisId);
+        if (dvSrc && Array.isArray(dvSrc.echeancier) && dvSrc.echeancier.length) {
+          data.echeancier = dvSrc.echeancier.map(e => Object.assign({}, e, { statut: 'en_attente', factureId: null }));
+        }
+      }
       DB.factures.create(data);
       if (typeof Toast !== 'undefined') Toast.show('Facture ' + data.numero + ' créée.', 'success');
     }
 
     overlay.remove();
     _renderPage();
+  }
+
+  /* ----------------------------------------------------------
+     ECHÉANCIER — Section HTML pour le modal encaissement
+     ---------------------------------------------------------- */
+
+  function _buildEcheancierSection(f) {
+    const echeancier = Array.isArray(f.echeancier) ? f.echeancier : [];
+    if (!echeancier.length) return '';
+
+    const rows = echeancier.map(function(e, i) {
+      const isEnc = e.statut === 'encaisse';
+      const styleEnc = isEnc ? 'text-decoration:line-through;color:var(--text-muted);' : '';
+      return '<tr>' +
+        '<td style="' + styleEnc + '">' + _esc(e.label || '\u2014') + '</td>' +
+        '<td style="' + styleEnc + '">' + (e.date ? new Date(e.date).toLocaleDateString('fr-FR') : '\u2014') + '</td>' +
+        '<td class="text-mono" style="' + styleEnc + '">' + _fmtEur(e.montantTTC) + '</td>' +
+        '<td style="text-align:center;">' +
+          (isEnc
+            ? '<span class="tag" style="background:rgba(46,125,50,0.15);color:#2e7d32;font-size:0.75rem;">Encaiss\u00e9</span>'
+            : '<button type="button" class="btn btn-sm btn-ech-encaisser" data-idx="' + i + '" data-montant="' + e.montantTTC + '" style="color:#2e7d32;font-size:0.78rem;">&#8853;&nbsp;Encaisser</button>') +
+        '</td>' +
+      '</tr>';
+    }).join('');
+
+    return '<div class="section-label" style="font-size:0.72rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">\u00c9ch\u00e9ancier</div>' +
+      '<table class="data-table" style="margin-bottom:16px;font-size:0.83rem;">' +
+      '<thead><tr><th>\u00c9ch\u00e9ance</th><th>Date</th><th>Montant TTC</th><th style="text-align:center;">Statut</th></tr></thead>' +
+      '<tbody>' + rows + '</tbody></table>';
   }
 
   /* ----------------------------------------------------------
@@ -877,6 +913,8 @@ Views.Factures = (() => {
 
           encHist +
 
+          _buildEcheancierSection(f) +
+
           '<div class="section-label" style="font-size:0.72rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">Nouvel encaissement</div>' +
           '<div class="form-row">' +
             '<div class="form-group"><label>Date *</label><input type="date" id="enc-date" class="form-control" value="' + todayStr + '" /></div>' +
@@ -909,6 +947,41 @@ Views.Factures = (() => {
         else if (updated.length > 0) newStatut = 'partiellement_payee';
         else newStatut = 'emise';
         DB.factures.update(factureId, { encaissements: updated, statut: newStatut });
+        overlay.remove();
+        _openEncaissementModal(factureId);
+      });
+    });
+
+    /* Boutons "Encaisser" de l'échéancier */
+    overlay.querySelectorAll('.btn-ech-encaisser').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const idx      = parseInt(btn.dataset.idx, 10);
+        const montant  = parseFloat(btn.dataset.montant) || 0;
+        const facturef = DB.factures.getById(factureId);
+        if (!facturef) return;
+
+        /* Créer l'encaissement correspondant à l'échéance */
+        const todayStr = new Date().toISOString().slice(0, 10);
+        const newEnc = {
+          id:        (Date.now().toString(36) + Math.random().toString(36).slice(2)),
+          date:      todayStr,
+          montant:   _round2(montant),
+          mode:      'virement',
+          reference: '',
+          note:      ''
+        };
+        const updatedEncs = [...(facturef.encaissements || []), newEnc];
+        const totalEnc    = updatedEncs.reduce((s, e) => s + (parseFloat(e.montant) || 0), 0);
+        const newSolde    = _round2((parseFloat(facturef.totalTTC) || 0) - totalEnc);
+        let newStatut     = newSolde <= 0 ? 'soldee' : (totalEnc > 0 ? 'partiellement_payee' : (facturef.statut || 'emise'));
+
+        /* Marquer l'échéance comme encaissée */
+        const updatedEch = (facturef.echeancier || []).map((e, i) =>
+          i === idx ? Object.assign({}, e, { statut: 'encaisse', factureId: factureId }) : e
+        );
+
+        DB.factures.update(factureId, { encaissements: updatedEncs, statut: newStatut, echeancier: updatedEch });
+        if (typeof Toast !== 'undefined') Toast.show(_fmtEur(montant) + ' encaiss\u00e9.', 'success');
         overlay.remove();
         _openEncaissementModal(factureId);
       });

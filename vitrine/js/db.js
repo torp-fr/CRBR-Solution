@@ -295,6 +295,7 @@ const DB = (() => {
           volumeMin: 1,
           volumeMax: 5,
           coeff: 1.00,
+          prixBase: null,
           demiJourneeDisponible: true,
           livrables: []
         },
@@ -304,6 +305,7 @@ const DB = (() => {
           volumeMin: 6,
           volumeMax: 14,
           coeff: 0.90,
+          prixBase: null,
           demiJourneeDisponible: false,
           livrables: ['bilan_trimestriel', 'rapport_annuel']
         },
@@ -313,6 +315,7 @@ const DB = (() => {
           volumeMin: 15,
           volumeMax: 24,
           coeff: 0.82,
+          prixBase: null,
           demiJourneeDisponible: false,
           livrables: ['bilan_trimestriel', 'rapport_annuel']
         },
@@ -322,6 +325,7 @@ const DB = (() => {
           volumeMin: 25,
           volumeMax: 9999,
           coeff: 0.75,
+          prixBase: null,
           demiJourneeDisponible: false,
           livrables: ['bilan_trimestriel', 'rapport_annuel', 'rapport_territorial']
         }
@@ -435,14 +439,22 @@ const DB = (() => {
 
     // Règles de paiement et conditions contractuelles
     paiement: {
-      acomptePercent:            30,       // % acompte demandé à la commande
-      acompteObligatoire:        true,     // blocage alerte si non reçu
-      delaiSoldJours:            30,       // délai paiement solde (jours)
-      penaliteRetardPercent:     3,        // taux pénalités légal (%)
-      indemniteForfaitaire:      40,       // € forfait recouvrement
-      blocageSessionSiImpaye:    true,     // alerte session si facture en retard
+      acomptePercent:            30,
+      acompteObligatoire:        true,
+      delaiSoldeJours:           30,
+      penaliteRetardPercent:     3,
+      indemniteForfaitaire:      40,
+      blocageSessionSiImpaye:    true,
+      schemasActifs:             ['ponctuel', 'trimestriel', 'semestriel', 'annuel', 'b2c'],
+      schemaParSegment: {
+        institutionnel: 'trimestriel',
+        grand_compte:   'semestriel',
+        b2b:            'ponctuel',
+        b2c:            'b2c'
+      },
       messageAcompte:            'Un acompte de 30\u00a0% est exigible à la commande. Aucune session ne sera réalisée avant réception de l\'acompte.',
-      messageSolde:              'Solde payable à 30 jours date de facture. Tout retard entraîne des pénalités au taux légal en vigueur + indemnité forfaitaire de 40\u00a0€ pour frais de recouvrement.'
+      messageSolde:              'Solde payable à 30 jours date de facture. Tout retard entraîne des pénalités au taux légal en vigueur + indemnité forfaitaire de 40\u00a0€ pour frais de recouvrement.',
+      messageB2C:                'Paiement int\u00e9gral exigible avant le d\u00e9but de la prestation.'
     },
 
     // Paramètres RH avancés (CDI vs Freelance)
