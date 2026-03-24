@@ -567,10 +567,15 @@ const DB = (() => {
     status:           'freelance',
     active:           true,
     // === TARIFICATION ===
-    netDaily:         0,
-    companyCostDaily: 0,
-    costMode:         'daily_rate',
-    dailyRate:        0,
+    netDaily:                 0,     // rétrocompat (= coutJournalierEntreprise)
+    companyCostDaily:         0,     // rétrocompat
+    costMode:                 'daily_rate', // rétrocompat
+    tarifsFreelance:          { tarifJournalierHT: 0 },
+    tarifsPortage:            { tarifJournalierHT: 0 },
+    tarifsSalarie:            { saisieMode: 'brut_mensuel', valeur: 0, brutMensuelCalc: 0, netMensuelCalc: 0, coutJournalierEntreprise: 0, dateDebutCDD: '', dateFinCDD: '' },
+    tarifsVacation:           { tarifNetJournalier: 0, coutJournalierEntreprise: 0 },
+    coutJournalierEntreprise: 0,
+    coutAnnuelProjecte:       0,
     // === NOTES ===
     notes:            '',
     // === ZONE GÉOGRAPHIQUE ===

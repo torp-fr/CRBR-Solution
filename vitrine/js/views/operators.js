@@ -196,25 +196,27 @@ Views.Operators = (() => {
       return '<span class="tag tag-neutral" style="font-size:0.7rem;">Ponctuel</span>';
     }
 
+    const seuilPlancher = (settings.coutJournee && settings.coutJournee.coutOperateurJour) || 0;
+
     const rows = operators.map(op => {
-      const cost = _getDisplayCost(op, settings);
+      const coutJourOp = op.coutJournalierEntreprise || _getDisplayCost(op, settings) || null;
       const tagClass = STATUS_TAG_CLASS[op.status] || 'tag-neutral';
       const specialties = (op.specialites || op.specialties || []).join(', ') || '—';
       const activeLabel = op.active !== false
         ? '<span class="tag tag-green">Actif</span>'
         : '<span class="tag tag-neutral">Inactif</span>';
 
-      const rateInfo = op.rateUnit === 'horaire' && op.hourlyRate
-        ? '<small class="text-muted" style="display:block;font-size:0.7rem;">' + Engine.fmt(op.hourlyRate) + '/h</small>'
-        : (op.costMode === 'tjm_facture' ? '<small class="text-muted" style="display:block;font-size:0.7rem;">TJM facture</small>' : '');
-
+      const alertIcon = (coutJourOp && seuilPlancher > 0 && coutJourOp > seuilPlancher)
+        ? ' <span title="Coût supérieur au seuil plancher" style="color:var(--color-warning);">⚠</span>'
+        : '';
+      const typeBadge = _typeContratBadge(op.typeContrat || op.status);
       const zoneDisplay = _escape(op.zoneLabel || op.villeBase || '—');
 
       return `
         <tr>
           <td><strong>${_escape(op.firstName)} ${_escape(op.lastName)}</strong></td>
           <td><span class="tag ${tagClass}">${Engine.statusLabel(op.status)}</span></td>
-          <td class="num">${cost !== null ? Engine.fmt(cost) : '—'}${rateInfo}</td>
+          <td class="num">${typeBadge} ${coutJourOp !== null ? Engine.fmt(coutJourOp) + alertIcon : '—'}</td>
           <td>${_escape(specialties)}</td>
           <td>${zoneDisplay}</td>
           <td>${activeLabel} ${_dispoBadge(op)}</td>
@@ -387,89 +389,129 @@ Views.Operators = (() => {
               </div>
             </div>
 
-            <!-- Mode de coût -->
-            <div class="card" style="margin-top:8px;">
-              <div class="card-header">
-                <h3>Tarification</h3>
-              </div>
+            <!-- SECTION : Tarification -->
+            <div class="card" style="margin-top:8px;" id="tarif-card">
+              <div class="card-header"><h3>Tarification</h3></div>
 
-              <!-- Unité de tarification : journalier ou horaire -->
+              <!-- Part A : Type de tarification -->
               <div class="form-group">
-                <label>Unité de tarification</label>
-                <div class="flex gap-16" style="margin-top:4px;">
-                  <label class="form-check">
-                    <input type="radio" name="rateUnit" value="journalier"
-                           ${op.rateUnit !== 'horaire' ? 'checked' : ''} />
-                    <span>Taux journalier</span>
-                  </label>
-                  <label class="form-check">
-                    <input type="radio" name="rateUnit" value="horaire"
-                           ${op.rateUnit === 'horaire' ? 'checked' : ''} />
-                    <span>Taux horaire</span>
-                  </label>
+                <label>Type de tarification</label>
+                <div class="flex gap-12" style="margin-top:6px;flex-wrap:wrap;">
+                  ${[['freelance','Freelance'],['portage','Portage salarial'],['cdi','CDI'],['cdd','CDD'],['vacation','Vacation']].map(([v,l]) =>
+                    `<label class="form-check"><input type="radio" name="tarifType" value="${v}" ${(op.typeContrat||'freelance')===v?'checked':''}><span>${l}</span></label>`
+                  ).join('')}
                 </div>
               </div>
 
-              <div class="form-group">
-                <label>Mode de calcul</label>
-                <div class="flex gap-16" style="margin-top:4px;">
-                  <label class="form-check">
-                    <input type="radio" name="costMode" value="net_desired"
-                           ${op.costMode !== 'company_max' && op.costMode !== 'tjm_facture' ? 'checked' : ''} />
-                    <span id="label-net-desired">Net souhaité par l'opérateur</span>
-                  </label>
-                  <label class="form-check">
-                    <input type="radio" name="costMode" value="company_max"
-                           ${op.costMode === 'company_max' ? 'checked' : ''} />
-                    <span>Coût max entreprise</span>
-                  </label>
-                  <label class="form-check" id="group-tjm-facture" style="${op.status === 'freelance' ? '' : 'display:none;'}">
-                    <input type="radio" name="costMode" value="tjm_facture"
-                           ${op.costMode === 'tjm_facture' ? 'checked' : ''} />
-                    <span>TJM sur facture <small style="color:var(--text-muted);">(facture HT = coût)</small></span>
-                  </label>
+              <!-- Part B : Blocs conditionnels -->
+
+              <!-- BLOC FREELANCE -->
+              <div id="bloc-tarifType-freelance" style="${(op.typeContrat||'freelance')==='freelance'?'':'display:none;'}">
+                <div class="form-group">
+                  <label for="op-freelance-tjh">Tarif journalier HT (&euro;)</label>
+                  <input type="number" id="op-freelance-tjh" class="form-control" min="0" step="any"
+                         value="${op.tarifsFreelance ? (op.tarifsFreelance.tarifJournalierHT||'') : (op.coutJournalierEntreprise||op.netDaily||'')}" placeholder="Ex : 450" />
+                  <span class="form-help">Montant facturé HT — coût direct pour DST (aucune charge patronale).</span>
                 </div>
               </div>
 
-              <div class="form-row">
-                <div class="form-group" id="group-netDaily">
-                  <label for="op-netDaily" id="label-netDaily">Net journalier souhaité (&euro;)</label>
-                  <input type="number" id="op-netDaily" class="form-control" min="0" step="any"
-                         value="${op.netDaily || ''}" placeholder="Ex : 250" />
-                </div>
-                <div class="form-group" id="group-companyCost">
-                  <label for="op-companyCostDaily" id="label-companyCost">Coût max entreprise / jour (&euro;)</label>
-                  <input type="number" id="op-companyCostDaily" class="form-control" min="0" step="any"
-                         value="${op.companyCostDaily || ''}" placeholder="Ex : 450" />
-                </div>
-                <div class="form-group" id="group-tjmFacture" style="display:none;">
-                  <label for="op-tjmFacture">TJM sur facture HT (&euro;)</label>
-                  <input type="number" id="op-tjmFacture" class="form-control" min="0" step="any"
-                         value="${op.tjmFacture || ''}" placeholder="Ex : 500" />
+              <!-- BLOC PORTAGE SALARIAL -->
+              <div id="bloc-tarifType-portage" style="${op.typeContrat==='portage'?'':'display:none;'}">
+                <div class="form-group">
+                  <label for="op-portage-tjh">Tarif journalier HT — facture société de portage (&euro;)</label>
+                  <input type="number" id="op-portage-tjh" class="form-control" min="0" step="any"
+                         value="${op.tarifsPortage ? (op.tarifsPortage.tarifJournalierHT||'') : ''}" placeholder="Ex : 500" />
+                  <span class="form-help">Facture de la société de portage — coût direct pour DST.</span>
                 </div>
               </div>
 
-              <!-- Taux horaire (visible si unité = horaire) -->
-              <div id="group-hourly-fields" style="display:none;">
+              <!-- BLOC CDI -->
+              <div id="bloc-tarifType-cdi" style="${op.typeContrat==='cdi'?'':'display:none;'}">
                 <div class="form-row">
                   <div class="form-group">
-                    <label for="op-hourlyRate">Taux horaire (&euro;)</label>
-                    <input type="number" id="op-hourlyRate" class="form-control" min="0" step="any"
-                           value="${op.hourlyRate || ''}" placeholder="Ex : 35" />
+                    <label for="op-cdi-saisieMode">Mode de saisie</label>
+                    <select id="op-cdi-saisieMode" class="form-control">
+                      ${[['brut_mensuel','Brut mensuel'],['net_mensuel','Net mensuel'],['brut_horaire','Brut horaire'],['net_horaire','Net horaire']].map(([v,l]) =>
+                        `<option value="${v}" ${((op.tarifsSalarie&&op.tarifsSalarie.saisieMode===v)||(v==='brut_mensuel'&&!op.tarifsSalarie))?'selected':''}>${l}</option>`
+                      ).join('')}
+                    </select>
                   </div>
                   <div class="form-group">
-                    <label for="op-hoursPerDay">Heures / jour</label>
-                    <input type="number" id="op-hoursPerDay" class="form-control" min="1" max="24" step="any"
-                           value="${op.hoursPerDay || DB.settings.get().hoursPerDay || 7}" />
+                    <label for="op-cdi-valeur">Valeur (&euro;)</label>
+                    <input type="number" id="op-cdi-valeur" class="form-control" min="0" step="any"
+                           value="${op.tarifsSalarie ? (op.tarifsSalarie.valeur||'') : ''}" placeholder="Ex : 2\u202f800" />
                   </div>
                 </div>
+                <div class="calcul-auto" id="calcul-auto-cdi" style="display:none;"></div>
               </div>
 
-              <!-- Résultat du calcul en temps réel -->
-              <div id="cost-preview" class="mt-8"></div>
+              <!-- BLOC CDD -->
+              <div id="bloc-tarifType-cdd" style="${op.typeContrat==='cdd'?'':'display:none;'}">
+                <div class="form-row">
+                  <div class="form-group">
+                    <label for="op-cdd-saisieMode">Mode de saisie</label>
+                    <select id="op-cdd-saisieMode" class="form-control">
+                      ${[['brut_mensuel','Brut mensuel'],['net_mensuel','Net mensuel'],['brut_horaire','Brut horaire'],['net_horaire','Net horaire']].map(([v,l]) =>
+                        `<option value="${v}" ${((op.tarifsSalarie&&op.tarifsSalarie.saisieMode===v)||(v==='brut_mensuel'&&!op.tarifsSalarie))?'selected':''}>${l}</option>`
+                      ).join('')}
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label for="op-cdd-valeur">Valeur (&euro;)</label>
+                    <input type="number" id="op-cdd-valeur" class="form-control" min="0" step="any"
+                           value="${op.tarifsSalarie ? (op.tarifsSalarie.valeur||'') : ''}" placeholder="Ex : 2\u202f800" />
+                  </div>
+                </div>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label for="op-cdd-debut">Date début CDD</label>
+                    <input type="date" id="op-cdd-debut" class="form-control"
+                           value="${op.tarifsSalarie ? (op.tarifsSalarie.dateDebutCDD||'') : ''}" />
+                  </div>
+                  <div class="form-group">
+                    <label for="op-cdd-fin">Date fin CDD</label>
+                    <input type="date" id="op-cdd-fin" class="form-control"
+                           value="${op.tarifsSalarie ? (op.tarifsSalarie.dateFinCDD||'') : ''}" />
+                  </div>
+                </div>
+                <div class="calcul-auto" id="calcul-auto-cdd" style="display:none;"></div>
+              </div>
 
-              <!-- Comparaison horaire vs journalier -->
-              <div id="hourly-comparison" class="mt-8"></div>
+              <!-- BLOC VACATION -->
+              <div id="bloc-tarifType-vacation" style="${op.typeContrat==='vacation'?'':'display:none;'}">
+                <div class="form-group">
+                  <label for="op-vacation-net">Tarif net journalier versé (&euro;)</label>
+                  <input type="number" id="op-vacation-net" class="form-control" min="0" step="any"
+                         value="${op.tarifsVacation ? (op.tarifsVacation.tarifNetJournalier||'') : ''}" placeholder="Ex : 200" />
+                  <span class="form-help">Net perçu par le vacataire / jour d'intervention.</span>
+                </div>
+                <div class="calcul-auto" id="calcul-auto-vacation" style="display:none;"></div>
+              </div>
+
+              <!-- Part C : Synthèse tarifaire -->
+              <div class="tarif-synthese" id="tarif-synthese" style="margin-top:16px;">
+                <div style="font-size:0.75rem;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:8px;">Synthèse tarifaire</div>
+                <div class="synthese-row">
+                  <span>Coût journalier entreprise</span>
+                  <span id="syn-cout-jour" style="font-weight:600;font-family:var(--font-mono);">—</span>
+                </div>
+                <div class="synthese-row">
+                  <span>Seuil plancher DST</span>
+                  <span id="syn-seuil" style="font-family:var(--font-mono);">—</span>
+                </div>
+                <div class="synthese-row">
+                  <span>Statut tarifaire</span>
+                  <span id="syn-statut">—</span>
+                </div>
+                <div class="synthese-row">
+                  <span>Sessions assignées cette année</span>
+                  <span id="syn-sessions">—</span>
+                </div>
+                <div class="synthese-row synthese-total">
+                  <span>Coût annuel projeté</span>
+                  <span id="syn-annuel" style="font-family:var(--font-mono);">—</span>
+                </div>
+              </div>
             </div>
 
             <!-- Spécialités (tags) -->
@@ -590,21 +632,10 @@ Views.Operators = (() => {
             <!-- SECTION : Contrat -->
             <div class="card" style="margin-top:8px;">
               <div class="card-header"><h3>Contrat</h3></div>
-              <div class="form-row">
-                <div class="form-group">
-                  <label for="op-typeContrat">Type de contrat</label>
-                  <select id="op-typeContrat" class="form-control">
-                    <option value="freelance"        ${(op.typeContrat || 'freelance') === 'freelance'        ? 'selected' : ''}>Freelance</option>
-                    <option value="auto_entrepreneur" ${op.typeContrat === 'auto_entrepreneur' ? 'selected' : ''}>Auto-entrepreneur</option>
-                    <option value="cdd"              ${op.typeContrat === 'cdd'              ? 'selected' : ''}>CDD</option>
-                    <option value="cdi"              ${op.typeContrat === 'cdi'              ? 'selected' : ''}>CDI</option>
-                  </select>
-                </div>
-                <div class="form-group" id="group-siret">
-                  <label for="op-siret">SIRET (si freelance / AE)</label>
-                  <input type="text" id="op-siret" class="form-control"
-                         value="${_escapeAttr(op.siretFreelance || '')}" placeholder="12345678900012" />
-                </div>
+              <div class="form-group" id="group-siret">
+                <label for="op-siret">SIRET <span class="text-muted" style="font-size:0.75rem;">(freelance / portage)</span></label>
+                <input type="text" id="op-siret" class="form-control"
+                       value="${_escapeAttr(op.siretFreelance || '')}" placeholder="12345678900012" />
               </div>
               <div class="form-group">
                 <label for="op-noteInterne">Note interne
@@ -626,11 +657,10 @@ Views.Operators = (() => {
 
     document.body.appendChild(overlay);
 
-    // Initialiser la visibilité des champs de coût
-    _toggleCostFields();
-
-    // Calcul de coût initial si des valeurs existent
-    _updateCostPreview();
+    // Initialiser la tarification
+    var _currentTarifType = op.typeContrat || 'freelance';
+    _showTarifBloc(_currentTarifType, overlay);
+    _updateTarifSynthese(overlay, isEdit ? op.id : null);
 
     // --- Événements de la modale ---
 
@@ -642,37 +672,33 @@ Views.Operators = (() => {
       if (e.target === overlay) closeModal();
     });
 
-    // Basculer entre les modes de coût
-    overlay.querySelectorAll('input[name="costMode"]').forEach(radio => {
-      radio.addEventListener('change', () => {
-        _toggleCostFields();
-        _updateCostPreview();
+    // Basculer entre types de tarification
+    overlay.querySelectorAll('input[name="tarifType"]').forEach(function(radio) {
+      radio.addEventListener('change', function() {
+        _showTarifBloc(this.value, overlay);
+        _updateTarifSynthese(overlay, isEdit ? op.id : null);
+        var gs = overlay.querySelector('#group-siret');
+        if (gs) gs.style.display = (this.value === 'freelance' || this.value === 'portage') ? '' : 'none';
       });
     });
 
-    // Basculer entre unités
-    overlay.querySelectorAll('input[name="rateUnit"]').forEach(radio => {
-      radio.addEventListener('change', () => {
-        _toggleCostFields();
-        _updateCostPreview();
-      });
+    // Écouter les inputs tarif pour mise à jour en temps réel
+    ['#op-freelance-tjh','#op-portage-tjh','#op-cdi-valeur','#op-cdd-valeur','#op-vacation-net'].forEach(function(id) {
+      var el = overlay.querySelector(id);
+      if (el) el.addEventListener('input', function() { _updateTarifSynthese(overlay, isEdit ? op.id : null); });
+    });
+    ['#op-cdi-saisieMode','#op-cdd-saisieMode'].forEach(function(id) {
+      var el = overlay.querySelector(id);
+      if (el) el.addEventListener('change', function() { _updateTarifSynthese(overlay, isEdit ? op.id : null); });
+    });
+    ['#op-cdd-debut','#op-cdd-fin'].forEach(function(id) {
+      var el = overlay.querySelector(id);
+      if (el) el.addEventListener('change', function() { _updateTarifSynthese(overlay, isEdit ? op.id : null); });
     });
 
-    // Mise à jour du calcul en temps réel
-    overlay.querySelector('#op-netDaily').addEventListener('input', _updateCostPreview);
-    overlay.querySelector('#op-companyCostDaily').addEventListener('input', _updateCostPreview);
-    overlay.querySelector('#op-status').addEventListener('change', () => {
-      _toggleCostFields();
-      _updateCostPreview();
-    });
-
-    // Champs supplémentaires
-    var tjmInput = overlay.querySelector('#op-tjmFacture');
-    if (tjmInput) tjmInput.addEventListener('input', _updateCostPreview);
-    var hourlyInput = overlay.querySelector('#op-hourlyRate');
-    if (hourlyInput) hourlyInput.addEventListener('input', _updateCostPreview);
-    var hpdInput = overlay.querySelector('#op-hoursPerDay');
-    if (hpdInput) hpdInput.addEventListener('input', _updateCostPreview);
+    // Visibilité initiale SIRET
+    var groupSiretInit = overlay.querySelector('#group-siret');
+    if (groupSiretInit) groupSiretInit.style.display = (_currentTarifType === 'freelance' || _currentTarifType === 'portage') ? '' : 'none';
 
     // Initialiser periodeIndispo
     _modalIndispo = JSON.parse(JSON.stringify(op.periodeIndispo || []));
@@ -698,18 +724,6 @@ Views.Operators = (() => {
       });
     }
 
-    // Affichage conditionnel SIRET
-    var typeContratEl = overlay.querySelector('#op-typeContrat');
-    var groupSiret = overlay.querySelector('#group-siret');
-    if (typeContratEl && groupSiret) {
-      function _updateSiretVis() {
-        var v = typeContratEl.value;
-        groupSiret.style.display = (v === 'freelance' || v === 'auto_entrepreneur') ? '' : 'none';
-      }
-      typeContratEl.addEventListener('change', _updateSiretVis);
-      _updateSiretVis();
-    }
-
     // Sauvegarde
     overlay.querySelector('#modal-save').addEventListener('click', () => {
       const form = overlay.querySelector('#operator-form');
@@ -718,216 +732,194 @@ Views.Operators = (() => {
     });
   }
 
-  /** Bascule la visibilité des champs selon le mode de coût et l'unité */
-  function _toggleCostFields() {
-    const overlay = document.getElementById('operator-modal-overlay');
-    if (!overlay) return;
-
-    const mode = overlay.querySelector('input[name="costMode"]:checked').value;
-    const rateUnit = overlay.querySelector('input[name="rateUnit"]:checked').value;
-    const status = overlay.querySelector('#op-status').value;
-    const groupNet = overlay.querySelector('#group-netDaily');
-    const groupCompany = overlay.querySelector('#group-companyCost');
-    const groupTjmFacture = overlay.querySelector('#group-tjmFacture');
-    const groupHourly = overlay.querySelector('#group-hourly-fields');
-    const groupTjmRadio = overlay.querySelector('#group-tjm-facture');
-    const labelNet = overlay.querySelector('#label-netDaily');
-    const labelCompany = overlay.querySelector('#label-companyCost');
-
-    // Afficher/masquer le radio TJM sur facture (freelance uniquement)
-    if (groupTjmRadio) {
-      groupTjmRadio.style.display = status === 'freelance' ? '' : 'none';
-      // Si on quitte le statut freelance et qu'on était en mode tjm_facture, basculer
-      if (status !== 'freelance' && mode === 'tjm_facture') {
-        var netRadio = overlay.querySelector('input[name="costMode"][value="net_desired"]');
-        if (netRadio) netRadio.checked = true;
-      }
-    }
-
-    // Afficher les champs horaire si unité = horaire
-    var isHourly = rateUnit === 'horaire';
-    if (groupHourly) groupHourly.style.display = isHourly ? '' : 'none';
-
-    // Labels dynamiques selon unité
-    if (labelNet) {
-      labelNet.textContent = isHourly ? 'Net horaire souhaité (€)' : 'Net journalier souhaité (€)';
-    }
-    if (labelCompany) {
-      labelCompany.textContent = isHourly ? 'Coût max entreprise / heure (€)' : 'Coût max entreprise / jour (€)';
-    }
-
-    var currentMode = overlay.querySelector('input[name="costMode"]:checked').value;
-
-    if (currentMode === 'net_desired') {
-      groupNet.style.display = '';
-      groupCompany.style.display = 'none';
-      if (groupTjmFacture) groupTjmFacture.style.display = 'none';
-    } else if (currentMode === 'company_max') {
-      groupNet.style.display = 'none';
-      groupCompany.style.display = '';
-      if (groupTjmFacture) groupTjmFacture.style.display = 'none';
-    } else if (currentMode === 'tjm_facture') {
-      groupNet.style.display = 'none';
-      groupCompany.style.display = 'none';
-      if (groupTjmFacture) groupTjmFacture.style.display = '';
-    }
+  /** Affiche le bloc tarifaire correspondant au type, masque les autres */
+  function _showTarifBloc(typeVal, overlay) {
+    var ov = overlay || document.getElementById('operator-modal-overlay');
+    if (!ov) return;
+    ['freelance','portage','cdi','cdd','vacation'].forEach(function(t) {
+      var bloc = ov.querySelector('#bloc-tarifType-' + t);
+      if (bloc) bloc.style.display = (t === typeVal) ? '' : 'none';
+    });
   }
 
-  /** Met à jour l'aperçu du calcul de coût dans la modale */
-  function _updateCostPreview() {
-    const overlay = document.getElementById('operator-modal-overlay');
-    if (!overlay) return;
+  /** Calcule les données tarifaires CDI/CDD depuis le mode de saisie et la valeur */
+  function _calcSalarieTarif(saisieMode, valeur, typeContrat, settings) {
+    if (!valeur || valeur <= 0) return null;
+    var cc = Engine.getChargesConfig(settings);
+    var joursAn = (cc && cc.joursOuvresAn) || 218;
+    var brutMensuel = 0;
 
-    const mode = overlay.querySelector('input[name="costMode"]:checked').value;
-    const rateUnit = overlay.querySelector('input[name="rateUnit"]:checked').value;
-    const status = overlay.querySelector('#op-status').value;
-    const preview = overlay.querySelector('#cost-preview');
-    const comparisonDiv = overlay.querySelector('#hourly-comparison');
-    const settings = DB.settings.get();
-    const isHourly = rateUnit === 'horaire';
-
-    let calc = null;
-
-    if (mode === 'tjm_facture') {
-      // TJM sur facture (freelance)
-      const tjmVal = parseFloat(overlay.querySelector('#op-tjmFacture').value);
-      if (!tjmVal || tjmVal <= 0) { preview.innerHTML = ''; if (comparisonDiv) comparisonDiv.innerHTML = ''; return; }
-      var tjmResult = Engine.freelanceTjmFacture(tjmVal, settings);
-      preview.innerHTML = `
-        <div class="kpi-grid" style="grid-template-columns:repeat(3,1fr);">
-          <div class="kpi-card">
-            <span class="kpi-label">TJM facture HT</span>
-            <span class="kpi-value" style="font-size:1.2rem;">${Engine.fmt(tjmResult.tjmFacture)}</span>
-          </div>
-          <div class="kpi-card">
-            <span class="kpi-label">Net freelance estimé</span>
-            <span class="kpi-value" style="font-size:1.2rem;">${Engine.fmt(tjmResult.netFreelance)}</span>
-          </div>
-          <div class="kpi-card kpi-warning">
-            <span class="kpi-label">Coût entreprise / jour</span>
-            <span class="kpi-value" style="font-size:1.2rem;">${Engine.fmt(tjmResult.coutEntrepriseJour)}</span>
-          </div>
-        </div>
-        <div style="font-size:0.75rem;color:var(--text-secondary);margin-top:4px;">
-          Charges auto-entrepreneur (${tjmResult.tauxChargesAE}%) : ${Engine.fmt(tjmResult.chargesAE)} / jour — à la charge du freelance.
-        </div>
-      `;
-      if (comparisonDiv) comparisonDiv.innerHTML = '';
-      return;
-    }
-
-    if (isHourly) {
-      // Mode horaire
-      const hourlyRate = parseFloat(overlay.querySelector('#op-hourlyRate').value);
-      const hoursPerDay = parseFloat(overlay.querySelector('#op-hoursPerDay').value) || 7;
-      if (!hourlyRate || hourlyRate <= 0) { preview.innerHTML = ''; if (comparisonDiv) comparisonDiv.innerHTML = ''; return; }
-
-      var hrMode = mode === 'company_max' ? 'brut' : 'net';
-      var hrResult = Engine.computeCoutHoraire(hourlyRate, status, hrMode, settings);
-
-      preview.innerHTML = `
-        <div class="kpi-grid" style="grid-template-columns:repeat(4,1fr);">
-          <div class="kpi-card">
-            <span class="kpi-label">Taux horaire</span>
-            <span class="kpi-value" style="font-size:1.2rem;">${Engine.fmt(hourlyRate)}/h</span>
-          </div>
-          <div class="kpi-card">
-            <span class="kpi-label">Équivalent journalier (${hoursPerDay}h)</span>
-            <span class="kpi-value" style="font-size:1.2rem;">${Engine.fmt(hrResult.journalierEquivalent)}</span>
-          </div>
-          <div class="kpi-card">
-            <span class="kpi-label">Coût entreprise / heure</span>
-            <span class="kpi-value" style="font-size:1.2rem;">${Engine.fmt(hrResult.coutEntrepriseHeure)}</span>
-          </div>
-          <div class="kpi-card kpi-warning">
-            <span class="kpi-label">Coût entreprise / jour</span>
-            <span class="kpi-value" style="font-size:1.2rem;">${Engine.fmt(hrResult.coutEntrepriseJour)}</span>
-          </div>
-        </div>
-      `;
-
-      // Comparaison horaire vs journalier si un taux journalier est aussi renseigné
-      var dailyVal = parseFloat(overlay.querySelector('#op-netDaily').value) || 0;
-      if (dailyVal > 0 && comparisonDiv) {
-        var comp = Engine.compareHoraireJournalier(hourlyRate, dailyVal, status, hrMode, settings);
-        var recoColor = comp.recommendation === 'horaire' ? 'var(--color-success)' : comp.recommendation === 'journalier' ? 'var(--color-info)' : 'var(--text-muted)';
-        var recoLabel = comp.recommendation === 'horaire' ? 'Horaire plus rentable' : comp.recommendation === 'journalier' ? 'Journalier plus rentable' : 'Équivalent';
-        comparisonDiv.innerHTML = `
-          <div class="card" style="padding:14px;margin-top:8px;">
-            <div class="card-header" style="margin-bottom:8px;"><h3>Comparaison horaire / journalier</h3></div>
-            <div class="kpi-grid" style="grid-template-columns:repeat(3,1fr);">
-              <div class="kpi-card">
-                <span class="kpi-label">Coût horaire (${comp.horaire.heuresJour}h/j)</span>
-                <span class="kpi-value" style="font-size:1.1rem;">${Engine.fmt(comp.horaire.coutEntrepriseJour)}/j</span>
-              </div>
-              <div class="kpi-card">
-                <span class="kpi-label">Coût journalier</span>
-                <span class="kpi-value" style="font-size:1.1rem;">${Engine.fmt(comp.journalier.coutEntrepriseJour)}/j</span>
-              </div>
-              <div class="kpi-card">
-                <span class="kpi-label">Recommandation</span>
-                <span class="kpi-value" style="font-size:0.95rem;color:${recoColor};">${recoLabel}</span>
-                <span class="kpi-detail">Écart : ${Engine.fmt(comp.ecart)} (${comp.ecartPercent}%)</span>
-              </div>
-            </div>
-          </div>
-        `;
-      } else if (comparisonDiv) {
-        comparisonDiv.innerHTML = '';
-      }
-      return;
-    }
-
-    // Mode journalier classique
-    if (mode === 'net_desired') {
-      const netVal = parseFloat(overlay.querySelector('#op-netDaily').value);
-      if (!netVal || netVal <= 0) { preview.innerHTML = ''; if (comparisonDiv) comparisonDiv.innerHTML = ''; return; }
-      calc = Engine.netToCompanyCost(netVal, status, settings);
+    if (saisieMode === 'brut_mensuel') {
+      brutMensuel = valeur;
+    } else if (saisieMode === 'brut_horaire') {
+      brutMensuel = Engine.round2(valeur * 151.67);
+    } else if (saisieMode === 'net_mensuel') {
+      var netAn1 = valeur * 12;
+      brutMensuel = Engine.round2(Engine.netToBrutIteratif(netAn1, cc) / 12);
+    } else if (saisieMode === 'net_horaire') {
+      var netMensHoraire = Engine.round2(valeur * 151.67);
+      brutMensuel = Engine.round2(Engine.netToBrutIteratif(netMensHoraire * 12, cc) / 12);
     } else {
-      const costVal = parseFloat(overlay.querySelector('#op-companyCostDaily').value);
-      if (!costVal || costVal <= 0) { preview.innerHTML = ''; if (comparisonDiv) comparisonDiv.innerHTML = ''; return; }
-      calc = Engine.companyCostToNet(costVal, status, settings);
+      return null;
     }
 
-    if (!calc) { preview.innerHTML = ''; if (comparisonDiv) comparisonDiv.innerHTML = ''; return; }
+    if (brutMensuel <= 0) return null;
 
-    // Taux patronales effectif
-    const dc = calc.detailComplet;
-    const tauxPatroInfo = dc && dc.tauxPatronalesEffectif
-      ? ' <span style="font-size:0.7rem;color:var(--text-muted);">(' + dc.tauxPatronalesEffectif + '% eff.)</span>'
-      : '';
-    const tauxSalInfo = dc && dc.tauxSalarialesEffectif
-      ? ' <span style="font-size:0.7rem;color:var(--text-muted);">(' + dc.tauxSalarialesEffectif + '% eff.)</span>'
-      : '';
+    var brutAnnuel = brutMensuel * 12;
+    var details = Engine.computeChargesDetaillees(brutAnnuel, cc);
+    var netMensuel = Engine.round2(details.totaux.netAnnuel / 12);
+    var coutAnnuel = details.totaux.coutEntreprise;
 
-    // Infos spécifiques CDD
-    let cddInfo = '';
-    if (dc && status === 'cdd' && dc.majorationCDD) {
-      cddInfo = '<div style="font-size:0.75rem;color:var(--color-warning);margin-top:8px;">Majoration CDD (précarité + CP) : +' + Engine.fmt(dc.majorationCDD) + '/jour</div>';
+    // CDD : ajouter prime précarité + indemnité CP sur le brut
+    if (typeContrat === 'cdd') {
+      var txPrec = (cc.cdd && cc.cdd.primePrecarite) || 10;
+      var txCP   = (cc.cdd && cc.cdd.indemniteCP)    || 10;
+      var primePrec = Engine.round2(brutAnnuel * txPrec / 100);
+      var indemCP   = Engine.round2((brutAnnuel + primePrec) * txCP / 100);
+      var brutTotCDD = brutAnnuel + primePrec + indemCP;
+      var detailsCDD = Engine.computeChargesDetaillees(brutTotCDD, cc);
+      coutAnnuel = detailsCDD.totaux.coutEntreprise;
     }
 
-    preview.innerHTML = `
-      <div class="kpi-grid" style="grid-template-columns:repeat(4,1fr);">
-        <div class="kpi-card">
-          <span class="kpi-label">Net / jour</span>
-          <span class="kpi-value" style="font-size:1.2rem;">${Engine.fmt(calc.net)}</span>
-        </div>
-        <div class="kpi-card">
-          <span class="kpi-label">Brut / jour</span>
-          <span class="kpi-value" style="font-size:1.2rem;">${Engine.fmt(calc.gross)}</span>
-        </div>
-        <div class="kpi-card">
-          <span class="kpi-label">Charges patronales${tauxPatroInfo}</span>
-          <span class="kpi-value" style="font-size:1.2rem;">${Engine.fmt(calc.charges)}</span>
-        </div>
-        <div class="kpi-card${status === 'fondateur' ? '' : ' kpi-warning'}">
-          <span class="kpi-label">Coût entreprise / jour</span>
-          <span class="kpi-value" style="font-size:1.2rem;">${Engine.fmt(calc.companyCost)}</span>
-        </div>
-      </div>
-      ${cddInfo}
-    `;
-    if (comparisonDiv) comparisonDiv.innerHTML = '';
+    var coutJour = Engine.round2(coutAnnuel / joursAn);
+    return { brutMensuel, netMensuel, coutAnnuel: Engine.round2(coutAnnuel), coutJour, joursAn };
+  }
+
+  /** Calcule les données tarifaires Vacation */
+  function _calcVacationTarif(tarifNet, settings) {
+    if (!tarifNet || tarifNet <= 0) return null;
+    var cc = Engine.getChargesConfig(settings);
+    var tauxPat = 42;
+    if (cc && cc.patronales) {
+      tauxPat = Engine.round2(cc.patronales.reduce(function(s, l) { return s + (l.taux || 0); }, 0));
+    }
+    var chargesPatronales = Engine.round2(tarifNet * tauxPat / 100);
+    var coutJour = Engine.round2(tarifNet + chargesPatronales);
+    return { tarifNet, tauxPat, chargesPatronales, coutJour };
+  }
+
+  /** Met à jour la synthèse tarifaire et les blocs de calcul auto dans la modale */
+  function _updateTarifSynthese(overlay, opId) {
+    var ov = overlay || document.getElementById('operator-modal-overlay');
+    if (!ov) return;
+
+    var tarifTypeEl = ov.querySelector('input[name="tarifType"]:checked');
+    var tarifType = tarifTypeEl ? tarifTypeEl.value : 'freelance';
+    var settings = DB.settings.get();
+    var seuilPlancher = (settings.coutJournee && settings.coutJournee.coutOperateurJour) || 0;
+    var coutJour = 0;
+
+    switch (tarifType) {
+      case 'freelance':
+        coutJour = parseFloat((ov.querySelector('#op-freelance-tjh') || {}).value) || 0;
+        break;
+      case 'portage':
+        coutJour = parseFloat((ov.querySelector('#op-portage-tjh') || {}).value) || 0;
+        break;
+      case 'cdi': {
+        var sm1 = (ov.querySelector('#op-cdi-saisieMode') || {}).value || 'brut_mensuel';
+        var v1  = parseFloat((ov.querySelector('#op-cdi-valeur') || {}).value) || 0;
+        var c1  = _calcSalarieTarif(sm1, v1, 'cdi', settings);
+        var autoDiv1 = ov.querySelector('#calcul-auto-cdi');
+        if (c1) {
+          coutJour = c1.coutJour;
+          if (autoDiv1) {
+            autoDiv1.style.display = '';
+            autoDiv1.innerHTML =
+              '<div class="calcul-row"><span>Brut mensuel</span><span>' + Engine.fmt(c1.brutMensuel) + '</span></div>' +
+              '<div class="calcul-row"><span>Net mensuel estimé</span><span>' + Engine.fmt(c1.netMensuel) + '</span></div>' +
+              '<div class="calcul-row"><span>Coût salarial annuel</span><span>' + Engine.fmt(c1.coutAnnuel) + '</span></div>' +
+              '<div class="calcul-row synthese-total"><span>Coût journalier (/' + c1.joursAn + '\u00a0j)</span><span>' + Engine.fmt(c1.coutJour) + '</span></div>';
+          }
+        } else if (autoDiv1) { autoDiv1.style.display = 'none'; }
+        break;
+      }
+      case 'cdd': {
+        var sm2   = (ov.querySelector('#op-cdd-saisieMode') || {}).value || 'brut_mensuel';
+        var v2    = parseFloat((ov.querySelector('#op-cdd-valeur') || {}).value) || 0;
+        var deb   = (ov.querySelector('#op-cdd-debut') || {}).value || '';
+        var fin   = (ov.querySelector('#op-cdd-fin') || {}).value || '';
+        var c2    = _calcSalarieTarif(sm2, v2, 'cdd', settings);
+        var autoDiv2 = ov.querySelector('#calcul-auto-cdd');
+        if (c2) {
+          coutJour = c2.coutJour;
+          if (autoDiv2) {
+            autoDiv2.style.display = '';
+            var html2 =
+              '<div class="calcul-row"><span>Brut mensuel</span><span>' + Engine.fmt(c2.brutMensuel) + '</span></div>' +
+              '<div class="calcul-row"><span>Net mensuel estimé</span><span>' + Engine.fmt(c2.netMensuel) + '</span></div>' +
+              '<div class="calcul-row"><span>Coût salarial annuel (+ précarité)</span><span>' + Engine.fmt(c2.coutAnnuel) + '</span></div>' +
+              '<div class="calcul-row synthese-total"><span>Coût journalier (/' + c2.joursAn + '\u00a0j)</span><span>' + Engine.fmt(c2.coutJour) + '</span></div>';
+            if (deb && fin) {
+              var d1 = new Date(deb), d2f = new Date(fin);
+              var joursCDD = Math.max(0, Math.round((d2f - d1) / 86400000));
+              var moisCDD  = Engine.round2(joursCDD / 30.44);
+              html2 +=
+                '<div class="calcul-row"><span>Durée CDD</span><span>' + moisCDD.toFixed(1) + '\u00a0mois (' + joursCDD + '\u00a0j)</span></div>' +
+                '<div class="calcul-row"><span>Coût total CDD estimé</span><span>' + Engine.fmt(Engine.round2(c2.coutJour * joursCDD)) + '</span></div>';
+            }
+            autoDiv2.innerHTML = html2;
+          }
+        } else if (autoDiv2) { autoDiv2.style.display = 'none'; }
+        break;
+      }
+      case 'vacation': {
+        var vn = parseFloat((ov.querySelector('#op-vacation-net') || {}).value) || 0;
+        var cv = _calcVacationTarif(vn, settings);
+        var autoDiv3 = ov.querySelector('#calcul-auto-vacation');
+        if (cv) {
+          coutJour = cv.coutJour;
+          if (autoDiv3) {
+            autoDiv3.style.display = '';
+            autoDiv3.innerHTML =
+              '<div class="calcul-row"><span>Net versé / jour</span><span>' + Engine.fmt(cv.tarifNet) + '</span></div>' +
+              '<div class="calcul-row"><span>Charges patronales (\u2248' + cv.tauxPat + '\u00a0%)</span><span>' + Engine.fmt(cv.chargesPatronales) + '</span></div>' +
+              '<div class="calcul-row synthese-total"><span>Coût entreprise / jour</span><span>' + Engine.fmt(cv.coutJour) + '</span></div>';
+          }
+        } else if (autoDiv3) { autoDiv3.style.display = 'none'; }
+        break;
+      }
+    }
+
+    // Compter sessions cette année pour cet opérateur
+    var nbSessions = 0;
+    if (opId) {
+      var currentYear = new Date().getFullYear().toString();
+      nbSessions = DB.sessions.getAll().filter(function(s) {
+        return (s.operatorIds || []).includes(opId) &&
+          s.date && s.date.startsWith(currentYear) &&
+          s.statut !== 'annulee' && s.statut !== 'soldee';
+      }).length;
+    }
+
+    var coutAnnuelProj = Engine.round2(coutJour * nbSessions);
+
+    // Mettre à jour la synthèse
+    var synCoutJour = ov.querySelector('#syn-cout-jour');
+    var synSeuil    = ov.querySelector('#syn-seuil');
+    var synStatut   = ov.querySelector('#syn-statut');
+    var synSessions = ov.querySelector('#syn-sessions');
+    var synAnnuel   = ov.querySelector('#syn-annuel');
+
+    if (synCoutJour) synCoutJour.textContent = coutJour > 0 ? Engine.fmt(coutJour) : '—';
+    if (synSeuil)    synSeuil.textContent    = seuilPlancher > 0 ? Engine.fmt(seuilPlancher) : '—';
+
+    if (synStatut) {
+      if (coutJour <= 0) {
+        synStatut.innerHTML = '<span class="tag tag-neutral">Non renseigné</span>';
+      } else if (seuilPlancher <= 0) {
+        synStatut.innerHTML = '<span class="tag tag-neutral">Seuil non configuré</span>';
+      } else if (coutJour > seuilPlancher * 1.10) {
+        synStatut.innerHTML = '<span class="tag tag-success">OK (+' + Engine.fmt(Engine.round2(coutJour - seuilPlancher)) + ')</span>';
+      } else if (coutJour >= seuilPlancher) {
+        synStatut.innerHTML = '<span class="tag tag-warning">Proche seuil (+' + Engine.fmt(Engine.round2(coutJour - seuilPlancher)) + ')</span>';
+      } else {
+        synStatut.innerHTML = '<span class="tag tag-danger">Sous seuil (\u2212' + Engine.fmt(Engine.round2(seuilPlancher - coutJour)) + ')</span>';
+      }
+    }
+
+    if (synSessions) synSessions.textContent = nbSessions;
+    if (synAnnuel)   synAnnuel.textContent   = nbSessions === 0 ? '0 session assignée' : Engine.fmt(coutAnnuelProj);
   }
 
   /* ----------------------------------------------------------
@@ -1451,90 +1443,127 @@ Views.Operators = (() => {
    * @param {HTMLElement} overlay — élément modale à fermer après sauvegarde
    */
   function _saveOperator(operatorId, overlay) {
-    const costMode = overlay.querySelector('input[name="costMode"]:checked').value;
-    const rateUnit = overlay.querySelector('input[name="rateUnit"]:checked').value;
-    const status = overlay.querySelector('#op-status').value;
-    const settings = DB.settings.get();
-    const isHourly = rateUnit === 'horaire';
+    var tarifTypeEl = overlay.querySelector('input[name="tarifType"]:checked');
+    var tarifType   = tarifTypeEl ? tarifTypeEl.value : 'freelance';
+    var status      = overlay.querySelector('#op-status').value;
+    var settings    = DB.settings.get();
 
-    // Transformer les spécialités en tableau de tags propres
-    const rawSpecialties = overlay.querySelector('#op-specialites').value;
-    const specialites = rawSpecialties
-      .split(',')
-      .map(s => s.trim())
-      .filter(s => s.length > 0);
+    // Spécialités
+    var rawSpecialties = overlay.querySelector('#op-specialites').value;
+    var specialites = rawSpecialties.split(',').map(function(s) { return s.trim(); }).filter(function(s) { return s.length > 0; });
 
-    let netDaily = 0;
-    let companyCostDaily = 0;
-    let hourlyRate = parseFloat(overlay.querySelector('#op-hourlyRate').value) || 0;
-    let hoursPerDay = parseFloat(overlay.querySelector('#op-hoursPerDay').value) || 7;
-    let tjmFacture = parseFloat(overlay.querySelector('#op-tjmFacture').value) || 0;
+    // Lire et calculer les tarifs selon le type
+    var tarifsFreelance = { tarifJournalierHT: 0 };
+    var tarifsPortage   = { tarifJournalierHT: 0 };
+    var tarifsSalarie   = { saisieMode: 'brut_mensuel', valeur: 0, brutMensuelCalc: 0, netMensuelCalc: 0, coutJournalierEntreprise: 0, dateDebutCDD: '', dateFinCDD: '' };
+    var tarifsVacation  = { tarifNetJournalier: 0, coutJournalierEntreprise: 0 };
+    var coutJour        = 0;
 
-    if (costMode === 'tjm_facture') {
-      companyCostDaily = tjmFacture;
-      var tjmR = Engine.freelanceTjmFacture(tjmFacture, settings);
-      netDaily = tjmR.netFreelance;
-    } else if (isHourly && hourlyRate > 0) {
-      var hrMode = costMode === 'company_max' ? 'brut' : 'net';
-      var hrResult = Engine.computeCoutHoraire(hourlyRate, status, hrMode, settings);
-      companyCostDaily = hrResult.coutEntrepriseJour;
-      netDaily = hrResult.journalierEquivalent;
-    } else if (costMode === 'net_desired') {
-      netDaily = parseFloat(overlay.querySelector('#op-netDaily').value) || 0;
-      var calcN = Engine.netToCompanyCost(netDaily, status, settings);
-      companyCostDaily = calcN ? calcN.companyCost : 0;
-    } else if (costMode === 'company_max') {
-      companyCostDaily = parseFloat(overlay.querySelector('#op-companyCostDaily').value) || 0;
-      var calcC = Engine.companyCostToNet(companyCostDaily, status, settings);
-      netDaily = calcC ? calcC.net : 0;
+    switch (tarifType) {
+      case 'freelance': {
+        var tjhF = parseFloat((overlay.querySelector('#op-freelance-tjh') || {}).value) || 0;
+        tarifsFreelance = { tarifJournalierHT: tjhF };
+        coutJour = tjhF;
+        break;
+      }
+      case 'portage': {
+        var tjhP = parseFloat((overlay.querySelector('#op-portage-tjh') || {}).value) || 0;
+        tarifsPortage = { tarifJournalierHT: tjhP };
+        coutJour = tjhP;
+        break;
+      }
+      case 'cdi':
+      case 'cdd': {
+        var smS  = (overlay.querySelector('#op-' + tarifType + '-saisieMode') || {}).value || 'brut_mensuel';
+        var valS = parseFloat((overlay.querySelector('#op-' + tarifType + '-valeur') || {}).value) || 0;
+        var debS = tarifType === 'cdd' ? ((overlay.querySelector('#op-cdd-debut') || {}).value || '') : '';
+        var finS = tarifType === 'cdd' ? ((overlay.querySelector('#op-cdd-fin')   || {}).value || '') : '';
+        var cS   = _calcSalarieTarif(smS, valS, tarifType, settings);
+        tarifsSalarie = {
+          saisieMode: smS,
+          valeur:     valS,
+          brutMensuelCalc:          cS ? cS.brutMensuel : 0,
+          netMensuelCalc:           cS ? cS.netMensuel  : 0,
+          coutJournalierEntreprise: cS ? cS.coutJour    : 0,
+          dateDebutCDD: debS,
+          dateFinCDD:   finS
+        };
+        coutJour = cS ? cS.coutJour : 0;
+        break;
+      }
+      case 'vacation': {
+        var vn2 = parseFloat((overlay.querySelector('#op-vacation-net') || {}).value) || 0;
+        var cv2 = _calcVacationTarif(vn2, settings);
+        tarifsVacation = {
+          tarifNetJournalier:       vn2,
+          coutJournalierEntreprise: cv2 ? cv2.coutJour : 0
+        };
+        coutJour = cv2 ? cv2.coutJour : 0;
+        break;
+      }
     }
 
-    // Nouveaux champs
-    const zoneLabel      = (overlay.querySelector('#op-zoneLabel')      || {}).value?.trim() || '';
-    const villeBase      = (overlay.querySelector('#op-villeBase')       || {}).value?.trim() || '';
-    const codePostalBase = (overlay.querySelector('#op-codePostalBase')  || {}).value?.trim() || '';
-    const rayonKm        = parseFloat((overlay.querySelector('#op-rayonKm') || {}).value) || 150;
-    const rawDepts       = (overlay.querySelector('#op-departements')    || {}).value || '';
-    const departements   = rawDepts.split(',').map(s => s.trim()).filter(s => s.length > 0);
+    // Sessions cette année pour coût annuel projeté
+    var nbSess = 0;
+    if (operatorId) {
+      var yr = new Date().getFullYear().toString();
+      nbSess = DB.sessions.getAll().filter(function(s) {
+        return (s.operatorIds || []).includes(operatorId) &&
+          s.date && s.date.startsWith(yr) &&
+          s.statut !== 'annulee' && s.statut !== 'soldee';
+      }).length;
+    }
+    var coutAnnuelProjecte = Engine.round2(coutJour * nbSess);
 
-    const segments  = Array.from(overlay.querySelectorAll('input[name="op-segments"]:checked')).map(cb => cb.value);
-    const niveauxMax = Array.from(overlay.querySelectorAll('input[name="op-niveaux"]:checked')).map(cb => cb.value);
-    const certifications = (overlay.querySelector('#op-certifications') || {}).value?.trim() || '';
+    // Champs zone
+    var zoneLabel      = (overlay.querySelector('#op-zoneLabel')     || {}).value?.trim() || '';
+    var villeBase      = (overlay.querySelector('#op-villeBase')      || {}).value?.trim() || '';
+    var codePostalBase = (overlay.querySelector('#op-codePostalBase') || {}).value?.trim() || '';
+    var rayonKm        = parseFloat((overlay.querySelector('#op-rayonKm') || {}).value) || 150;
+    var rawDepts       = (overlay.querySelector('#op-departements')   || {}).value || '';
+    var departements   = rawDepts.split(',').map(function(s) { return s.trim(); }).filter(function(s) { return s.length > 0; });
 
-    const disponibiliteType  = (overlay.querySelector('#op-dispoType')      || {}).value || 'ponctuelle';
-    const joursDispoParMois  = parseInt((overlay.querySelector('#op-joursDispoMois') || {}).value) || 0;
+    var segments     = Array.from(overlay.querySelectorAll('input[name="op-segments"]:checked')).map(function(cb) { return cb.value; });
+    var niveauxMax   = Array.from(overlay.querySelectorAll('input[name="op-niveaux"]:checked')).map(function(cb) { return cb.value; });
+    var certifications = (overlay.querySelector('#op-certifications') || {}).value?.trim() || '';
 
-    const typeContrat    = (overlay.querySelector('#op-typeContrat')  || {}).value || 'freelance';
-    const siretFreelance = (overlay.querySelector('#op-siret')        || {}).value?.trim() || '';
-    const noteInterne    = (overlay.querySelector('#op-noteInterne')  || {}).value?.trim() || '';
+    var disponibiliteType = (overlay.querySelector('#op-dispoType')       || {}).value || 'ponctuelle';
+    var joursDispoParMois = parseInt((overlay.querySelector('#op-joursDispoMois') || {}).value) || 0;
 
-    const data = {
+    var siretFreelance = (overlay.querySelector('#op-siret')       || {}).value?.trim() || '';
+    var noteInterne    = (overlay.querySelector('#op-noteInterne') || {}).value?.trim() || '';
+
+    var data = {
       firstName:        overlay.querySelector('#op-firstName').value.trim(),
       lastName:         overlay.querySelector('#op-lastName').value.trim(),
       email:            overlay.querySelector('#op-email').value.trim(),
       phone:            overlay.querySelector('#op-phone').value.trim(),
       status:           status,
       active:           overlay.querySelector('#op-active').checked,
-      costMode:         costMode,
-      rateUnit:         rateUnit,
-      hourlyRate:       Engine.round2(hourlyRate),
-      hoursPerDay:      hoursPerDay,
-      tjmFacture:       Engine.round2(tjmFacture),
-      netDaily:         Engine.round2(netDaily),
-      companyCostDaily: Engine.round2(companyCostDaily),
-      specialites:      specialites,
+      // Tarification — nouveaux champs
+      typeContrat:              tarifType,
+      tarifsFreelance,
+      tarifsPortage,
+      tarifsSalarie,
+      tarifsVacation,
+      coutJournalierEntreprise: Engine.round2(coutJour),
+      coutAnnuelProjecte,
+      // Rétrocompat
+      netDaily:         Engine.round2(coutJour),
+      companyCostDaily: Engine.round2(coutJour),
+      costMode:         'daily_rate',
+      specialites,
       notes:            overlay.querySelector('#op-notes').value.trim(),
       // Zone
       zoneLabel, villeBase, codePostalBase, rayonKm, departements,
       // Compétences
-      segments, niveauxMax, specialites, certifications,
+      segments, niveauxMax, certifications,
       // Disponibilités
       disponibiliteType, joursDispoParMois, periodeIndispo: JSON.parse(JSON.stringify(_modalIndispo)),
       // Contrat
-      typeContrat, siretFreelance, noteInterne
+      siretFreelance, noteInterne
     };
 
-    // Validation minimale
     if (!data.firstName || !data.lastName) return;
 
     if (operatorId) {
@@ -1687,11 +1716,28 @@ Views.Operators = (() => {
    * @param {object} settings — paramètres économiques
    * @returns {number|null}
    */
+  /** Retourne le badge HTML pour le type de tarification/contrat */
+  function _typeContratBadge(typeContrat) {
+    var map = {
+      freelance:          ['tag-blue',    'Freelance'],
+      portage:            ['tag-neutral', 'Portage'],
+      cdi:                ['tag-green',   'CDI'],
+      cdd:                ['tag-yellow',  'CDD'],
+      vacation:           ['tag-neutral', 'Vacation'],
+      auto_entrepreneur:  ['tag-blue',    'AE'],
+      interim:            ['tag-yellow',  'Intérim'],
+      contrat_journalier: ['tag-neutral', 'Journalier'],
+      fondateur:          ['tag-red',     'Fondateur'],
+    };
+    if (!typeContrat) return '';
+    var entry = map[typeContrat] || ['tag-neutral', typeContrat];
+    return '<span class="tag ' + entry[0] + '" style="font-size:0.7rem;">' + entry[1] + '</span>';
+  }
+
   function _getDisplayCost(op, settings) {
     if (op.status === 'fondateur') return 0;
-    if (op.costMode === 'company_max') {
-      return op.companyCostDaily || null;
-    }
+    if (op.coutJournalierEntreprise > 0) return op.coutJournalierEntreprise;
+    if (op.costMode === 'company_max') return op.companyCostDaily || null;
     if (op.netDaily && op.netDaily > 0) {
       const calc = Engine.netToCompanyCost(op.netDaily, op.status, settings);
       return calc.companyCost;
@@ -1706,6 +1752,26 @@ Views.Operators = (() => {
    * @returns {object|null}
    */
   function _computeOperatorCost(op, settings) {
+    var tc = op.typeContrat;
+    // CDI/CDD — recalcul depuis les données salariales
+    if ((tc === 'cdi' || tc === 'cdd') && op.tarifsSalarie && op.tarifsSalarie.netMensuelCalc > 0) {
+      var cc = Engine.getChargesConfig(settings);
+      var joursAn = (cc && cc.joursOuvresAn) || 218;
+      var netJour = Engine.round2(op.tarifsSalarie.netMensuelCalc * 12 / joursAn);
+      return Engine.netToCompanyCost(netJour, tc, settings);
+    }
+    // Freelance / Portage — TJM direct
+    if (tc === 'freelance' || tc === 'portage') {
+      var tjh = tc === 'freelance'
+        ? (op.tarifsFreelance && op.tarifsFreelance.tarifJournalierHT) || op.coutJournalierEntreprise || 0
+        : (op.tarifsPortage  && op.tarifsPortage.tarifJournalierHT)   || op.coutJournalierEntreprise || 0;
+      if (tjh > 0) return { net: tjh, gross: tjh, charges: 0, companyCost: tjh, detailComplet: null };
+    }
+    // Champ unifié
+    if (op.coutJournalierEntreprise > 0) {
+      return { net: op.coutJournalierEntreprise, gross: op.coutJournalierEntreprise, charges: 0, companyCost: op.coutJournalierEntreprise, detailComplet: null };
+    }
+    // Rétrocompat
     if (op.costMode === 'company_max' && op.companyCostDaily > 0) {
       return Engine.companyCostToNet(op.companyCostDaily, op.status, settings);
     }

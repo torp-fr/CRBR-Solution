@@ -1789,3 +1789,51 @@ textarea.form-control {
 .seo-action-text {
   color: var(--text-secondary);
 }
+
+/* --- Tarification — synthèse modale opérateur --- */
+.tarif-synthese {
+  background: var(--bg-input);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 12px 16px;
+}
+.synthese-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 5px 0;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  border-bottom: 1px solid var(--border-color);
+}
+.synthese-row:last-child { border-bottom: none; }
+.synthese-total {
+  font-weight: 700;
+  color: var(--text-heading);
+  font-size: 0.9rem;
+  padding-top: 8px;
+  margin-top: 2px;
+}
+.calcul-auto {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  padding: 10px 14px;
+  margin-top: 10px;
+}
+.calcul-auto .calcul-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 3px 0;
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  border-bottom: 1px solid var(--border-color);
+}
+.calcul-auto .calcul-row:last-child { border-bottom: none; }
+.calcul-auto .synthese-total {
+  font-weight: 700;
+  color: var(--text-primary);
+  font-size: 0.85rem;
+  background: none;
+  border: none;
+}
