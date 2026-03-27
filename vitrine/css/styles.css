@@ -62,6 +62,95 @@
   --transition-fast: 150ms cubic-bezier(.4,0,.2,1);
   --transition-normal: 280ms cubic-bezier(.4,0,.2,1);
   --transition-smooth: 400ms cubic-bezier(.25,.8,.25,1);
+
+  /* Alias utilisé par les composants */
+  --color-primary: var(--accent-red);
+  --border-subtle: rgba(255,255,255,0.03);
+}
+
+/* ============================================================
+   LIGHT MODE — [data-theme="light"]
+   ============================================================ */
+[data-theme="light"] {
+  --bg-primary:    #f5f6fa;
+  --bg-secondary:  #ffffff;
+  --bg-tertiary:   #f0f1f5;
+  --bg-card:       #ffffff;
+  --bg-hover:      #f0f1f5;
+  --bg-input:      #ffffff;
+  --text-primary:  #1a1a2e;
+  --text-secondary:#374151;
+  --text-muted:    #6b7280;
+  --text-heading:  #111827;
+  --border-color:  rgba(0,0,0,0.08);
+  --border-light:  rgba(0,0,0,0.05);
+  --border-subtle: rgba(0,0,0,0.03);
+  --color-primary: #e63946;
+  --accent-red:    #e63946;
+  --accent-red-bg: rgba(230,57,70,0.06);
+  --color-success: #059669;
+  --color-warning: #d97706;
+  --color-info:    #2563eb;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.10);
+  --shadow-lg: 0 8px 32px rgba(0,0,0,0.15);
+
+  /* Sidebar reste sombre pour le contraste de la marque */
+  --sidebar-bg:   #0d1120;
+  --sidebar-text: #e8eaf0;
+}
+
+[data-theme="light"] #sidebar {
+  background: #0d1120;
+}
+[data-theme="light"] .nav-item {
+  color: #c4c9dc;
+}
+[data-theme="light"] .nav-item.active {
+  color: #ffffff;
+}
+[data-theme="light"] .nav-section {
+  color: rgba(255,255,255,0.35);
+}
+[data-theme="light"] .sidebar-footer {
+  color: rgba(255,255,255,0.4);
+}
+[data-theme="light"] .card {
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  border: 1px solid rgba(0,0,0,0.06);
+}
+[data-theme="light"] table thead tr {
+  background: rgba(0,0,0,0.03);
+}
+[data-theme="light"] .modal-content,
+[data-theme="light"] .modal {
+  box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+  background: #ffffff;
+  border: 1px solid rgba(0,0,0,0.08);
+}
+[data-theme="light"] .modal-overlay {
+  background: rgba(0,0,0,0.4);
+}
+[data-theme="light"] input,
+[data-theme="light"] select,
+[data-theme="light"] textarea {
+  background: #ffffff;
+  border-color: rgba(0,0,0,0.15);
+  color: var(--text-primary);
+}
+[data-theme="light"] .tag {
+  filter: brightness(0.88) saturate(1.2);
+}
+[data-theme="light"] #header {
+  background: #ffffff;
+  border-bottom: 1px solid rgba(0,0,0,0.08);
+}
+[data-theme="light"] .calcul-auto {
+  background: rgba(0,0,0,0.02);
+  border-color: rgba(0,0,0,0.08);
+}
+[data-theme="light"] .tarif-synthese {
+  background: rgba(0,0,0,0.02);
 }
 
 /* Animations globales */
@@ -1837,3 +1926,22 @@ textarea.form-control {
   background: none;
   border: none;
 }
+
+/* ============================================================
+   Références Settings dans les modals
+   ============================================================ */
+.settings-reference {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  background: rgba(255,255,255,0.03);
+  border-left: 2px solid var(--color-primary);
+  border-radius: 0 4px 4px 0;
+  margin-bottom: 6px;
+  font-size: 11px;
+}
+.ref-label { color: var(--text-muted); flex: 1; }
+.ref-value { font-weight: 600; color: var(--text-primary); }
+.ref-link { color: var(--color-primary); font-size: 10px; text-decoration: none; }
+.ref-link:hover { text-decoration: underline; }

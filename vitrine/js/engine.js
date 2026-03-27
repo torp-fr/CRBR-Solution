@@ -1764,6 +1764,28 @@ const Engine = (() => {
     // CDI vs Freelance
     calculateComparaisonRH,
     // Échéancier de paiement
-    generateEcheancier
+    generateEcheancier,
+    // Déplacements
+    calculerCoutDeplacement
   };
+
+  /**
+   * Calcule le coût de déplacement pour une mission.
+   * @param {number} distanceKm — distance aller-retour en km
+   * @param {number} nbJours — nombre de jours de mission
+   * @param {object} [s] — paramètres (DB.settings.get())
+   * @returns {number} coût total HT en €
+   */
+  function calculerCoutDeplacement(distanceKm, nbJours, s) {
+    s = s || DB.settings.get();
+    var d = s.deplacement || {};
+    var taux = d.bareme === 'interne'
+      ? (d.tauxInterneKm || 0.35)
+      : (d.tauxFiscalKm  || 0.321);
+    var zoneGratuite   = d.zoneGratuiteKm || 0;
+    var distFacturable = Math.max(0, distanceKm - zoneGratuite);
+    var coutKm         = distFacturable * taux;
+    var forfait        = (d.forfaitJournee || 0) * (nbJours || 1);
+    return round2(coutKm + forfait);
+  }
 })();

@@ -505,6 +505,7 @@ Views.Clients = (() => {
           <tr><td class="text-muted">Téléphone</td><td>${_escapeHtml(client.contactPhone || '—')}</td></tr>
           <tr><td class="text-muted">Site web</td><td>${client.website ? '<a href="' + _escapeAttr(client.website) + '" target="_blank">' + _escapeHtml(client.website) + '</a>' : '—'}</td></tr>
           <tr><td class="text-muted">Adresse</td><td>${_escapeHtml(client.address || '—')}${client.city ? ', ' + _escapeHtml(client.city) : ''}${client.postalCode ? ' ' + _escapeHtml(client.postalCode) : ''}</td></tr>
+          <tr><td class="text-muted">Distance A/R</td><td>${client.distanceKm ? client.distanceKm + '\u00a0km — co\u00fbt d\u00e9pl. estim\u00e9\u00a0: ' + Engine.fmt(Engine.calculerCoutDeplacement(client.distanceKm, 1)) + '/j' : '—'}</td></tr>
           <tr><td class="text-muted">SIRET</td><td><span class="text-mono">${_escapeHtml(client.siret || '—')}</span></td></tr>
           <tr><td class="text-muted">Conditions de paiement</td><td>${_escapeHtml(client.paymentTerms || '—')}</td></tr>
           <tr><td class="text-muted">Priorité</td><td>${_renderPriority(client.priority)}</td></tr>
@@ -852,6 +853,14 @@ Views.Clients = (() => {
           </div>
           <div class="form-row">
             <div class="form-group">
+              <label for="client-distance-km">Distance A/R depuis base DST (km)</label>
+              <input type="number" class="form-control" id="client-distance-km"
+                     value="${c.distanceKm || 0}" min="0" step="1" style="max-width:160px;" />
+              <span class="form-help">Aller-retour. Utilis\u00e9 pour le calcul des co\u00fbts de d\u00e9placement.</span>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
               <label for="client-city">Ville</label>
               <input type="text" class="form-control" id="client-city"
                      value="${_escapeAttr(c.city || '')}" placeholder="Ville" />
@@ -976,6 +985,7 @@ Views.Clients = (() => {
         contactPhone: overlay.querySelector('#client-contact-phone').value.trim(),
         website: overlay.querySelector('#client-website').value.trim(),
         address: overlay.querySelector('#client-address').value.trim(),
+        distanceKm: parseFloat(overlay.querySelector('#client-distance-km').value) || 0,
         city: overlay.querySelector('#client-city').value.trim(),
         postalCode: overlay.querySelector('#client-postal-code').value.trim(),
         siret: overlay.querySelector('#client-siret').value.trim(),

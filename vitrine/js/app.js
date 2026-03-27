@@ -23,11 +23,34 @@ const App = (() => {
     operators:  { label: 'Opérateurs',          icon: '🧑‍💼', view: () => Views.Operators },
     modules:    { label: 'Modules',             icon: '🎓',   view: () => Views.Modules },
     locations:  { label: 'Lieux',               icon: '📍',   view: () => Views.Locations },
-    regions:    { label: 'Régions',             icon: '🗺',   view: () => Views.Regions },
-    simulateurs:{ label: 'Simulateurs',         icon: '📡',   view: () => Views.Simulateurs },
-    settings:   { label: 'Paramètres',          icon: '⚙️',   view: () => Views.Settings },
-    analytics:  { label: 'Analytics',           icon: '📊',   view: () => Views.Analytics }
+    regions:      { label: 'Régions',             icon: '🗺',   view: () => Views.Regions },
+    simulateurs:  { label: 'Simulateurs',         icon: '📡',   view: () => Views.Simulateurs },
+    settings:     { label: 'Paramètres',          icon: '⚙️',   view: () => Views.Settings },
+    analytics:    { label: 'Analytics',           icon: '📊',   view: () => Views.Analytics },
+    deplacements: { label: 'Coût des déplacements', icon: '🚗', view: () => Views.Deplacements }
   };
+
+  /* --- Gestion du thème (light / dark) --- */
+  function _initTheme() {
+    var saved = localStorage.getItem('dst_theme') || 'dark';
+    document.documentElement.setAttribute('data-theme', saved);
+    _updateThemeToggle(saved);
+  }
+
+  function _updateThemeToggle(theme) {
+    var btn = document.getElementById('theme-toggle');
+    if (!btn) return;
+    btn.textContent = theme === 'dark' ? '\uD83C\uDF19' : '\u2600\uFE0F';
+    btn.title = theme === 'dark' ? 'Passer en mode clair' : 'Passer en mode sombre';
+  }
+
+  function _toggleTheme() {
+    var current = document.documentElement.getAttribute('data-theme') || 'dark';
+    var next = current === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', next);
+    localStorage.setItem('dst_theme', next);
+    _updateThemeToggle(next);
+  }
 
   /* --- Initialisation des données par défaut --- */
   function _initDefaultData() {
@@ -67,6 +90,7 @@ const App = (() => {
 
   /* --- Initialisation --- */
   function init() {
+    _initTheme();
     _initDefaultData();
     renderSidebar();
     _applyEntrepriseGlobale();
@@ -247,6 +271,11 @@ const App = (() => {
       <div class="header-title" id="header-title">Dashboard dirigeant</div>
       <div class="header-alerts">
         <span class="header-context" id="header-context"></span>
+        <button id="theme-toggle"
+          title="Passer en mode clair"
+          style="background:none;border:none;cursor:pointer;padding:6px 8px;border-radius:4px;font-size:16px;color:var(--text-muted);">
+          🌙
+        </button>
         <button class="header-alert-btn" id="alerts-toggle" title="Alertes stratégiques">
           ⚠ Alertes
           <span class="badge hidden" id="alerts-badge">0</span>
@@ -259,6 +288,10 @@ const App = (() => {
     panel.className = 'alerts-panel';
     panel.id = 'alerts-panel';
     document.body.appendChild(panel);
+
+    // Toggle thème
+    document.getElementById('theme-toggle').addEventListener('click', _toggleTheme);
+    _updateThemeToggle(localStorage.getItem('dst_theme') || 'dark');
 
     // Toggle alertes
     document.getElementById('alerts-toggle').addEventListener('click', toggleAlertsPanel);
@@ -364,6 +397,7 @@ const App = (() => {
     init,
     navigate,
     refresh,
+    toggleTheme: _toggleTheme,
     get currentView() { return currentView; }
   };
 })();

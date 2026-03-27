@@ -485,6 +485,17 @@ const DB = (() => {
 
       // === DÉLAI D'ANTICIPATION ===
       moisAnticipationInvestissement: 3     // mois avant saturation pour déclencher l'alerte
+    },
+
+    // Déplacements — barème et calculateur
+    deplacement: {
+      bareme:             'fiscal',   // 'fiscal' | 'interne'
+      tauxFiscalKm:       0.321,      // €/km barème fiscal 2025
+      tauxInterneKm:      0.35,       // €/km tarif interne
+      forfaitJournee:     0,          // € forfait fixe/déplacement
+      seuilInclusJours:   1,          // nb jours au-delà = facturable
+      zoneGratuiteKm:     30,         // km inclus dans le tarif de base
+      inclureDansDevis:   true        // auto-inclure dans les devis
     }
   };
 
@@ -622,6 +633,7 @@ const DB = (() => {
     priority:           'normal',
     active:             true,
     notes:              '',
+    distanceKm:         0,           // distance aller-retour depuis base DST
     portailToken:       '',
     portailActif:       false,
     portailGenereeLe:   '',

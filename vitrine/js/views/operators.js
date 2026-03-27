@@ -331,6 +331,16 @@ Views.Operators = (() => {
       op.specialites = op.specialties.slice();
     }
 
+    /* Références Settings pour la section tarification */
+    const _ms = DB.settings.get();
+    const _cj = _ms.coutJournee || {};
+    const _rh = _ms.rh || {};
+    const _cc = _ms.chargesConfig || DB.settings.getDefaults().chargesConfig;
+    const _tauxSal = Engine.round2((_cc.salariales||[]).reduce((s,l)=>s+(l.taux||0),0));
+    const _tauxPat = Engine.round2((_cc.patronales||[]).reduce((s,l)=>s+(l.taux||0),0));
+    const _seuilRef = _cj.coutOperateurJour || 0;
+    const _cdiValDef = !isEdit ? ((_rh.cdi && _rh.cdi.salaireBrutMensuel) || 0) : (op.tarifsSalarie ? (op.tarifsSalarie.valeur||'') : '');
+
     const overlay = document.createElement('div');
     overlay.className = 'modal-overlay';
     overlay.id = 'operator-modal-overlay';
@@ -393,6 +403,21 @@ Views.Operators = (() => {
             <div class="card" style="margin-top:8px;" id="tarif-card">
               <div class="card-header"><h3>Tarification</h3></div>
 
+              <!-- Références depuis Paramètres -->
+              <div class="settings-reference">
+                <span class="ref-label">&#9881; Seuil plancher DST (depuis Param\u00e8tres)</span>
+                <span class="ref-value" id="op-ref-seuil">${_seuilRef}\u00a0\u20ac/j</span>
+                <a href="#" onclick="App.navigate('settings');return false;" class="ref-link">Modifier</a>
+              </div>
+              <div class="settings-reference">
+                <span class="ref-label">Charges salariales (depuis Param\u00e8tres)</span>
+                <span class="ref-value">${_tauxSal}\u00a0%</span>
+              </div>
+              <div class="settings-reference">
+                <span class="ref-label">Charges patronales (depuis Param\u00e8tres)</span>
+                <span class="ref-value">${_tauxPat}\u00a0%</span>
+              </div>
+
               <!-- Part A : Type de tarification -->
               <div class="form-group">
                 <label>Type de tarification</label>
@@ -439,7 +464,7 @@ Views.Operators = (() => {
                   <div class="form-group">
                     <label for="op-cdi-valeur">Valeur (&euro;)</label>
                     <input type="number" id="op-cdi-valeur" class="form-control" min="0" step="any"
-                           value="${op.tarifsSalarie ? (op.tarifsSalarie.valeur||'') : ''}" placeholder="Ex : 2\u202f800" />
+                           value="${_cdiValDef}" placeholder="Ex : 2\u202f800" />
                   </div>
                 </div>
                 <div class="calcul-auto" id="calcul-auto-cdi" style="display:none;"></div>
