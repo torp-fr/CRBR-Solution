@@ -164,7 +164,7 @@ const App = (() => {
     const navSections = [
       { title: 'Pilotage',       items: ['dashboard', 'analytics'] },
       { title: 'CRM',            items: ['pipeline', 'devis', 'factures'] },
-      { title: 'Opérationnel',   items: ['sessions', 'offers'] },
+      { title: 'Opérationnel',   items: ['sessions', 'offers', 'deplacements'] },
       { title: 'Équipe',         items: ['operators', 'regions', 'simulateurs'] },
       { title: 'Configuration',  items: ['settings'] }
     ];
