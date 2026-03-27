@@ -767,8 +767,10 @@ Views.Operators = (() => {
 
     var brutAnnuel = brutMensuel * 12;
     var details = Engine.computeChargesDetaillees(brutAnnuel, cc);
-    var netMensuel = Engine.round2(details.totaux.netAnnuel / 12);
-    var coutAnnuel = details.totaux.coutEntreprise;
+    var netMensuel      = Engine.round2(details.totaux.netAnnuel / 12);
+    var chargesSalMens  = Engine.round2(details.totaux.chargesSalariales / 12);
+    var chargesPatMens  = Engine.round2(details.totaux.chargesPatronales / 12);
+    var coutAnnuel      = details.totaux.coutEntreprise;
 
     // CDD : ajouter prime précarité + indemnité CP sur le brut
     if (typeContrat === 'cdd') {
@@ -778,11 +780,13 @@ Views.Operators = (() => {
       var indemCP   = Engine.round2((brutAnnuel + primePrec) * txCP / 100);
       var brutTotCDD = brutAnnuel + primePrec + indemCP;
       var detailsCDD = Engine.computeChargesDetaillees(brutTotCDD, cc);
-      coutAnnuel = detailsCDD.totaux.coutEntreprise;
+      coutAnnuel     = detailsCDD.totaux.coutEntreprise;
+      chargesPatMens = Engine.round2(detailsCDD.totaux.chargesPatronales / 12);
     }
 
-    var coutJour = Engine.round2(coutAnnuel / joursAn);
-    return { brutMensuel, netMensuel, coutAnnuel: Engine.round2(coutAnnuel), coutJour, joursAn };
+    var coutJour    = Engine.round2(coutAnnuel / joursAn);
+    var coutMoisEnt = Engine.round2(coutAnnuel / 12);
+    return { brutMensuel, netMensuel, chargesSalMens, chargesPatMens, coutMoisEnt, coutAnnuel: Engine.round2(coutAnnuel), coutJour, joursAn };
   }
 
   /** Calcule les données tarifaires Vacation */
@@ -826,10 +830,12 @@ Views.Operators = (() => {
           if (autoDiv1) {
             autoDiv1.style.display = '';
             autoDiv1.innerHTML =
-              '<div class="calcul-row"><span>Brut mensuel</span><span>' + Engine.fmt(c1.brutMensuel) + '</span></div>' +
-              '<div class="calcul-row"><span>Net mensuel estimé</span><span>' + Engine.fmt(c1.netMensuel) + '</span></div>' +
-              '<div class="calcul-row"><span>Coût salarial annuel</span><span>' + Engine.fmt(c1.coutAnnuel) + '</span></div>' +
-              '<div class="calcul-row synthese-total"><span>Coût journalier (/' + c1.joursAn + '\u00a0j)</span><span>' + Engine.fmt(c1.coutJour) + '</span></div>';
+              '<div class="calcul-row"><span>Salaire net employ\u00e9</span><span>' + Engine.fmt(c1.netMensuel) + '\u00a0/ mois</span></div>' +
+              '<div class="calcul-row"><span>Salaire brut (converti)</span><span>' + Engine.fmt(c1.brutMensuel) + '\u00a0/ mois</span></div>' +
+              '<div class="calcul-row"><span>Charges salariales</span><span>' + Engine.fmt(c1.chargesSalMens) + '\u00a0/ mois</span></div>' +
+              '<div class="calcul-row"><span>Charges patronales</span><span>' + Engine.fmt(c1.chargesPatMens) + '\u00a0/ mois</span></div>' +
+              '<div class="calcul-row"><span>Co\u00fbt total entreprise\u00a0/ mois</span><span>' + Engine.fmt(c1.coutMoisEnt) + '</span></div>' +
+              '<div class="calcul-row synthese-total"><span>Co\u00fbt journalier (\u00f7\u00a0' + c1.joursAn + '\u00a0j)</span><span>' + Engine.fmt(c1.coutJour) + '</span></div>';
           }
         } else if (autoDiv1) { autoDiv1.style.display = 'none'; }
         break;
@@ -846,10 +852,12 @@ Views.Operators = (() => {
           if (autoDiv2) {
             autoDiv2.style.display = '';
             var html2 =
-              '<div class="calcul-row"><span>Brut mensuel</span><span>' + Engine.fmt(c2.brutMensuel) + '</span></div>' +
-              '<div class="calcul-row"><span>Net mensuel estimé</span><span>' + Engine.fmt(c2.netMensuel) + '</span></div>' +
-              '<div class="calcul-row"><span>Coût salarial annuel (+ précarité)</span><span>' + Engine.fmt(c2.coutAnnuel) + '</span></div>' +
-              '<div class="calcul-row synthese-total"><span>Coût journalier (/' + c2.joursAn + '\u00a0j)</span><span>' + Engine.fmt(c2.coutJour) + '</span></div>';
+              '<div class="calcul-row"><span>Salaire net employ\u00e9</span><span>' + Engine.fmt(c2.netMensuel) + '\u00a0/ mois</span></div>' +
+              '<div class="calcul-row"><span>Salaire brut (converti)</span><span>' + Engine.fmt(c2.brutMensuel) + '\u00a0/ mois</span></div>' +
+              '<div class="calcul-row"><span>Charges salariales</span><span>' + Engine.fmt(c2.chargesSalMens) + '\u00a0/ mois</span></div>' +
+              '<div class="calcul-row"><span>Charges patronales\u00a0(+ pr\u00e9carit\u00e9)</span><span>' + Engine.fmt(c2.chargesPatMens) + '\u00a0/ mois</span></div>' +
+              '<div class="calcul-row"><span>Co\u00fbt total entreprise\u00a0/ mois</span><span>' + Engine.fmt(c2.coutMoisEnt) + '</span></div>' +
+              '<div class="calcul-row synthese-total"><span>Co\u00fbt journalier (\u00f7\u00a0' + c2.joursAn + '\u00a0j)</span><span>' + Engine.fmt(c2.coutJour) + '</span></div>';
             if (deb && fin) {
               var d1 = new Date(deb), d2f = new Date(fin);
               var joursCDD = Math.max(0, Math.round((d2f - d1) / 86400000));
