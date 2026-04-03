@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Plaquette DST System — Location de simulateur à demeure</title>
+  <style>
+    @page { size: A4; margin: 0; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Arial, Helvetica, sans-serif; font-size: 10pt; color: #111; background: #fff; line-height: 1.5; }
+
+    #btn-print { position: fixed; top: 16px; right: 16px; padding: 10px 20px; background: #c0392b; color: #fff; border: none; border-radius: 4px; font-size: 13px; cursor: pointer; z-index: 1000; font-weight: 600; }
+    #btn-print:hover { background: #a93226; }
+    @media print { #btn-print { display: none; } }
+
+    /* ──────────────────────────────────────────────
+       PAGE SYSTEM — each .page is one A4 sheet
+    ────────────────────────────────────────────── */
+    .page {
+      width: 210mm;
+      min-height: 297mm;
+      margin: 0 auto 8mm;
+      background: #fff;
+      position: relative;
+      overflow: hidden;
+      page-break-after: always;
+    }
+    .page:last-child { page-break-after: auto; margin-bottom: 0; }
+
+    @media screen {
+      body { background: #e5e5e5; padding: 16px 0 40px; }
+      .page { box-shadow: 0 4px 24px rgba(0,0,0,0.18); }
+    }
+
+    /* ──────────────────────────────────────────────
+       SHARED COMPONENTS
+    ────────────────────────────────────────────── */
+    .red { color: #c0392b; }
+    .dark { color: #1a1a2e; }
+
+    /* PAGE HEADER (small, repeats on inner pages) */
+    .page-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10mm 14mm 6mm;
+      border-bottom: 1px solid #e5e5e7;
+    }
+    .page-header .logo-text { font-size: 11pt; font-weight: 700; color: #1a1a2e; letter-spacing: 0.5px; }
+    .page-header .logo-text span { color: #c0392b; }
+    .page-header .page-label { font-size: 8pt; color: #888; text-transform: uppercase; letter-spacing: 1.5px; }
+
+    /* PAGE FOOTER */
+    .page-footer {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      padding: 5mm 14mm;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-top: 1px solid #e5e5e7;
+      font-size: 7.5pt;
+      color: #aaa;
+    }
+    .page-footer a { color: #aaa; text-decoration: none; }
+
+    /* CONTENT AREA */
+    .page-content { padding: 0 14mm 22mm; }
+
+    /* SECTION TITLE */
+    .section-label {
+      font-size: 7pt;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: #c0392b;
+      margin-bottom: 6px;
+    }
+    h2.section-title {
+      font-size: 18pt;
+      font-weight: 700;
+      color: #1a1a2e;
+      line-height: 1.25;
+      margin-bottom: 10px;
+    }
+    h3.sub-title {
+      font-size: 11pt;
+      font-weight: 700;
+      color: #1a1a2e;
+      margin-bottom: 6px;
+    }
+    p.body-text {
+      font-size: 9.5pt;
+      color: #444;
+      line-height: 1.6;
+      margin-bottom: 8px;
+    }
+
+    /* DIVIDER */
+    .divider { border: none; border-top: 1px solid #e5e5e7; margin: 10mm 0; }
+
+    /* GRID HELPERS */
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8mm; }
+    .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6mm; }
+
+    /* HIGHLIGHT BOX */
+    .highlight-box {
+      background: #1a1a2e;
+      color: #fff;
+      border-radius: 4px;
+      padding: 8mm 10mm;
+    }
+    .highlight-box .hl-label { font-size: 7pt; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: #c0392b; margin-bottom: 4px; }
+    .highlight-box h3 { font-size: 13pt; font-weight: 700; color: #fff; line-height: 1.3; margin-bottom: 6px; }
+    .highlight-box p { font-size: 9pt; color: #ccc; line-height: 1.5; }
+
+    /* FEATURE CARD */
+    .feature-card {
+      border: 1px solid #e0e0e2;
+      border-radius: 4px;
+      padding: 6mm 8mm;
+    }
+    .feature-card .fc-num {
+      font-size: 7pt; font-weight: 800; letter-spacing: 2px;
+      text-transform: uppercase; color: #c0392b; margin-bottom: 4px;
+    }
+    .feature-card h4 { font-size: 10pt; font-weight: 700; color: #1a1a2e; margin-bottom: 4px; }
+    .feature-card p { font-size: 9pt; color: #555; line-height: 1.5; }
+
+    /* OFFER CARD */
+    .offer-card {
+      border: 1px solid #e0e0e2;
+      border-radius: 4px;
+      padding: 6mm 8mm;
+      position: relative;
+    }
+    .offer-card.featured {
+      border-color: #c0392b;
+      border-width: 2px;
+    }
+    .offer-badge {
+      display: inline-block;
+      font-size: 7pt;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: #fff;
+      background: #c0392b;
+      padding: 2px 8px;
+      border-radius: 2px;
+      margin-bottom: 6px;
+    }
+    .offer-card h4 { font-size: 10pt; font-weight: 700; color: #1a1a2e; margin-bottom: 2px; }
+    .offer-card .offer-sub { font-size: 8pt; color: #888; margin-bottom: 6px; }
+    .offer-checklist { list-style: none; padding: 0; margin: 0; }
+    .offer-checklist li { font-size: 8.5pt; color: #444; padding: 2px 0 2px 14px; position: relative; line-height: 1.4; }
+    .offer-checklist li::before { content: '✓'; position: absolute; left: 0; color: #c0392b; font-weight: 700; }
+    .offer-checklist li.extra::before { content: '+'; color: #888; }
+    .offer-checklist li.extra { color: #888; }
+
+    /* COMPARISON TABLE */
+    .comp-table { width: 100%; border-collapse: collapse; font-size: 8.5pt; }
+    .comp-table th { padding: 6px 8px; text-align: center; font-size: 7.5pt; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; color: #555; border-bottom: 2px solid #1a1a2e; }
+    .comp-table th:first-child { text-align: left; }
+    .comp-table td { padding: 6px 8px; text-align: center; border-bottom: 1px solid #e5e5e7; color: #444; }
+    .comp-table td:first-child { text-align: left; font-weight: 600; color: #1a1a2e; }
+    .comp-table tr:last-child td { border-bottom: none; }
+    .comp-table .check { color: #c0392b; font-weight: 700; font-size: 10pt; }
+    .comp-table .cross { color: #ccc; }
+    .comp-table .feat-col { background: #fdf5f5; }
+    .comp-table .feat-col.check { color: #c0392b; }
+
+    /* TIMELINE / STEPS */
+    .steps { display: flex; flex-direction: column; gap: 5mm; }
+    .step { display: flex; gap: 6mm; align-items: flex-start; }
+    .step-num {
+      flex: 0 0 28px; width: 28px; height: 28px;
+      background: #c0392b; color: #fff;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 8pt; font-weight: 700;
+    }
+    .step-body h4 { font-size: 9.5pt; font-weight: 700; color: #1a1a2e; margin-bottom: 2px; }
+    .step-body p { font-size: 8.5pt; color: #555; line-height: 1.45; }
+
+    /* QUOTE BLOCK */
+    .quote-block {
+      border-left: 3px solid #c0392b;
+      padding: 6mm 10mm;
+      background: #fafafa;
+      border-radius: 0 4px 4px 0;
+    }
+    .quote-block blockquote { font-size: 11pt; font-weight: 600; color: #1a1a2e; font-style: italic; line-height: 1.5; margin-bottom: 6px; }
+    .quote-block cite { font-size: 8pt; color: #888; font-style: normal; }
+
+    /* INFO PILL */
+    .info-pill {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: #f5f5f7; border-radius: 20px;
+      padding: 4px 12px; font-size: 8.5pt; color: #444;
+      margin: 3px 3px 3px 0;
+    }
+    .info-pill .dot { width: 6px; height: 6px; background: #c0392b; border-radius: 50%; flex-shrink: 0; }
+
+    /* CONTACT BLOCK */
+    .contact-block {
+      background: #1a1a2e; border-radius: 4px; padding: 8mm 10mm;
+      color: #fff;
+    }
+    .contact-block h3 { font-size: 13pt; font-weight: 700; margin-bottom: 4mm; }
+    .contact-block .c-row { display: flex; gap: 8mm; }
+    .contact-block .c-item { flex: 1; }
+    .contact-block .c-label { font-size: 7.5pt; color: #c0392b; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 2px; }
+    .contact-block .c-value { font-size: 10pt; font-weight: 600; color: #fff; }
+
+    /* ══════════════════════════════════════════════
+       PAGE 1 — COUVERTURE
+    ══════════════════════════════════════════════ */
+    .cover {
+      min-height: 297mm;
+      background: #1a1a2e;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 16mm 14mm 10mm;
+    }
+    .cover__top .cover-logo { font-size: 22pt; font-weight: 700; color: #fff; letter-spacing: 1px; }
+    .cover__top .cover-logo span { color: #c0392b; }
+    .cover__top .cover-tag {
+      display: inline-block;
+      margin-top: 8px;
+      font-size: 7.5pt; font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase;
+      color: #c0392b; background: rgba(192,57,43,0.12);
+      padding: 4px 12px; border-radius: 2px;
+    }
+    .cover__main { flex: 1; display: flex; flex-direction: column; justify-content: center; padding: 14mm 0; }
+    .cover__main h1 {
+      font-size: 26pt; font-weight: 700; color: #fff;
+      line-height: 1.2; margin-bottom: 8mm;
+      max-width: 150mm;
+    }
+    .cover__main h1 em { color: #c0392b; font-style: normal; }
+    .cover__main p { font-size: 11pt; color: #a0a8b8; line-height: 1.6; max-width: 140mm; margin-bottom: 10mm; }
+    .cover__pills { display: flex; flex-wrap: wrap; gap: 6px; }
+    .cover__pill {
+      padding: 5px 12px; border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 20px; font-size: 8pt; color: #ccc;
+    }
+    .cover__bottom {
+      border-top: 1px solid rgba(255,255,255,0.12);
+      padding-top: 6mm;
+      display: flex; justify-content: space-between; align-items: flex-end;
+    }
+    .cover__bottom .c-contact { font-size: 9pt; color: #888; line-height: 1.8; }
+    .cover__bottom .c-contact strong { color: #ccc; }
+    .cover__bottom .c-year { font-size: 8pt; color: #555; }
+
+    /* ══════════════════════════════════════════════
+       PAGE 2 — LE PROBLÈME ET LA SOLUTION
+    ══════════════════════════════════════════════ */
+
+    /* ══════════════════════════════════════════════
+       PAGE 3 — NOS SOLUTIONS (4 OFFRES)
+    ══════════════════════════════════════════════ */
+
+    /* ══════════════════════════════════════════════
+       PAGE 4 — TABLEAU COMPARATIF
+    ══════════════════════════════════════════════ */
+
+    /* ══════════════════════════════════════════════
+       PAGE 5 — FONCTIONNEMENT / DÉPLOIEMENT
+    ══════════════════════════════════════════════ */
+
+    /* ══════════════════════════════════════════════
+       PAGE 6 — À PROPOS & CONTACT
+    ══════════════════════════════════════════════ */
+
+  </style>
+</head>
+<body>
+
+<button id="btn-print" onclick="window.print()">Imprimer / Enregistrer PDF</button>
+
+<!-- ══════════════════════════════════════════════
+     PAGE 1 — COUVERTURE
+══════════════════════════════════════════════ -->
+<div class="page">
+  <div class="cover">
+    <div class="cover__top">
+      <div class="cover-logo"><strong>DST</strong> <span>System</span></div>
+      <div class="cover-tag">Location à demeure</div>
+    </div>
+
+    <div class="cover__main">
+      <h1>Votre simulateur<br>d'entraînement opérationnel,<br><em>dans vos locaux.</em></h1>
+      <p>DST System installe, maintient et fait évoluer un simulateur de tir laser en conditions réelles directement sur votre site. Disponible à toute heure, sans déplacement, sans munition réelle.</p>
+      <div class="cover__pills">
+        <div class="cover__pill">Zéro munition réelle</div>
+        <div class="cover__pill">Disponible 24h/24</div>
+        <div class="cover__pill">Maintenance incluse</div>
+        <div class="cover__pill">Mises à jour scénarios</div>
+        <div class="cover__pill">Suivi et traçabilité</div>
+        <div class="cover__pill">Abonnement mensuel</div>
+      </div>
+    </div>
+
+    <div class="cover__bottom">
+      <div class="c-contact">
+        <strong>DST System</strong><br>
+        dst-system@hotmail.com<br>
+        06 65 44 52 26
+      </div>
+      <div class="c-year">© 2026 — Drill &amp; Skills Training</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     PAGE 2 — LE PROBLÈME ET LA SOLUTION
+══════════════════════════════════════════════ -->
+<div class="page">
+  <div class="page-header">
+    <div class="logo-text"><strong>DST</strong> <span>System</span></div>
+    <div class="page-label">Problème &amp; Solution — p. 2</div>
+  </div>
+  <div class="page-content" style="padding-top:8mm;">
+
+    <div class="section-label">Le contexte</div>
+    <h2 class="section-title">Un besoin structurel.<br>Une réponse permanente.</h2>
+    <p class="body-text">L'entraînement opérationnel au tir est une obligation réglementaire et une nécessité tactique. Pourtant, les structures de sécurité publique se heurtent aux mêmes obstacles depuis des années.</p>
+
+    <div class="grid-2" style="margin:8mm 0;">
+      <div class="feature-card">
+        <div class="fc-num">01</div>
+        <h4>La distance et la logistique</h4>
+        <p>Les stands de tir homologués sont rares. Chaque session implique des déplacements, des transports sécurisés, des créneaux à planifier des semaines à l'avance.</p>
+      </div>
+      <div class="feature-card">
+        <div class="fc-num">02</div>
+        <h4>La rareté des créneaux</h4>
+        <p>Un instructeur mobile n'est pas toujours disponible. Les plannings s'ajustent autour de ses contraintes, pas autour des besoins opérationnels de votre unité.</p>
+      </div>
+      <div class="feature-card">
+        <div class="fc-num">03</div>
+        <h4>Le coût réel par session</h4>
+        <p>Munitions, déplacements, heures de transport, location de salle… le coût réel d'une session sur stand externe dépasse largement le tarif affiché.</p>
+      </div>
+      <div class="feature-card">
+        <div class="fc-num">04</div>
+        <h4>La dépendance au prestataire</h4>
+        <p>Sans prestataire disponible, pas d'entraînement. La continuité pédagogique dépend d'un tiers dont le planning ne correspond pas au vôtre.</p>
+      </div>
+    </div>
+
+    <hr class="divider">
+
+    <div class="section-label">La solution DST System</div>
+    <h2 class="section-title" style="font-size:15pt;">Le simulateur est chez vous.<br>Disponible en permanence.</h2>
+
+    <div class="grid-2" style="margin-top:6mm;">
+      <div>
+        <p class="body-text">DST System installe un simulateur laser complet dans vos locaux et prend en charge l'intégralité de la gestion technique et pédagogique. Vous vous concentrez sur l'entraînement — nous gérons le reste.</p>
+        <div style="margin-top:5mm;">
+          <div class="info-pill"><span class="dot"></span>Installation complète sur votre site</div>
+          <div class="info-pill"><span class="dot"></span>Maintenance préventive et curative</div>
+          <div class="info-pill"><span class="dot"></span>Mises à jour de scénarios incluses</div>
+          <div class="info-pill"><span class="dot"></span>Suivi des sessions et bilans mensuels</div>
+          <div class="info-pill"><span class="dot"></span>Formation de vos référents internes</div>
+          <div class="info-pill"><span class="dot"></span>Un abonnement mensuel tout inclus</div>
+        </div>
+      </div>
+      <div class="highlight-box">
+        <div class="hl-label">Résultat</div>
+        <h3>Entraînez-vous quand vous en avez besoin.</h3>
+        <p>Vos équipes accèdent au simulateur à toute heure, sans préavis, sans déplacement. La fréquence n'est plus contrainte par des ressources externes — elle est définie par vos objectifs opérationnels.</p>
+      </div>
+    </div>
+
+  </div>
+  <div class="page-footer">
+    <span>DST System — Location de simulateurs à demeure</span>
+    <span>dst-system@hotmail.com &nbsp;·&nbsp; 06 65 44 52 26</span>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     PAGE 3 — NOS SOLUTIONS (4 OFFRES)
+══════════════════════════════════════════════ -->
+<div class="page">
+  <div class="page-header">
+    <div class="logo-text"><strong>DST</strong> <span>System</span></div>
+    <div class="page-label">Nos solutions — p. 3</div>
+  </div>
+  <div class="page-content" style="padding-top:8mm;">
+
+    <div class="section-label">Quatre formules</div>
+    <h2 class="section-title">Une logique commune.<br>Des équipements adaptés à vos besoins.</h2>
+    <p class="body-text">Chaque formule inclut le simulateur, l'installation, la maintenance et le suivi. Les formules se distinguent par le type d'armement simulé et les équipements associés.</p>
+
+    <div class="grid-2" style="margin:8mm 0;">
+
+      <div class="offer-card">
+        <h4>Offre Base</h4>
+        <div class="offer-sub">Formule 1 — Simulateur + armes de poing</div>
+        <ul class="offer-checklist">
+          <li>Simulateur laser installé dans vos locaux</li>
+          <li>Armes de poing simulées (pistolets)</li>
+          <li>Cibles fixes et scénarios de base</li>
+          <li>Maintenance et assurance incluses</li>
+          <li>Mises à jour de scénarios</li>
+          <li>Suivi des sessions</li>
+          <li>Formation référent interne</li>
+        </ul>
+      </div>
+
+      <div class="offer-card featured">
+        <div class="offer-badge">Recommandé</div>
+        <h4>Offre Opérationnel</h4>
+        <div class="offer-sub">Formule 2 — Équipement complet CQB</div>
+        <ul class="offer-checklist">
+          <li>Simulateur laser installé dans vos locaux</li>
+          <li>Armes de poing simulées</li>
+          <li>Cibles individuelles réactives</li>
+          <li>Équipement CQB (combat en zone urbaine)</li>
+          <li>Humanoïdes articulés</li>
+          <li>Maintenance et assurance incluses</li>
+          <li>Mises à jour de scénarios</li>
+          <li>Suivi des sessions et bilans mensuels</li>
+        </ul>
+      </div>
+
+      <div class="offer-card">
+        <h4>Offre Premium</h4>
+        <div class="offer-sub">Formule 3 — Opérationnel + airsoft</div>
+        <ul class="offer-checklist">
+          <li>Tout le contenu de l'Offre Opérationnel</li>
+          <li class="extra">Armement airsoft complet</li>
+          <li class="extra">Équipements de protection airsoft</li>
+          <li class="extra">Munitions airsoft (quota mensuel inclus)</li>
+          <li class="extra">Scénarios hybrides laser + airsoft</li>
+          <li>Maintenance et assurance incluses</li>
+          <li>Suivi étendu et bilans trimestriels</li>
+        </ul>
+      </div>
+
+      <div class="offer-card">
+        <h4>Programme Mobile</h4>
+        <div class="offer-sub">Formule 4 — Instructeur sur site</div>
+        <ul class="offer-checklist">
+          <li>Intervention d'un instructeur DST System</li>
+          <li>Programme pédagogique sur mesure</li>
+          <li>Sessions encadrées et débriefées</li>
+          <li>Compatible avec toute formule à demeure</li>
+          <li>Planification en accord avec vos contraintes</li>
+          <li>Rapport de session transmis après chaque intervention</li>
+        </ul>
+      </div>
+
+    </div>
+
+    <div style="background:#f5f5f7; border-radius:4px; padding:5mm 8mm; font-size:8.5pt; color:#555; margin-top:2mm;">
+      <strong style="color:#1a1a2e;">Plusieurs sites à équiper ?</strong> Des formules multi-postes sont disponibles sur demande. Contactez-nous pour une proposition adaptée à votre organisation.
+    </div>
+
+  </div>
+  <div class="page-footer">
+    <span>DST System — Location de simulateurs à demeure</span>
+    <span>dst-system@hotmail.com &nbsp;·&nbsp; 06 65 44 52 26</span>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     PAGE 4 — TABLEAU COMPARATIF
+══════════════════════════════════════════════ -->
+<div class="page">
+  <div class="page-header">
+    <div class="logo-text"><strong>DST</strong> <span>System</span></div>
+    <div class="page-label">Comparatif — p. 4</div>
+  </div>
+  <div class="page-content" style="padding-top:8mm;">
+
+    <div class="section-label">Pourquoi DST System</div>
+    <h2 class="section-title">Comparer les alternatives.</h2>
+    <p class="body-text">La location à demeure ne se compare pas à une prestation ponctuelle. Elle restructure l'entraînement de façon durable.</p>
+
+    <div style="margin:8mm 0 6mm;">
+      <table class="comp-table">
+        <thead>
+          <tr>
+            <th>Critère</th>
+            <th>Stand de tir externe</th>
+            <th style="background:#fdf5f5; color:#c0392b;">Location DST à demeure</th>
+            <th>Instructeur mobile</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Disponibilité</td>
+            <td>Créneaux réservés</td>
+            <td class="feat-col check">✓ 24h/24 sur site</td>
+            <td>Selon planning instructeur</td>
+          </tr>
+          <tr>
+            <td>Déplacements</td>
+            <td>À chaque session</td>
+            <td class="feat-col check">✓ Aucun</td>
+            <td>Instructeur se déplace</td>
+          </tr>
+          <tr>
+            <td>Munitions</td>
+            <td>Réelles — coût + logistique</td>
+            <td class="feat-col check">✓ Zéro (laser)</td>
+            <td>Selon formule</td>
+          </tr>
+          <tr>
+            <td>Fréquence</td>
+            <td>Contrainte par créneau</td>
+            <td class="feat-col check">✓ Illimitée</td>
+            <td>Contrainte par disponibilité</td>
+          </tr>
+          <tr>
+            <td>Coût par session</td>
+            <td>Variable + frais cachés</td>
+            <td class="feat-col check">✓ Inclus dans l'abo.</td>
+            <td>Facturation à la journée</td>
+          </tr>
+          <tr>
+            <td>Maintenance</td>
+            <td>Non applicable</td>
+            <td class="feat-col check">✓ Prise en charge DST</td>
+            <td>Non applicable</td>
+          </tr>
+          <tr>
+            <td>Suivi pédagogique</td>
+            <td>Inexistant</td>
+            <td class="feat-col check">✓ Rapports mensuels</td>
+            <td>Rapport post-session</td>
+          </tr>
+          <tr>
+            <td>Budget</td>
+            <td>Imprévisible</td>
+            <td class="feat-col check">✓ Mensualité fixe</td>
+            <td>Imprévisible</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <hr class="divider">
+
+    <div class="quote-block">
+      <blockquote>« La régularité n'est pas un confort pédagogique — c'est une condition opérationnelle. Un entraînement espacé produit des réflexes qui se dégradent. Un simulateur dans vos locaux, c'est la garantie que vos équipes maintiennent leur niveau en permanence. »</blockquote>
+      <cite>— Fondateur DST System, ancien formateur CNEC</cite>
+    </div>
+
+    <div class="grid-3" style="margin-top:8mm;">
+      <div class="feature-card">
+        <div class="fc-num">Tout inclus</div>
+        <h4>Zéro surprise budgétaire</h4>
+        <p>Matériel, maintenance, assurance, mises à jour, suivi : un seul abonnement mensuel.</p>
+      </div>
+      <div class="feature-card">
+        <div class="fc-num">Sans limite</div>
+        <h4>Entraînez-vous autant que nécessaire</h4>
+        <p>Le simulateur est chez vous. Aucun créneau à réserver, aucun quota de sessions.</p>
+      </div>
+      <div class="feature-card">
+        <div class="fc-num">Traçable</div>
+        <h4>Suivi et justification</h4>
+        <p>Chaque session est enregistrée. Bilans mensuels, statistiques, rapports disponibles à la demande.</p>
+      </div>
+    </div>
+
+  </div>
+  <div class="page-footer">
+    <span>DST System — Location de simulateurs à demeure</span>
+    <span>dst-system@hotmail.com &nbsp;·&nbsp; 06 65 44 52 26</span>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     PAGE 5 — FONCTIONNEMENT / DÉPLOIEMENT
+══════════════════════════════════════════════ -->
+<div class="page">
+  <div class="page-header">
+    <div class="logo-text"><strong>DST</strong> <span>System</span></div>
+    <div class="page-label">Fonctionnement — p. 5</div>
+  </div>
+  <div class="page-content" style="padding-top:8mm;">
+
+    <div class="section-label">Déploiement</div>
+    <h2 class="section-title">Six étapes, du premier contact à l'entraînement permanent.</h2>
+    <p class="body-text">De la prise de contact à la première session autonome : un processus structuré, prévisible, sans improvisation.</p>
+
+    <div class="grid-2" style="margin:8mm 0;">
+      <div class="steps">
+        <div class="step">
+          <div class="step-num">01</div>
+          <div class="step-body">
+            <h4>Premier échange</h4>
+            <p>Appel ou réunion initiale pour qualifier vos besoins, votre effectif, vos contraintes d'espace et votre cadre réglementaire.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">02</div>
+          <div class="step-body">
+            <h4>Visite de site</h4>
+            <p>Un technicien DST System se déplace pour évaluer la faisabilité de l'installation dans vos locaux existants.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">03</div>
+          <div class="step-body">
+            <h4>Proposition et contrat</h4>
+            <p>Remise d'une proposition personnalisée. Signature du contrat d'abonnement avec engagement et conditions clairs.</p>
+          </div>
+        </div>
+      </div>
+      <div class="steps">
+        <div class="step">
+          <div class="step-num">04</div>
+          <div class="step-body">
+            <h4>Installation</h4>
+            <p>Installation complète du simulateur par l'équipe DST System. Câblage, calibration, tests — sans interruption de votre activité.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">05</div>
+          <div class="step-body">
+            <h4>Prise en main</h4>
+            <p>Formation de vos référents internes. Première session guidée par un instructeur DST System.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">06</div>
+          <div class="step-body">
+            <h4>Suivi continu</h4>
+            <p>Maintenance préventive planifiée, mises à jour de scénarios, bilans mensuels. Votre interlocuteur DST System reste disponible.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <hr class="divider">
+
+    <div class="section-label">Logique de la location à demeure</div>
+    <div class="grid-3" style="margin-top:5mm;">
+      <div style="padding:5mm 6mm; background:#f5f5f7; border-radius:4px;">
+        <div style="font-size:7.5pt; font-weight:700; text-transform:uppercase; letter-spacing:1px; color:#888; margin-bottom:4px;">Vous apportez</div>
+        <div style="font-size:8.5pt; color:#444; line-height:1.7;">
+          Un espace dédié (15 m² min.)<br>
+          Une prise électrique standard<br>
+          Un référent interne<br>
+          Vos objectifs de formation
+        </div>
+      </div>
+      <div style="padding:5mm 6mm; background:#1a1a2e; border-radius:4px;">
+        <div style="font-size:7.5pt; font-weight:700; text-transform:uppercase; letter-spacing:1px; color:#c0392b; margin-bottom:4px;">DST System installe &amp; gère</div>
+        <div style="font-size:8.5pt; color:#ccc; line-height:1.7;">
+          Matériel et logiciels<br>
+          Installation et câblage<br>
+          Maintenance et assurance<br>
+          Mises à jour de scénarios<br>
+          Suivi pédagogique
+        </div>
+      </div>
+      <div style="padding:5mm 6mm; background:#f5f5f7; border-radius:4px;">
+        <div style="font-size:7.5pt; font-weight:700; text-transform:uppercase; letter-spacing:1px; color:#888; margin-bottom:4px;">Résultat</div>
+        <div style="font-size:8.5pt; color:#444; line-height:1.7;">
+          Entraînement permanent<br>
+          Zéro logistique<br>
+          Budget prévisible<br>
+          Progression mesurable<br>
+          Disponibilité totale
+        </div>
+      </div>
+    </div>
+
+  </div>
+  <div class="page-footer">
+    <span>DST System — Location de simulateurs à demeure</span>
+    <span>dst-system@hotmail.com &nbsp;·&nbsp; 06 65 44 52 26</span>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     PAGE 6 — À PROPOS & CONTACT
+══════════════════════════════════════════════ -->
+<div class="page">
+  <div class="page-header">
+    <div class="logo-text"><strong>DST</strong> <span>System</span></div>
+    <div class="page-label">À propos &amp; Contact — p. 6</div>
+  </div>
+  <div class="page-content" style="padding-top:8mm;">
+
+    <div class="section-label">Qui sommes-nous</div>
+    <h2 class="section-title">Un parcours de terrain.<br>Une solution conçue de l'intérieur.</h2>
+
+    <div class="grid-2" style="margin:7mm 0;">
+      <div>
+        <p class="body-text">DST System est fondé par un ancien formateur militaire issu du CNEC (Centre National d'Entraînement Commando). Ce parcours forge une lecture directe des besoins opérationnels — la formation ne se conçoit pas depuis un bureau.</p>
+        <p class="body-text">De la formation commando à la conception de programmes pour forces de sécurité, la trajectoire est celle d'un praticien : technique, rigoureuse, orientée résultat.</p>
+        <div style="margin-top:6mm;">
+          <div class="info-pill"><span class="dot"></span>Ancien formateur CNEC</div>
+          <div class="info-pill"><span class="dot"></span>Instructeur tir et techniques d'intervention</div>
+          <div class="info-pill"><span class="dot"></span>Gestion de crise et commandement</div>
+          <div class="info-pill"><span class="dot"></span>Formation forces de sécurité civile</div>
+        </div>
+      </div>
+      <div>
+        <div class="highlight-box" style="margin-bottom:6mm;">
+          <div class="hl-label">Notre mission</div>
+          <h3>Rendre l'entraînement opérationnel accessible en permanence.</h3>
+          <p>Un simulateur dans vos locaux, c'est supprimer tous les obstacles qui empêchent vos équipes de s'entraîner aussi souvent qu'elles en ont besoin.</p>
+        </div>
+        <div style="padding:5mm 6mm; background:#f5f5f7; border-radius:4px;">
+          <div style="font-size:7.5pt; font-weight:700; text-transform:uppercase; color:#888; letter-spacing:1px; margin-bottom:6px;">Nos valeurs</div>
+          <div style="font-size:8.5pt; color:#444; line-height:1.8;">
+            <strong style="color:#1a1a2e;">Rigueur sans compromis</strong> — Les standards opérationnels ne sont pas négociables.<br>
+            <strong style="color:#1a1a2e;">Adaptation terrain</strong> — Chaque dispositif est ajusté à votre réalité, pas à un catalogue.<br>
+            <strong style="color:#1a1a2e;">Transparence</strong> — Résultats mesurables, budget prévisible, rapport systématique.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <hr class="divider">
+
+    <div class="contact-block">
+      <h3>Prêt à installer votre simulateur ?</h3>
+      <p style="font-size:9pt; color:#a0a8b8; margin-bottom:6mm;">Contactez-nous pour un premier échange. Nous évaluons ensemble la faisabilité sur votre site et vous remettons une proposition personnalisée sans engagement.</p>
+      <div class="c-row">
+        <div class="c-item">
+          <div class="c-label">Email</div>
+          <div class="c-value">dst-system@hotmail.com</div>
+        </div>
+        <div class="c-item">
+          <div class="c-label">Téléphone</div>
+          <div class="c-value">06 65 44 52 26</div>
+        </div>
+        <div class="c-item">
+          <div class="c-label">Site web</div>
+          <div class="c-value">dst-system.fr</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top:6mm; text-align:center;">
+      <p style="font-size:8pt; color:#aaa;">© 2026 DST System — Drill &amp; Skills Training. Tous droits réservés.<br>
+      Location de simulateurs d'entraînement opérationnel à demeure pour les forces de sécurité et services publics armés.</p>
+    </div>
+
+  </div>
+  <div class="page-footer">
+    <span>DST System — Location de simulateurs à demeure</span>
+    <span>dst-system@hotmail.com &nbsp;·&nbsp; 06 65 44 52 26</span>
+  </div>
+</div>
+
+</body>
+</html>
