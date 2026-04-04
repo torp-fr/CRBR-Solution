@@ -276,10 +276,13 @@
     ══════════════════════════════════════════════ */
 
   </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </head>
 <body>
 
 <button id="btn-print" onclick="downloadPlaquette()">Télécharger la plaquette</button>
+
+<div id="plaquette-content">
 
 <!-- ══════════════════════════════════════════════
      PAGE 1 — COUVERTURE
@@ -760,17 +763,19 @@
   </div>
 </div>
 
+</div><!-- #plaquette-content -->
+
 <script>
 function downloadPlaquette() {
-  const htmlContent = document.documentElement.outerHTML;
-  const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
-  const link = document.createElement('a');
-  link.href = URL.createObjectURL(blob);
-  link.download = 'DST-System-Plaquette.html';
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-  URL.revokeObjectURL(link.href);
+  const element = document.getElementById('plaquette-content') || document.body;
+  const opt = {
+    margin: 10,
+    filename: 'DST-System-Plaquette.pdf',
+    image: { type: 'jpeg', quality: 0.98 },
+    html2canvas: { scale: 2 },
+    jsPDF: { orientation: 'portrait', unit: 'mm', format: 'a4' }
+  };
+  html2pdf().set(opt).save();
 }
 </script>
 </body>
