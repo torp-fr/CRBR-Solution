@@ -19,13 +19,20 @@
     .page {
       width: 210mm;
       min-height: 297mm;
+      max-height: 297mm;
       margin: 0 auto 8mm;
       background: #fff;
       position: relative;
       overflow: hidden;
       page-break-after: always;
+      break-after: page;
     }
-    .page:last-child { page-break-after: auto; margin-bottom: 0; }
+    .page:last-child { page-break-after: auto; break-after: auto; margin-bottom: 0; }
+
+    @media print {
+      body { background: #fff; }
+      .page { margin: 0; max-height: none; box-shadow: none; }
+    }
 
     @media screen {
       body { background: #e5e5e5; padding: 16px 0 40px; }
@@ -768,16 +775,36 @@
 
 <script>
 function downloadPlaquette() {
-  const element = document.getElementById('plaquette-content');
+  const btn = document.getElementById('btn-print');
+  btn.textContent = 'Génération en cours…';
+  btn.disabled = true;
 
-  html2canvas(element, { scale: 2, useCORS: true }).then(canvas => {
-    const imgData = canvas.toDataURL('image/jpeg', 0.98);
-    const { jsPDF } = window.jspdf;
-    const pdf = new jsPDF('p', 'mm', 'a4');
-    const imgWidth = 210 - 20;
-    const imgHeight = (canvas.height * imgWidth) / canvas.width;
-    pdf.addImage(imgData, 'JPEG', 10, 10, imgWidth, imgHeight);
+  const pages = Array.from(document.querySelectorAll('.page'));
+  const { jsPDF } = window.jspdf;
+  const pdf = new jsPDF('p', 'mm', 'a4');
+  const A4_W = 210;
+  const A4_H = 297;
+  const margin = 0;
+  const imgWidth = A4_W - margin * 2;
+
+  const captures = pages.map(page =>
+    html2canvas(page, { scale: 2, useCORS: true, allowTaint: true, backgroundColor: page.style.background || '#ffffff' })
+  );
+
+  Promise.all(captures).then(canvases => {
+    canvases.forEach((canvas, i) => {
+      const imgData = canvas.toDataURL('image/jpeg', 0.95);
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      if (i > 0) pdf.addPage();
+      pdf.addImage(imgData, 'JPEG', margin, margin, imgWidth, imgHeight);
+    });
     pdf.save('DST-System-Plaquette.pdf');
+    btn.textContent = 'Télécharger la plaquette';
+    btn.disabled = false;
+  }).catch(err => {
+    console.error('PDF error:', err);
+    btn.textContent = 'Télécharger la plaquette';
+    btn.disabled = false;
   });
 }
 </script>
