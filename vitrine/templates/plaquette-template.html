@@ -276,7 +276,8 @@
     ══════════════════════════════════════════════ */
 
   </style>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 </head>
 <body>
 
@@ -767,15 +768,17 @@
 
 <script>
 function downloadPlaquette() {
-  const element = document.getElementById('plaquette-content') || document.body;
-  const opt = {
-    margin: 10,
-    filename: 'DST-System-Plaquette.pdf',
-    image: { type: 'jpeg', quality: 0.98 },
-    html2canvas: { scale: 2 },
-    jsPDF: { orientation: 'portrait', unit: 'mm', format: 'a4' }
-  };
-  html2pdf().set(opt).save();
+  const element = document.getElementById('plaquette-content');
+
+  html2canvas(element, { scale: 2, useCORS: true }).then(canvas => {
+    const imgData = canvas.toDataURL('image/jpeg', 0.98);
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF('p', 'mm', 'a4');
+    const imgWidth = 210 - 20;
+    const imgHeight = (canvas.height * imgWidth) / canvas.width;
+    pdf.addImage(imgData, 'JPEG', 10, 10, imgWidth, imgHeight);
+    pdf.save('DST-System-Plaquette.pdf');
+  });
 }
 </script>
 </body>
