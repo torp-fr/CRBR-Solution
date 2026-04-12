@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Espace Instructeur — DST System</title>
+  <title>Espace Instructeur — CRBR Solutions</title>
   <meta name="robots" content="noindex, nofollow">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -277,7 +277,7 @@
 <body>
 
   <header>
-    <div id="portail-logo" class="header-logo"><span style="font-size:18px;font-weight:700;letter-spacing:1px;">DST System</span></div>
+    <div id="portail-logo" class="header-logo"><span style="font-size:18px;font-weight:700;letter-spacing:1px;">CRBR Solutions</span></div>
     <div class="header-op" id="header-op-name">Espace instructeur</div>
   </header>
 
@@ -291,7 +291,7 @@
       <strong>Accès refusé</strong>
       <p id="error-msg" style="margin-top:8px;">Le lien d'accès est invalide ou a expiré.</p>
       <p style="margin-top:16px;font-size:0.82rem;">
-        Contactez DST System : <a href="mailto:dst-system@hotmail.com" style="color:var(--accent);">dst-system@hotmail.com</a>
+        Contactez CRBR Solutions : <a href="mailto:info@crbr-solution.fr" style="color:var(--accent);">info@crbr-solution.fr</a>
       </p>
     </div>
 
@@ -300,7 +300,7 @@
 
       <!-- Bandeau bienvenue (first login) -->
       <div class="welcome-banner hidden" id="welcome-banner">
-        👋 Bienvenue ! Commencez par compléter votre profil pour que DST System puisse vous contacter facilement.
+        👋 Bienvenue ! Commencez par compléter votre profil pour que CRBR Solutions puisse vous contacter facilement.
       </div>
 
       <div class="tabs" id="tabs">
@@ -406,7 +406,7 @@
           </form>
 
           <div class="note-box">
-            Vos informations administratives (zone, statut, spécialités) sont gérées par DST System.
+            Vos informations administratives (zone, statut, spécialités) sont gérées par CRBR Solutions.
           </div>
         </div>
 
@@ -414,7 +414,7 @@
           <div class="card-title">Accès</div>
           <p style="font-size:0.84rem;color:var(--text-muted);line-height:1.6;">
             Votre lien d'accès personnel est confidentiel. Conservez-le dans vos favoris.<br>
-            Pour tout changement d'identifiant, contactez DST System.
+            Pour tout changement d'identifiant, contactez CRBR Solutions.
           </p>
         </div>
       </div>
@@ -422,13 +422,13 @@
       <!-- TAB 4 — CONTACT DST -->
       <div id="tab-contact" class="hidden">
         <div class="card">
-          <div class="card-title">Contacter DST System</div>
+          <div class="card-title">Contacter CRBR Solutions</div>
           <p style="font-size:0.85rem;color:var(--text-muted);margin-bottom:18px;">
             Pour toute question concernant vos missions, votre planning ou votre rémunération :
           </p>
           <div style="margin-bottom:16px;font-size:0.9rem;line-height:2;">
             <div>
-              📧 <a href="mailto:dst-system@hotmail.com" style="color:var(--accent);">dst-system@hotmail.com</a>
+              📧 <a href="mailto:info@crbr-solution.fr" style="color:var(--accent);">info@crbr-solution.fr</a>
             </div>
             <div>
               📞 <a href="tel:+33665445226" style="color:var(--accent);">06 65 44 52 26</a>
@@ -446,7 +446,7 @@
   </div><!-- /container -->
 
   <footer>
-    &copy; DST — Drill &amp; Skills Training &nbsp;·&nbsp; Espace instructeur sécurisé
+    &copy; DST — Conception de Réponse Basées sur les Retex &nbsp;·&nbsp; Espace instructeur sécurisé
   </footer>
 
   <script src="../js/supabase-config.js"></script>
@@ -617,7 +617,7 @@
       // Message contact pré-rempli
       document.getElementById('contact-message').value =
         'Bonjour,\n\nJe suis ' + ((op.prenom || '') + ' ' + (op.nom || '')).trim()
-        + ', instructeur DST System.\n\n[Votre message ici]\n\nCordialement';
+        + ', instructeur CRBR Solutions.\n\n[Votre message ici]\n\nCordialement';
 
       // Afficher le contenu
       document.getElementById('loading-state').classList.add('hidden');
@@ -793,8 +793,8 @@
     document.getElementById('btn-contact-mail').addEventListener('click', function() {
       var msg = document.getElementById('contact-message').value;
       var name = _opData ? ((_opData.prenom || '') + ' ' + (_opData.nom || '')).trim() : '';
-      window.location.href = 'mailto:dst-system@hotmail.com'
-        + '?subject=' + encodeURIComponent('Message de ' + name + ' — DST System')
+      window.location.href = 'mailto:info@crbr-solution.fr'
+        + '?subject=' + encodeURIComponent('Message de ' + name + ' — CRBR Solutions')
         + '&body=' + encodeURIComponent(msg);
     });
 
@@ -805,7 +805,7 @@
   </script>
 
 <script>
-(function(){try{var s=JSON.parse(localStorage.getItem('dst_config_settings')||'{}');var logoTexte=s.entreprise&&s.entreprise.logoTexteBase64;var logoEl=document.getElementById('portail-logo');if(!logoEl)return;if(logoTexte){logoEl.innerHTML='<img src="'+logoTexte+'" style="max-height:48px;max-width:200px;object-fit:contain;">';}else{var img=document.createElement('img');img.src='../img/DST-Light.png';img.style.cssText='max-height:48px;max-width:200px;object-fit:contain;';img.onerror=function(){logoEl.innerHTML='<span style="font-size:18px;font-weight:700;letter-spacing:1px;">DST System</span>';};logoEl.innerHTML='';logoEl.appendChild(img);}}catch(e){}})();
+(function(){try{var s=JSON.parse(localStorage.getItem('dst_config_settings')||'{}');var logoTexte=s.entreprise&&s.entreprise.logoTexteBase64;var logoEl=document.getElementById('portail-logo');if(!logoEl)return;if(logoTexte){logoEl.innerHTML='<img src="'+logoTexte+'" style="max-height:48px;max-width:200px;object-fit:contain;">';}else{var img=document.createElement('img');img.src='../img/DST-Light.png';img.style.cssText='max-height:48px;max-width:200px;object-fit:contain;';img.onerror=function(){logoEl.innerHTML='<span style="font-size:18px;font-weight:700;letter-spacing:1px;">CRBR Solutions</span>';};logoEl.innerHTML='';logoEl.appendChild(img);}}catch(e){}})();
 </script>
 </body>
 </html>

@@ -184,7 +184,7 @@
 <body>
 
   <header>
-    <div id="portail-logo" class="header-logo"><span style="font-size:18px;font-weight:700;letter-spacing:1px;">DST System</span></div>
+    <div id="portail-logo" class="header-logo"><span style="font-size:18px;font-weight:700;letter-spacing:1px;">CRBR Solutions</span></div>
     <div class="header-client" id="header-client-name">Espace client</div>
   </header>
 
@@ -252,7 +252,7 @@
   </div>
 
   <footer>
-    &copy; DST — Drill &amp; Skills Training &nbsp;·&nbsp; Espace client sécurisé
+    &copy; DST — Conception de Réponse Basées sur les Retex &nbsp;·&nbsp; Espace client sécurisé
   </footer>
 
   <script src="../js/supabase-config.js"></script>
@@ -318,7 +318,7 @@
         );
         var clients = await r1.json();
         if (!clients || clients.length === 0) {
-          showError('Lien d\'accès invalide ou désactivé. Contactez DST System pour obtenir votre lien.');
+          showError('Lien d\'accès invalide ou désactivé. Contactez CRBR Solutions pour obtenir votre lien.');
           return;
         }
         var client = clients[0];
@@ -439,7 +439,7 @@
         var corps  = encodeURIComponent(
           'Client : ' + (clientNom || '') + '\nContact : ' + (clientContact || '') + '\n\n' + msg
         );
-        window.location.href = 'mailto:dst-system@hotmail.com?subject=' + sujet + '&body=' + corps;
+        window.location.href = 'mailto:info@crbr-solution.fr?subject=' + sujet + '&body=' + corps;
       });
     }
 
@@ -464,7 +464,7 @@
   </script>
 
 <script>
-(function(){try{var s=JSON.parse(localStorage.getItem('dst_config_settings')||'{}');var logoTexte=s.entreprise&&s.entreprise.logoTexteBase64;var logoEl=document.getElementById('portail-logo');if(!logoEl)return;if(logoTexte){logoEl.innerHTML='<img src="'+logoTexte+'" style="max-height:48px;max-width:200px;object-fit:contain;">';}else{var img=document.createElement('img');img.src='../img/DST-Light.png';img.style.cssText='max-height:48px;max-width:200px;object-fit:contain;';img.onerror=function(){logoEl.innerHTML='<span style="font-size:18px;font-weight:700;letter-spacing:1px;">DST System</span>';};logoEl.innerHTML='';logoEl.appendChild(img);}}catch(e){}})();
+(function(){try{var s=JSON.parse(localStorage.getItem('dst_config_settings')||'{}');var logoTexte=s.entreprise&&s.entreprise.logoTexteBase64;var logoEl=document.getElementById('portail-logo');if(!logoEl)return;if(logoTexte){logoEl.innerHTML='<img src="'+logoTexte+'" style="max-height:48px;max-width:200px;object-fit:contain;">';}else{var img=document.createElement('img');img.src='../img/DST-Light.png';img.style.cssText='max-height:48px;max-width:200px;object-fit:contain;';img.onerror=function(){logoEl.innerHTML='<span style="font-size:18px;font-weight:700;letter-spacing:1px;">CRBR Solutions</span>';};logoEl.innerHTML='';logoEl.appendChild(img);}}catch(e){}})();
 </script>
 </body>
 </html>

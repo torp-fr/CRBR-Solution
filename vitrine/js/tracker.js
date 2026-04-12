@@ -5,7 +5,7 @@
     location.hostname === '127.0.0.1' ||
     location.pathname.startsWith('/admin')
   ) {
-    window.DSTTrack = { event: function() {} };
+    window.CRBRTrack = { event: function() {} };
     return;
   }
 
@@ -105,7 +105,7 @@
   });
 
   // Tracking events exposé globalement
-  window.DSTTrack = {
+  window.CRBRTrack = {
     event: function(type, label) {
       fetch(_SB_URL + '/rest/v1/page_events', {
         method: 'POST',

@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Devis DST System</title>
+  <title>Devis CRBR Solutions</title>
   <style>
     /* ===================================================
-       DEVIS TEMPLATE — DST System
+       DEVIS TEMPLATE — CRBR Solutions
        Format A4, sobre, institutionnel
        =================================================== */
 
@@ -436,7 +436,7 @@
 
       /* ---- Titre de l'onglet ---- */
       var ent = d.entreprise || {};
-      if (d.numero) document.title = 'Devis ' + d.numero + ' \u2014 ' + (ent.nom || 'DST System');
+      if (d.numero) document.title = 'Devis ' + d.numero + ' \u2014 ' + (ent.nom || 'CRBR Solutions');
 
       /* ---- Logo ---- */
       var logoContainer = document.getElementById('logo-container');
@@ -448,7 +448,7 @@
           fbImg.src = '../img/logo%20principal%20DST.png';
           fbImg.style.cssText = 'max-height:70px;max-width:250px;';
           fbImg.onerror = function() {
-            logoContainer.innerHTML = '<div style="font-size:14pt;font-weight:700;color:#1a1a2e;">' + esc(ent.nom || 'DST System') + '</div>' +
+            logoContainer.innerHTML = '<div style="font-size:14pt;font-weight:700;color:#1a1a2e;">' + esc(ent.nom || 'CRBR Solutions') + '</div>' +
               '<div style="font-size:9pt;color:#555;">' + esc(ent.formeJuridique || 'SASU') + '</div>';
           };
           logoContainer.innerHTML = '';
@@ -589,7 +589,7 @@
       }
       var legalEl = document.getElementById('ftr-legal-info');
       if (legalEl) {
-        legalEl.textContent = (ent.nom || 'DST System') + ' \u2014 ' + (ent.formeJuridique || 'SASU') +
+        legalEl.textContent = (ent.nom || 'CRBR Solutions') + ' \u2014 ' + (ent.formeJuridique || 'SASU') +
           ' \u2014 SIRET\u00a0: ' + (ent.siret || '[\u00e0 compl\u00e9ter]');
       }
 
