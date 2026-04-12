@@ -414,7 +414,7 @@ const DB = (() => {
 
     // Identité entreprise et mentions légales documents
     entreprise: {
-      nom:              'DST System',
+      nom:              'CRBR Solutions',
       formeJuridique:   'SASU',
       siren:            '',
       siret:            '',
@@ -423,8 +423,8 @@ const DB = (() => {
       codePostal:       '',
       ville:            '',
       telephone:        '06 65 44 52 26',
-      email:            'dst-system@hotmail.com',
-      siteWeb:          'www.dst-system.fr',
+      email:            'info@crbr-solution.fr',
+      siteWeb:          'www.crbr-solution.fr',
       logoPrincipalBase64:  '',   // Emblème/blason — devis, factures, docs
       logoPrincipalMime:    '',
       logoTexteBase64:      '',   // Logo texte — headers digitaux, portails
@@ -433,7 +433,7 @@ const DB = (() => {
       faviconMime:          '',
       mentionLegaleDevis:    'Devis valable 30 jours. TVA applicable selon taux en vigueur. En cas d\'acceptation, retourner signé avec la mention "Bon pour accord".',
       mentionLegaleFacture:  'Paiement à 30 jours. Tout retard entraîne des pénalités au taux légal + indemnité forfaitaire de 40 €. SASU au capital de [compléter] €.',
-      mentionRGPD:           'Données traitées conformément au RGPD. Contact : dst-system@hotmail.com',
+      mentionRGPD:           'Données traitées conformément au RGPD. Contact : info@crbr-solution.fr',
       conditionsAnnulation:  'Annulation >72h : sans frais. <72h : 50%. Jour J : 100%.'
     },
 

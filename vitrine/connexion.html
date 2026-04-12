@@ -8,13 +8,26 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="icon" href="img/logo-cerbere-or.png" type="image/png">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+    :root {
+      --bg: hsl(220, 20%, 7%);
+      --bg-card: hsl(220, 18%, 10%);
+      --fg: #e8e8ec;
+      --fg-muted: #7a7a88;
+      --amber: hsl(36, 90%, 50%);
+      --amber-dim: rgba(242, 144, 16, 0.12);
+      --border: rgba(255,255,255,0.08);
+      --error: #e05252;
+      --error-bg: rgba(224, 82, 82, 0.10);
+    }
+
     body {
       font-family: 'Inter', sans-serif;
-      background: #f5f5f7;
-      color: #1a1a2e;
+      background: var(--bg);
+      color: var(--fg);
       min-height: 100vh;
       display: flex;
       flex-direction: column;
@@ -24,9 +37,10 @@
     }
 
     .connexion-card {
-      background: #ffffff;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
       border-radius: 12px;
-      box-shadow: 0 4px 24px rgba(0,0,0,0.10);
+      box-shadow: 0 8px 40px rgba(0,0,0,0.5);
       padding: 48px 40px 40px;
       width: 100%;
       max-width: 440px;
@@ -36,29 +50,36 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 12px;
-      margin-bottom: 32px;
+      margin-bottom: 24px;
     }
 
     .connexion-logo img {
-      max-height: 64px;
+      max-height: 72px;
       max-width: 240px;
       width: auto;
       object-fit: contain;
-      margin: 0 auto;
+    }
+
+    .connexion-divider {
+      width: 36px;
+      height: 2px;
+      background: var(--amber);
+      margin: 0 auto 24px;
+      border-radius: 1px;
     }
 
     h1 {
-      font-size: 1.25rem;
+      font-size: 1.2rem;
       font-weight: 700;
-      color: #1a1a2e;
+      color: var(--fg);
       text-align: center;
-      margin-bottom: 8px;
+      margin-bottom: 6px;
+      letter-spacing: 0.01em;
     }
 
     .connexion-subtitle {
-      font-size: 0.88rem;
-      color: #6b7280;
+      font-size: 0.85rem;
+      color: var(--fg-muted);
       text-align: center;
       margin-bottom: 32px;
     }
@@ -69,51 +90,58 @@
 
     label {
       display: block;
-      font-size: 0.82rem;
+      font-size: 0.78rem;
       font-weight: 600;
-      color: #374151;
-      margin-bottom: 6px;
+      color: var(--fg-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 8px;
     }
 
-    input[type="text"] {
+    input[type="text"],
+    input[type="password"] {
       display: block;
       width: 100%;
       padding: 12px 14px;
-      border: 1.5px solid #d1d5db;
+      border: 1.5px solid var(--border);
       border-radius: 6px;
       font-size: 0.95rem;
       font-family: inherit;
-      color: #1a1a2e;
-      background: #ffffff;
-      transition: border-color 0.15s;
+      color: var(--fg);
+      background: rgba(255,255,255,0.04);
+      transition: border-color 0.15s, background 0.15s;
       outline: none;
     }
 
-    input[type="text"]:focus {
-      border-color: #1a1a2e;
+    input[type="text"]:focus,
+    input[type="password"]:focus {
+      border-color: var(--amber);
+      background: rgba(255,255,255,0.06);
     }
 
-    input[type="text"].input-error {
-      border-color: #dc2626;
+    input[type="text"].input-error,
+    input[type="password"].input-error {
+      border-color: var(--error);
     }
 
     .btn-connexion {
       display: block;
       width: 100%;
       padding: 13px 20px;
-      background: #1a1a2e;
-      color: #ffffff;
+      background: var(--amber);
+      color: #0f1117;
       font-size: 0.95rem;
-      font-weight: 600;
+      font-weight: 700;
       font-family: inherit;
       border: none;
       border-radius: 6px;
       cursor: pointer;
-      transition: background 0.15s, transform 0.1s;
+      letter-spacing: 0.02em;
+      transition: filter 0.15s, transform 0.1s;
     }
 
     .btn-connexion:hover {
-      background: #2d2d50;
+      filter: brightness(1.1);
     }
 
     .btn-connexion:active {
@@ -124,11 +152,11 @@
       display: none;
       margin-top: 12px;
       padding: 10px 14px;
-      background: #fef2f2;
-      border: 1px solid #fca5a5;
+      background: var(--error-bg);
+      border: 1px solid rgba(224, 82, 82, 0.30);
       border-radius: 6px;
       font-size: 0.83rem;
-      color: #dc2626;
+      color: var(--error);
     }
 
     .error-msg.visible {
@@ -138,16 +166,20 @@
     .connexion-help {
       margin-top: 28px;
       padding-top: 24px;
-      border-top: 1px solid #e5e7eb;
+      border-top: 1px solid var(--border);
       font-size: 0.82rem;
-      color: #6b7280;
+      color: var(--fg-muted);
       text-align: center;
       line-height: 1.6;
     }
 
     .connexion-help a {
-      color: #1a1a2e;
+      color: var(--amber);
       font-weight: 600;
+      text-decoration: none;
+    }
+
+    .connexion-help a:hover {
       text-decoration: underline;
     }
 
@@ -155,33 +187,33 @@
       display: inline-block;
       margin-top: 16px;
       font-size: 0.78rem;
-      color: #9ca3af;
+      color: var(--fg-muted);
     }
 
     .admin-link a {
-      color: #9ca3af;
+      color: var(--fg-muted);
       text-decoration: none;
     }
 
     .admin-link a:hover {
-      color: #1a1a2e;
+      color: var(--fg);
     }
 
     footer {
       margin-top: 32px;
       font-size: 0.75rem;
-      color: #9ca3af;
+      color: var(--fg-muted);
       text-align: center;
       line-height: 1.7;
     }
 
     footer a {
-      color: #9ca3af;
+      color: var(--fg-muted);
       text-decoration: none;
     }
 
     footer a:hover {
-      text-decoration: underline;
+      color: var(--amber);
     }
 
     @media (max-width: 480px) {
@@ -199,8 +231,9 @@
   <div class="connexion-card">
 
     <div class="connexion-logo">
-      <img src="img/DST-Light.png" alt="CRBR Solutions" onerror="this.style.display='none'">
+      <img src="img/logo-cerbere-or.png" alt="CRBR Solutions" onerror="this.style.display='none'">
     </div>
+    <div class="connexion-divider"></div>
 
     <h1>Accès à votre espace</h1>
     <p class="connexion-subtitle">Entrez votre token d'accès pour vous connecter</p>

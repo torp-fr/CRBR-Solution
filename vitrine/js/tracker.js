@@ -63,7 +63,7 @@
 
   // Référent (externe uniquement)
   var ref = document.referrer || null;
-  if (ref && ref.indexOf('dst-system.fr') !== -1) ref = null;
+  if (ref && ref.indexOf('crbr-solution.fr') !== -1) ref = null;
 
   // Headers Supabase
   var headers = {

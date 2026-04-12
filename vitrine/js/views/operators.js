@@ -1225,7 +1225,7 @@ Views.Operators = (() => {
                 <span>${op.portailGenereeLe ? new Date(op.portailGenereeLe).toLocaleDateString('fr-FR') : '—'}</span>
               </div>
               <div style="background:var(--bg-secondary,#2a2a32);border-radius:6px;padding:10px 14px;font-family:monospace;font-size:0.82rem;word-break:break-all;margin-bottom:12px;" id="portail-link-display">
-                https://dst-system.fr/operateur/?token=${_escape(op.portailToken)}
+                https://crbr-solution.fr/operateur/?token=${_escape(op.portailToken)}
               </div>
               <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
                 <button class="btn btn-sm btn-primary" id="btn-sync-portail-op">☁ Synchroniser le portail</button>
@@ -1390,7 +1390,7 @@ Views.Operators = (() => {
     const btnCopier = overlay.querySelector('#btn-copy-portail-op');
     if (btnCopier) {
       btnCopier.addEventListener('click', () => {
-        const link = 'https://dst-system.fr/operateur/?token=' + op.portailToken;
+        const link = 'https://crbr-solution.fr/operateur/?token=' + op.portailToken;
         navigator.clipboard.writeText(link).then(() => {
           if (typeof Toast !== 'undefined') Toast.success('Lien copié dans le presse-papiers.');
           btnCopier.textContent = '✓ Copié';

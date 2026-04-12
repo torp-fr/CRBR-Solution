@@ -102,7 +102,7 @@ Views.Settings = {
           <div class="form-row">
             <div class="form-group">
               <label for="ent-nom">Nom de la soci\u00e9t\u00e9</label>
-              <input type="text" id="ent-nom" class="form-control" value="${escapeAttr(e.nom || 'DST System')}">
+              <input type="text" id="ent-nom" class="form-control" value="${escapeAttr(e.nom || 'CRBR Solutions')}">
             </div>
             <div class="form-group">
               <label for="ent-forme">Forme juridique</label>
@@ -146,11 +146,11 @@ Views.Settings = {
             </div>
             <div class="form-group">
               <label for="ent-email">Email</label>
-              <input type="email" id="ent-email" class="form-control" value="${escapeAttr(e.email || 'dst-system@hotmail.com')}">
+              <input type="email" id="ent-email" class="form-control" value="${escapeAttr(e.email || 'info@crbr-solution.fr')}">
             </div>
             <div class="form-group">
               <label for="ent-web">Site web</label>
-              <input type="text" id="ent-web" class="form-control" value="${escapeAttr(e.siteWeb || 'www.dst-system.fr')}">
+              <input type="text" id="ent-web" class="form-control" value="${escapeAttr(e.siteWeb || 'www.crbr-solution.fr')}">
             </div>
           </div>
 
@@ -175,7 +175,7 @@ Views.Settings = {
             base64:    e.logoTexteBase64 || '',
             keyB64:    'logoTexteBase64',
             keyMime:   'logoTexteMime',
-            defaultSrc: '../img/DST-Light.png'
+            defaultSrc: '../img/logo-cerbere-or.png'
           })}
           ${logoZone({
             label:     'Favicon \u2014 Ic\u00f4ne onglet navigateur',
@@ -186,7 +186,7 @@ Views.Settings = {
             base64:    e.faviconBase64 || '',
             keyB64:    'faviconBase64',
             keyMime:   'faviconMime',
-            defaultSrc: '../img/DST-Light-transparent.png'
+            defaultSrc: '../img/logo-cerbere-or.png'
           })}
 
           <h3 style="margin:20px 0 14px;font-size:0.88rem;color:var(--text-heading);">C. Mentions l\u00e9gales documents</h3>
@@ -1967,7 +1967,7 @@ Views.Settings = {
           keyMime:    'logoTexteMime',
           maxSize:    307200,
           imgStyle:   'max-height:60px;max-width:300px;',
-          defaultSrc: '../img/DST-Light.png'
+          defaultSrc: '../img/logo-cerbere-or.png'
         },
         {
           inputId:    'favicon-input',
@@ -1976,7 +1976,7 @@ Views.Settings = {
           keyMime:    'faviconMime',
           maxSize:    204800,
           imgStyle:   'width:32px;height:32px;image-rendering:pixelated;',
-          defaultSrc: '../img/DST-Light-transparent.png'
+          defaultSrc: '../img/logo-cerbere-or.png'
         }
       ];
 

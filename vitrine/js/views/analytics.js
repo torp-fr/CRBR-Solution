@@ -339,8 +339,8 @@ Views.Analytics = (function () {
     var CONSEILS = [
       'Publiez le lien de votre site sur les réseaux des polices municipales et associations de maires.',
       'Rédigez une page dédiée par type de public (police municipale, gendarmerie, entreprise) pour améliorer votre référencement.',
-      'Ajoutez un lien vers dst-system.fr dans votre signature email pour générer du trafic qualifié.',
-      'Demandez à vos premiers clients de mentionner DST System sur leurs sites ou réseaux sociaux.',
+      'Ajoutez un lien vers crbr-solution.fr dans votre signature email pour générer du trafic qualifié.',
+      'Demandez à vos premiers clients de mentionner CRBR Solutions sur leurs sites ou réseaux sociaux.',
       'Soumettez votre site à des annuaires spécialisés sécurité ou formation professionnelle.'
     ];
     var conseil = CONSEILS[new Date().getDate() % 5];
@@ -355,7 +355,7 @@ Views.Analytics = (function () {
       + _ct('Prochaines actions')
       + '<a href="https://search.google.com/search-console" target="_blank" class="seo-action high">'
       + '📌 Soumettre le sitemap à Google</a>'
-      + '<a href="https://www.linkedin.com/sharing/share-offsite/?url=https://dst-system.fr" target="_blank" class="seo-action medium">'
+      + '<a href="https://www.linkedin.com/sharing/share-offsite/?url=https://crbr-solution.fr" target="_blank" class="seo-action medium">'
       + '📧 Partager le lien sur LinkedIn</a>'
       + '<a href="https://trends.google.fr/trends/explore?q=formation+tir+simulation+police" target="_blank" class="seo-action low">'
       + '📊 Analyser les mots-clés cibles</a>'

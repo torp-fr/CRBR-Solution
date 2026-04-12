@@ -1,7 +1,7 @@
 /* ============================================================
-   DST-SYSTEM — Outil de Pilotage Stratégique
+   CRBR Solutions — Outil de Pilotage Stratégique
    Identité visuelle : premium, institutionnel, opérationnel
-   Neon Red Metallic — Dark Command Post Theme
+   Amber Command Post — Dark Tactical Theme
    ============================================================ */
 
 /* --- CSS Reset & Base --- */
@@ -22,15 +22,15 @@
   --text-muted: #5c6480;
   --text-heading: #f0f2f8;
 
-  /* Accent — rouge néon métallique */
-  --accent-red: #e63946;
-  --accent-red-light: #ff6b74;
-  --accent-red-dark: #c1121f;
-  --accent-red-bg: rgba(230, 57, 70, 0.08);
-  --neon-red: #ff1744;
-  --neon-red-glow: rgba(255, 23, 68, 0.35);
-  --neon-red-soft: rgba(255, 23, 68, 0.12);
-  --metallic-red: linear-gradient(135deg, #e53935 0%, #ff6659 40%, #e53935 60%, #ab000d 100%);
+  /* Accent — ambre tactique */
+  --accent-red: hsl(36, 90%, 50%);
+  --accent-red-light: #ffb84d;
+  --accent-red-dark: #c27008;
+  --accent-red-bg: rgba(242, 144, 16, 0.08);
+  --neon-red: #ffa000;
+  --neon-red-glow: rgba(255, 160, 0, 0.35);
+  --neon-red-soft: rgba(255, 160, 0, 0.12);
+  --metallic-red: linear-gradient(135deg, #f29010 0%, #ffb84d 40%, #f29010 60%, #c27008 100%);
 
   /* Statuts */
   --color-success: #2dd4a0;
@@ -57,6 +57,8 @@
   --shadow-md: 0 4px 12px rgba(0,0,0,0.5);
   --shadow-lg: 0 8px 32px rgba(0,0,0,0.6);
   --shadow-neon: 0 0 12px var(--neon-red-glow), 0 0 4px var(--neon-red-glow);
+  /* Alias ambre */
+  --amber: var(--accent-red);
 
   /* Transitions */
   --transition-fast: 150ms cubic-bezier(.4,0,.2,1);
@@ -73,7 +75,7 @@
   --sidebar-text:       var(--text-secondary);
   --sidebar-muted:      var(--text-muted);
   --sidebar-hover-bg:   rgba(255,255,255,0.05);
-  --sidebar-active-bg:  rgba(230,57,70,0.12);
+  --sidebar-active-bg:  rgba(242,144,16,0.12);
   --sidebar-active-text:#ffffff;
 
   /* Header */
@@ -102,9 +104,9 @@
   --border-color:    rgba(0,0,0,0.09);
   --border-light:    rgba(0,0,0,0.05);
   --border-subtle:   rgba(0,0,0,0.05);
-  --color-primary:   #e63946;
-  --accent-red:      #e63946;
-  --accent-red-bg:   rgba(230,57,70,0.06);
+  --color-primary:   hsl(36, 90%, 50%);
+  --accent-red:      hsl(36, 90%, 50%);
+  --accent-red-bg:   rgba(242,144,16,0.06);
   --color-success:   #059669;
   --color-warning:   #d97706;
   --color-info:      #2563eb;
@@ -118,8 +120,8 @@
   --sidebar-text:        #374151;
   --sidebar-muted:       #9ca3af;
   --sidebar-hover-bg:    #e8eaed;
-  --sidebar-active-bg:   rgba(230,57,70,0.08);
-  --sidebar-active-text: #e63946;
+  --sidebar-active-bg:   rgba(242,144,16,0.08);
+  --sidebar-active-text: hsl(36, 90%, 50%);
 
   /* Header EN CLAIR */
   --header-bg:           #ffffff;

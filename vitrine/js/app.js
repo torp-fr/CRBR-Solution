@@ -1,5 +1,5 @@
 /* ============================================================
-   DST-SYSTEM — Application principale
+   CRBR Solutions — Application principale
    Routeur SPA, navigation, gestion du header et des alertes
    ============================================================ */
 
@@ -192,7 +192,7 @@ const App = (() => {
 
     html += `</nav>
       <div class="sidebar-footer">
-        DST System &copy; ${new Date().getFullYear()}<br>
+        CRBR Solutions &copy; ${new Date().getFullYear()}<br>
         <span class="text-muted">Outil de pilotage interne</span>
       </div>
     `;
@@ -223,12 +223,12 @@ const App = (() => {
       var fallbackDiv =
         '<div style="display:none;flex-direction:column;">' +
           '<span style="font-size:14px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-primary);line-height:1.1;">' +
-            (ent.nom || 'DST SYSTEM') +
+            (ent.nom || 'CRBR Solutions') +
           '</span>' +
-          '<span style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--text-muted);margin-top:2px;">DRILL &amp; SKILLS TRAINING</span>' +
+          '<span style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--text-muted);margin-top:2px;">SOLUTIONS OPÉRATIONNELLES</span>' +
         '</div>';
       container.innerHTML =
-        '<img src="../img/DST-Light.png"' +
+        '<img src="../img/logo-cerbere-or.png"' +
         ' onerror="this.style.display=\'none\';this.nextSibling.style.display=\'flex\';"' +
         ' style="max-height:40px;max-width:160px;object-fit:contain;">' +
         fallbackDiv;
