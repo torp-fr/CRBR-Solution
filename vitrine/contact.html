@@ -4,49 +4,44 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Contact — DST System</title>
-  <meta name="description" content="Contactez DST System pour structurer la formation opérationnelle de vos équipes. Devis sur mesure, réponse sous 48h.">
+  <meta name="description" content="Prenez contact avec DST System pour un premier échange sans engagement. Nous répondons sous 48h.">
+  <meta name="robots" content="index, follow">
   <meta property="og:title" content="Contact — DST System">
-  <meta property="og:description" content="Prenez contact avec DST System pour un premier échange sans engagement sur votre programme d'entraînement.">
+  <meta property="og:description" content="Un premier échange sans engagement pour analyser votre besoin et vous proposer la solution adaptée.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://dst-system.fr/contact.html">
-  <meta property="og:image" content="https://dst-system.fr/img/DST-Light.png">
-  <meta property="og:locale" content="fr_FR">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
   <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
-<script>
-(function(){try{var s=JSON.parse(localStorage.getItem('dst_config_settings')||'{}');var fav=s.entreprise&&s.entreprise.faviconBase64;if(fav){var l=document.querySelector("link[rel*='icon']")||document.createElement('link');l.rel='icon';l.href=fav;l.type=(s.entreprise&&s.entreprise.faviconMime)||'image/png';if(!l.parentNode)document.head.appendChild(l);}}catch(e){}})();
-</script>
 </head>
 <body>
 
 <!-- NAVIGATION -->
 <nav class="nav" id="nav">
-  <div class="container nav__inner">
-    <a href="index.html" class="nav__logo"><strong>DST</strong> <span>System</span></a>
+  <div class="nav__inner">
+    <a href="index.html" class="nav__logo">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/><line x1="12" y1="2" x2="12" y2="5"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="2" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="22" y2="12"/></svg>
+      <strong>DST</strong> System
+    </a>
+    <ul class="nav__links" id="navLinks">
+      <li><a href="offres.html" class="nav__link">Nos solutions</a></li>
+      <li><a href="programme.html" class="nav__link">Notre démarche</a></li>
+      <li><a href="a-propos.html" class="nav__link">À propos</a></li>
+      <li><a href="contact.html" class="nav__link">Contact</a></li>
+      <li class="nav__mobile-actions">
+        <a href="contact.html?objet=presentation" class="btn btn--tactical btn--sm">Demander une présentation</a>
+        <a href="connexion.html" class="btn btn--connexion btn--sm">🔐 Connexion</a>
+      </li>
+    </ul>
+    <div class="nav__actions">
+      <a href="contact.html?objet=presentation" class="btn btn--tactical btn--sm">Demander une présentation</a>
+      <a href="connexion.html" class="btn btn--connexion btn--sm">🔐 Connexion</a>
+    </div>
     <button class="nav__burger" id="navBurger" aria-label="Ouvrir le menu" aria-expanded="false">
       <span></span><span></span><span></span>
     </button>
-    <ul class="nav__menu" id="navMenu">
-      <li class="nav__dropdown">
-        <a href="#" class="nav__link">
-          Notre approche
-          <svg class="nav__chevron" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </a>
-        <ul class="nav__submenu">
-          <li><a href="probleme.html">Le problème</a></li>
-          <li><a href="solution.html">La solution</a></li>
-        </ul>
-      </li>
-      <li><a href="programme.html" class="nav__link">Programme</a></li>
-      <li><a href="fonctionnement.html" class="nav__link">Fonctionnement</a></li>
-      <li><a href="offres.html" class="nav__link">Déploiement</a></li>
-      <li><a href="a-propos.html" class="nav__link">À propos</a></li>
-      <li><a href="contact.html" class="btn btn--red btn--sm active">Prendre contact</a></li>
-      <li><a href="connexion.html" class="btn btn--sm nav-connexion" style="background:#1a1a2e;color:#ffffff;border-radius:4px;padding:4px 12px;font-weight:600;">🔐 Connexion</a></li>
-    </ul>
   </div>
 </nav>
 <div class="nav-spacer"></div>
@@ -54,290 +49,147 @@
 <!-- PAGE HERO -->
 <section class="page-hero">
   <div class="container">
-    <div class="breadcrumb">
-      <a href="index.html">Accueil</a>
-      <span class="breadcrumb__sep">/</span>
-      <span>Contact</span>
-    </div>
     <span class="section-label">Prenons contact</span>
     <h1>Un premier échange,<br>sans engagement.</h1>
-    <p>
-      Décrivez-nous votre situation. Nous vous répondons dans les 48 heures
-      avec une première analyse et une proposition de programme adaptée à votre contexte.
-    </p>
+    <p>Décrivez votre structure et vos besoins. Nous revenons vers vous sous 48h avec une analyse de votre situation et une proposition adaptée.</p>
   </div>
 </section>
 
-<!-- SECTION : FORMULAIRE + INFOS -->
-<section class="section section--white">
+<!-- FORMULAIRE + SIDEBAR -->
+<section class="section">
   <div class="container">
     <div class="contact-grid">
 
       <!-- Formulaire -->
-      <div class="fade-up">
-        <h2 style="font-size: 1.4rem; margin-bottom: 8px;">Formulaire de contact</h2>
-        <p style="color: var(--text-l2); font-size: 0.9rem; margin-bottom: 32px;">
-          Remplissez les informations ci-dessous. Plus vous nous donnez de contexte, plus notre réponse sera précise.
-        </p>
-        <form class="form" id="contactForm" novalidate onsubmit="sendMail(event)">
+      <div class="form-card fade-up">
+        <h3>Formulaire de contact</h3>
+        <p class="form-sub">Tous les champs marqués d'un * sont obligatoires.</p>
 
-          <!-- Identité -->
+        <form class="form" id="contactForm" novalidate>
           <div class="form-row">
             <div class="field">
-              <label for="prenom">Prénom <span style="color: var(--red);">*</span></label>
+              <label for="prenom">Prénom <span style="color:var(--amber);">*</span></label>
               <input type="text" id="prenom" name="prenom" placeholder="Votre prénom" required autocomplete="given-name">
             </div>
             <div class="field">
-              <label for="nom">Nom <span style="color: var(--red);">*</span></label>
+              <label for="nom">Nom <span style="color:var(--amber);">*</span></label>
               <input type="text" id="nom" name="nom" placeholder="Votre nom" required autocomplete="family-name">
             </div>
           </div>
+
           <div class="field">
-            <label for="organisation">Organisation / Collectivité <span style="color: var(--red);">*</span></label>
-            <input type="text" id="organisation" name="organisation" placeholder="Ex : Mairie de Saint-Martin, Gendarmerie du Calvados…" required>
-          </div>
-          <div class="form-row">
-            <div class="field">
-              <label for="fonction">Fonction / Titre</label>
-              <input type="text" id="fonction" name="fonction" placeholder="Ex : Commandant, DGS, Chef de service…" autocomplete="organization-title">
-            </div>
-            <div class="field">
-              <label for="type_structure">Type de structure <span style="color: var(--red);">*</span></label>
-              <select id="type_structure" name="type_structure" required>
-                <option value="" disabled selected>Sélectionner votre structure</option>
-                <option value="police-municipale">Police municipale</option>
-                <option value="police-nationale">Police nationale</option>
-                <option value="gendarmerie">Gendarmerie</option>
-                <option value="administration-penitentiaire">Administration pénitentiaire</option>
-                <option value="douanes">Douanes</option>
-                <option value="convoyeurs">Convoyeurs de fonds</option>
-                <option value="securite-privee">Sécurité privée armée</option>
-                <option value="autre">Autre structure armée</option>
-              </select>
-            </div>
+            <label for="structure">Structure / Organisme <span style="color:var(--amber);">*</span></label>
+            <input type="text" id="structure" name="structure" placeholder="Nom de votre structure ou organisme" required>
           </div>
 
-          <!-- Dimensionnement -->
-          <div style="margin: 4px 0 8px; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-l3);">Dimensionnement de votre besoin</div>
           <div class="form-row">
             <div class="field">
-              <label for="effectif">Effectif concerné</label>
-              <select id="effectif" name="effectif">
-                <option value="" disabled selected>Nombre de personnels</option>
-                <option value="moins-10">Moins de 10 personnels</option>
-                <option value="10-25">10 à 25 personnels</option>
-                <option value="25-50">25 à 50 personnels</option>
-                <option value="50-100">50 à 100 personnels</option>
-                <option value="100+">Plus de 100 personnels</option>
-              </select>
-            </div>
-            <div class="field">
-              <label for="nb_sites">Nombre de sites / unités</label>
-              <select id="nb_sites" name="nb_sites">
-                <option value="" disabled selected>Nombre de sites</option>
-                <option value="1">1 site ou unité</option>
-                <option value="2-3">2 à 3 sites</option>
-                <option value="4-6">4 à 6 sites</option>
-                <option value="7+">7 sites ou plus</option>
-              </select>
-            </div>
-          </div>
-          <div class="field">
-            <label for="besoin">Nature du besoin estimé</label>
-            <select id="besoin" name="besoin">
-              <option value="" disabled selected>Quelle est la nature de votre besoin ?</option>
-              <option value="information">Demande d'information — comprendre le dispositif</option>
-              <option value="faisabilite">Étude de faisabilité — évaluer les conditions de déploiement</option>
-              <option value="projet">Projet de déploiement — structurer un programme sur mon territoire</option>
-              <option value="devis">Demande de devis — obtenir une proposition chiffrée</option>
-            </select>
-          </div>
-
-          <!-- Contact -->
-          <div style="margin: 4px 0 8px; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-l3);">Coordonnées</div>
-          <div class="form-row">
-            <div class="field">
-              <label for="email">Adresse e-mail <span style="color: var(--red);">*</span></label>
-              <input type="email" id="email" name="email" placeholder="votre@adresse.fr" required autocomplete="email">
+              <label for="email">Email <span style="color:var(--amber);">*</span></label>
+              <input type="email" id="email" name="email" placeholder="votre@email.fr" required autocomplete="email">
             </div>
             <div class="field">
               <label for="telephone">Téléphone</label>
-              <input type="tel" id="telephone" name="telephone" placeholder="0X XX XX XX XX" autocomplete="tel">
+              <input type="tel" id="telephone" name="telephone" placeholder="06 XX XX XX XX" autocomplete="tel">
             </div>
           </div>
 
-          <!-- Objet -->
           <div class="field">
-            <label for="formule">Objet de la demande</label>
-            <select id="formule" name="formule">
-              <option value="" disabled selected>Quelle est l'objet de votre démarche ?</option>
-              <option value="presentation">Demander une présentation du dispositif</option>
-              <option value="initier">Initier un projet de déploiement</option>
-              <option value="evaluation">Évaluer un déploiement sur mon territoire</option>
-              <option value="devis">Demander un devis détaillé</option>
-              <option value="indetermine">Je ne sais pas encore — besoin d'un échange préalable</option>
+            <label for="formule">Objet de la demande <span style="color:var(--amber);">*</span></label>
+            <select id="formule" name="formule" required>
+              <option value="" disabled selected>Sélectionner un objet…</option>
+              <option value="presentation">Demander une présentation</option>
+              <option value="offre-base">Offre Base — devis</option>
+              <option value="offre-operationnel">Offre Opérationnel — devis</option>
+              <option value="offre-premium">Offre Premium — devis</option>
+              <option value="programme-mobile">Programme Mobile — devis</option>
+              <option value="sur-mesure">Solution sur mesure</option>
+              <option value="devis">Demande de devis (général)</option>
+              <option value="evaluation">Évaluation des besoins</option>
+              <option value="indetermine">Autre / Non déterminé</option>
             </select>
           </div>
 
-          <!-- Message -->
           <div class="field">
-            <label for="message">Votre message <span style="color: var(--red);">*</span></label>
-            <textarea id="message" name="message" placeholder="Décrivez votre situation : contexte opérationnel, contraintes particulières (géographie, planning, budget), objectifs attendus…" required></textarea>
+            <label for="effectifs">Nombre d'effectifs à former (approximatif)</label>
+            <select id="effectifs" name="effectifs">
+              <option value="" disabled selected>Sélectionner une tranche…</option>
+              <option value="moins10">Moins de 10</option>
+              <option value="10-30">10 à 30</option>
+              <option value="30-100">30 à 100</option>
+              <option value="plus100">Plus de 100</option>
+              <option value="nc">Non communiqué</option>
+            </select>
           </div>
 
-          <div>
-            <p id="formNotice" class="form__notice" style="margin-bottom: 12px; min-height: 20px;"></p>
-            <button type="submit" class="btn btn--red btn--lg" style="width: 100%; justify-content: center;">
-              Envoyer la demande
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-            </button>
-            <div class="cta-micro cta-micro--light" style="justify-content: center; margin-top: 12px;">
-              <span>
-                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
-                Réponse sous 48h
-              </span>
-              <span>
-                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
-                Sans engagement
-              </span>
-              <span>
-                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
-                Adapté à votre organisation
-              </span>
-            </div>
+          <div class="field">
+            <label for="message">Message <span style="color:var(--amber);">*</span></label>
+            <textarea id="message" name="message" placeholder="Décrivez votre contexte, vos missions, vos contraintes, vos attentes…" required rows="5"></textarea>
           </div>
-          <p class="form__notice" style="text-align: center; margin-top: 8px;">
-            Les informations transmises sont utilisées uniquement pour répondre à votre demande. Elles ne sont pas partagées avec des tiers.
-          </p>
 
+          <button type="submit" class="btn btn--tactical btn--full btn--lg" id="submitBtn">
+            Envoyer la demande
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </button>
+
+          <div id="formNotice" class="form-notice" role="alert" aria-live="polite"></div>
         </form>
       </div>
 
-      <!-- Informations de contact -->
-      <div class="fade-up">
-        <h2 style="font-size: 1.4rem; margin-bottom: 8px;">Informations</h2>
-        <p style="color: var(--text-l2); font-size: 0.9rem; margin-bottom: 32px;">
-          Nous répondons à toutes les demandes dans un délai de 48 heures ouvrées.
-          Pour les demandes urgentes, privilégiez le contact téléphonique.
-        </p>
-        <div class="contact-info">
-          <div class="contact-info__item">
-            <div class="contact-info__icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" stroke-width="1.5" stroke-linecap="round"/><polyline points="22,6 12,13 2,6" stroke-width="1.5" stroke-linecap="round"/></svg>
-            </div>
+      <!-- Sidebar informations -->
+      <div class="contact-sidebar fade-up">
+
+        <div class="contact-info-card">
+          <div class="contact-info-card__label">Informations</div>
+          <div class="contact-info-item">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
             <div>
-              <h4>E-mail</h4>
-              <a href="mailto:dst-system@hotmail.com" id="contact-email-link"><span id="contact-email">dst-system@hotmail.com</span></a>
-              <p>Réponse sous 48h ouvrées</p>
+              <strong>Délai de réponse</strong>
+              <span>Nous répondons sous 48h ouvrées</span>
             </div>
           </div>
-          <div class="contact-info__item">
-            <div class="contact-info__icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81a19.79 19.79 0 01-3.07-8.67A2 2 0 012 1h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.91 8.9a16 16 0 006.29 6.29l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            </div>
+          <div class="contact-info-item">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81 19.79 19.79 0 012 1.18 2 2 0 014 0h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L8.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 14h-.08z"/></svg>
             <div>
-              <h4>Téléphone</h4>
-              <a href="tel:+33665445226" id="contact-tel-link"><span id="contact-tel">06 65 44 52 26</span></a>
-              <p>Lundi – Vendredi, 9h à 18h</p>
+              <strong>Premier échange</strong>
+              <span>Par téléphone ou visioconférence selon votre disponibilité</span>
             </div>
           </div>
-          <div class="contact-info__item">
-            <div class="contact-info__icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M17.657 16.657L13.414 20.9a2 2 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" stroke-width="1.5" stroke-linecap="round"/><path d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" stroke-width="1.5" stroke-linecap="round"/></svg>
-            </div>
+          <div class="contact-info-item">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
             <div>
-              <h4>Déploiement</h4>
-              <p>Territoire national</p>
-              <p>Déplacement inclus dans les formules</p>
+              <strong>Zone d'intervention</strong>
+              <span>France métropolitaine et territoires d'outre-mer</span>
             </div>
           </div>
         </div>
 
-        <!-- Ce qui se passe ensuite -->
-        <div style="margin-top: 40px; background: var(--bg-grey); border: 1px solid var(--bd-light-md); border-radius: var(--radius-lg); padding: 28px;">
-          <h4 style="font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-l3); margin-bottom: 20px;">Ce qui se passe après votre envoi</h4>
-          <div style="display: flex; flex-direction: column; gap: 16px;">
-            <div style="display: flex; gap: 16px; align-items: flex-start;">
-              <div style="width: 28px; height: 28px; background: var(--red-muted); border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 0.72rem; font-weight: 700; color: var(--red);">1</div>
-              <div>
-                <strong style="font-size: 0.9rem; display: block; margin-bottom: 2px;">Lecture de votre demande</strong>
-                <p style="font-size: 0.83rem; color: var(--text-l2);">Nous analysons votre situation et préparons des questions complémentaires si nécessaire.</p>
-              </div>
-            </div>
-            <div style="display: flex; gap: 16px; align-items: flex-start;">
-              <div style="width: 28px; height: 28px; background: var(--red-muted); border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 0.72rem; font-weight: 700; color: var(--red);">2</div>
-              <div>
-                <strong style="font-size: 0.9rem; display: block; margin-bottom: 2px;">Réponse sous 48h</strong>
-                <p style="font-size: 0.83rem; color: var(--text-l2);">Nous revenons vers vous avec une première analyse et une proposition de premier échange.</p>
-              </div>
-            </div>
-            <div style="display: flex; gap: 16px; align-items: flex-start;">
-              <div style="width: 28px; height: 28px; background: var(--red-muted); border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 0.72rem; font-weight: 700; color: var(--red);">3</div>
-              <div>
-                <strong style="font-size: 0.9rem; display: block; margin-bottom: 2px;">Entretien de cadrage</strong>
-                <p style="font-size: 0.83rem; color: var(--text-l2);">Un appel ou une réunion pour affiner votre besoin et construire une proposition de programme.</p>
-              </div>
-            </div>
+        <div class="contact-info-card">
+          <div class="contact-info-card__label">Ce qui nous aide à vous répondre</div>
+          <div class="contact-info-item">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            <span>Le nom et le type de votre structure</span>
+          </div>
+          <div class="contact-info-item">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            <span>Le nombre approximatif d'effectifs</span>
+          </div>
+          <div class="contact-info-item">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            <span>Vos missions et contexte opérationnel</span>
+          </div>
+          <div class="contact-info-item">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            <span>L'infrastructure disponible sur site</span>
           </div>
         </div>
 
-        <!-- Phase de déploiement -->
-        <div style="margin-top: 24px; padding: 18px 22px; background: var(--red-muted); border: 1px solid var(--red-border); border-radius: var(--radius); display: flex; gap: 14px; align-items: flex-start;">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="1.75" stroke-linecap="round" style="flex-shrink: 0; margin-top: 2px;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-          <p style="font-size: 0.84rem; color: var(--text-l1); line-height: 1.7; margin: 0;">
-            DST System est en phase de déploiement et accompagne ses premiers partenaires dans la mise en place de dispositifs territoriaux. Votre demande sera traitée avec une attention particulière.
+        <div class="contact-info-card" style="background:var(--amber-10);border-color:var(--amber-20);">
+          <p style="font-size:0.85rem;color:var(--fg-muted);line-height:1.65;">
+            <strong style="color:var(--amber);display:block;margin-bottom:6px;">Échange confidentiel</strong>
+            Toutes les informations partagées restent strictement confidentielles. Nous intervenons dans des environnements sensibles et traitons chaque demande avec la discrétion requise.
           </p>
         </div>
 
-        <!-- Documents disponibles -->
-        <div style="margin-top: 24px; padding: 24px; border: 1px solid var(--bd-light-md); border-radius: var(--radius-lg);">
-          <h4 style="font-size: 0.87rem; margin-bottom: 12px;">Documents disponibles</h4>
-          <a href="plaquette.html" target="_blank" onclick="DSTTrack?.event('download', 'plaquette_pdf')" style="display: flex; align-items: center; gap: 10px; padding: 10px 14px; background: var(--red-muted); border: 1px solid var(--red-border); border-radius: var(--radius-sm); margin-bottom: 12px; text-decoration: none;">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
-            <span>
-              <span style="display: block; font-size: 0.84rem; font-weight: 600; color: var(--text-l1);">Plaquette de présentation</span>
-              <span style="display: block; font-size: 0.76rem; color: var(--text-l3);">Document complet — 6 pages · PDF via navigateur</span>
-            </span>
-          </a>
-          <ul style="display: flex; flex-direction: column; gap: 8px;">
-            <li style="font-size: 0.85rem; color: var(--text-l2); display: flex; gap: 8px; align-items: center;">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
-              Exemple de rapport de session et de bilan trimestriel (sur demande)
-            </li>
-            <li style="font-size: 0.85rem; color: var(--text-l2); display: flex; gap: 8px; align-items: center;">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
-              Documents administratifs pour constitution de dossier (RC Pro, Kbis)
-            </li>
-            <li style="font-size: 0.85rem; color: var(--text-l2); display: flex; gap: 8px; align-items: center;">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
-              Modèle de cahier des charges pour consultation MAPA
-            </li>
-          </ul>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- RÉASSURANCE -->
-<section class="section section--grey">
-  <div class="container">
-    <div class="stats fade-up">
-      <div class="stat">
-        <div class="stat__number stat__number--red">48h</div>
-        <div class="stat__label">Délai de réponse maximum</div>
-      </div>
-      <div class="stat">
-        <div class="stat__number">0</div>
-        <div class="stat__label">Engagement à la prise de contact</div>
-      </div>
-      <div class="stat">
-        <div class="stat__number stat__number--red">1</div>
-        <div class="stat__label">Interlocuteur référent tout au long</div>
-      </div>
-      <div class="stat">
-        <div class="stat__number">3–4</div>
-        <div class="stat__label">Semaines pour démarrer le programme</div>
       </div>
     </div>
   </div>
@@ -346,88 +198,83 @@
 <!-- FOOTER -->
 <footer class="footer">
   <div class="container">
-    <div class="footer__grid">
+    <div class="footer__inner">
       <div class="footer__brand">
-        <div class="footer__logo"><strong>DST</strong> System</div>
-        <p>Formation opérationnelle professionnelle à destination des forces de sécurité, d'intervention et de protection.</p>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/><line x1="12" y1="2" x2="12" y2="5"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="2" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="22" y2="12"/></svg>
+        <strong>DST</strong> System
+        <span style="margin-left:8px;font-weight:400;">— Drill &amp; Skills Training</span>
       </div>
-      <div class="footer__col">
-        <h4>Navigation</h4>
-        <ul>
-          <li><a href="programme.html">Le programme</a></li>
-          <li><a href="fonctionnement.html">Fonctionnement</a></li>
-          <li><a href="offres.html">Déploiement</a></li>
-          <li><a href="a-propos.html">À propos</a></li>
-          <li><a href="contact.html">Contact</a></li>
-          <li><a href="plaquette.html" target="_blank" onclick="DSTTrack?.event('download', 'plaquette_pdf')">Plaquette PDF</a></li>
-        </ul>
-      </div>
-      <div class="footer__col">
-        <h4>Contact direct</h4>
-        <p>dst-system@hotmail.com<br>06 65 44 52 26<br><br>Lundi – Vendredi<br>9h – 18h</p>
-      </div>
-    </div>
-    <div class="footer__bottom">
-      <p>© 2026 DST System — Drill &amp; Skills Training. Tous droits réservés.</p>
-      <p>Formation opérationnelle professionnelle</p>
-      <p style="font-size:12px;color:#6b7280;margin-top:8px;">
-        <a href="mentions-legales.html" style="color:#6b7280;text-decoration:none;">Mentions légales</a>
-        &nbsp;·&nbsp;
-        <a href="confidentialite.html" style="color:#6b7280;text-decoration:none;">Politique de confidentialité</a>
-        &nbsp;·&nbsp;
-        <a href="cgv.html" style="color:#6b7280;text-decoration:none;">CGV</a>
-      </p>
+      <nav class="footer__links">
+        <a href="offres.html">Nos solutions</a>
+        <a href="programme.html">Notre démarche</a>
+        <a href="a-propos.html">À propos</a>
+        <a href="contact.html">Contact</a>
+        <a href="mentions-legales.html">Mentions légales</a>
+        <a href="cgv.html">CGV</a>
+        <a href="confidentialite.html">Confidentialité</a>
+      </nav>
+      <p class="footer__copy">&copy; <script>document.write(new Date().getFullYear())</script> DST System. Tous droits réservés.</p>
     </div>
   </div>
 </footer>
 
-<script src="js/main.js"></script>
+<script src="js/main.js" defer></script>
 <script src="js/tracker.js" defer></script>
 <script>
 (function(){
   emailjs.init("CgTXrA6V-AGhtlJvz");
-})();
 
-function sendMail(e) {
-  e.preventDefault();
-  var btn = e.target.querySelector('button[type="submit"]');
-  var notice = document.getElementById('formNotice');
-  btn.disabled = true;
-  btn.textContent = 'Envoi en cours…';
+  var form = document.getElementById('contactForm');
+  if (!form) return;
 
-  emailjs.send("service_q6n1xhc", "template_x629ciw", {
-    prenom:        document.getElementById('prenom').value,
-    nom:           document.getElementById('nom').value,
-    organisation:  document.getElementById('organisation').value,
-    type:          document.getElementById('type_structure').value,
-    fonction:      document.getElementById('fonction').value,
-    effectif:      document.getElementById('effectif').value,
-    localisation:  document.getElementById('nb_sites').value,
-    besoin:        document.getElementById('besoin').value,
-    email:         document.getElementById('email').value,
-    telephone:     document.getElementById('telephone').value,
-    formule:       document.getElementById('formule').value,
-    message:       document.getElementById('message').value
-  })
-  .then(function() {
-    DSTTrack?.event('form_submit', 'contact');
-    alert("Message envoyé avec succès");
-    notice.textContent = "Votre demande a bien été envoyée. Nous vous répondons sous 48h.";
-    notice.style.color = "green";
-    e.target.reset();
-    btn.disabled = false;
-    btn.innerHTML = 'Envoyer la demande <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>';
-  }, function(error) {
-    alert("Erreur lors de l'envoi");
-    notice.textContent = "Une erreur est survenue. Merci de réessayer ou de nous contacter directement.";
-    notice.style.color = "var(--red)";
-    btn.disabled = false;
-    btn.innerHTML = 'Envoyer la demande <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>';
+  form.addEventListener('submit', function(e) {
+    e.preventDefault();
+    var btn    = document.getElementById('submitBtn');
+    var notice = document.getElementById('formNotice');
+
+    // Validation
+    var required = form.querySelectorAll('[required]');
+    var valid = true;
+    required.forEach(function(field) {
+      field.style.borderColor = '';
+      if (!field.value.trim()) {
+        field.style.borderColor = 'var(--amber)';
+        valid = false;
+      }
+    });
+    if (!valid) {
+      notice.textContent = 'Veuillez remplir tous les champs obligatoires.';
+      notice.className = 'form-notice error';
+      return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = 'Envoi en cours…';
+
+    emailjs.send("service_q6n1xhc", "template_x629ciw", {
+      prenom:     document.getElementById('prenom').value,
+      nom:        document.getElementById('nom').value,
+      email:      document.getElementById('email').value,
+      telephone:  document.getElementById('telephone').value,
+      structure:  document.getElementById('structure').value,
+      formule:    document.getElementById('formule').value,
+      effectifs:  document.getElementById('effectifs').value,
+      message:    document.getElementById('message').value,
+    }).then(function() {
+      DSTTrack?.event('form_submit', 'contact');
+      notice.textContent = 'Votre demande a bien été envoyée. Nous vous répondons sous 48h.';
+      notice.className = 'form-notice success';
+      form.reset();
+      btn.disabled = false;
+      btn.innerHTML = 'Envoyer la demande <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>';
+    }, function(err) {
+      notice.textContent = 'Une erreur est survenue. Merci de réessayer ou de nous contacter directement.';
+      notice.className = 'form-notice error';
+      btn.disabled = false;
+      btn.innerHTML = 'Envoyer la demande <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>';
+    });
   });
-}
-</script>
-<script>
-(function(){try{var s=JSON.parse(localStorage.getItem('dst_config_settings')||'{}');var ent=s.entreprise;if(ent&&ent.email){var em=document.getElementById('contact-email');var emL=document.getElementById('contact-email-link');if(em)em.textContent=ent.email;if(emL)emL.href='mailto:'+ent.email;}if(ent&&ent.telephone){var tel=document.getElementById('contact-tel');var telL=document.getElementById('contact-tel-link');if(tel)tel.textContent=ent.telephone;if(telL)telL.href='tel:'+ent.telephone.replace(/\s/g,'');}}catch(e){}})();
+})();
 </script>
 </body>
 </html>

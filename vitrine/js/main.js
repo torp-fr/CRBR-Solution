@@ -1,6 +1,6 @@
 /* ============================================================
-   DST SYSTEM — Vitrine JS
-   Navigation, animations, formulaire
+   DST SYSTEM — Vitrine JS v2.0
+   Navigation flat, animations scroll, FAQ, formulaire
    ============================================================ */
 
 (function () {
@@ -8,44 +8,36 @@
 
   /* --- Navigation burger (mobile) --- */
   const burger  = document.getElementById('navBurger');
-  const navMenu = document.getElementById('navMenu');
+  const navLinks = document.getElementById('navLinks');
 
-  if (burger && navMenu) {
+  if (burger && navLinks) {
     burger.addEventListener('click', function () {
-      const isOpen = navMenu.classList.toggle('open');
+      const isOpen = navLinks.classList.toggle('open');
       burger.classList.toggle('open', isOpen);
       burger.setAttribute('aria-expanded', isOpen);
+      document.body.style.overflow = isOpen ? 'hidden' : '';
     });
   }
 
-  /* --- Dropdown mobile (touch/click) --- */
-  document.querySelectorAll('.nav__dropdown > .nav__link').forEach(function (link) {
-    link.addEventListener('click', function (e) {
-      if (window.innerWidth <= 768) {
-        e.preventDefault();
-        const parent = link.closest('.nav__dropdown');
-        parent.classList.toggle('open');
-      }
-    });
-  });
-
   /* --- Fermer le menu si on clique en dehors --- */
   document.addEventListener('click', function (e) {
-    if (navMenu && burger && !navMenu.contains(e.target) && !burger.contains(e.target)) {
-      navMenu.classList.remove('open');
+    if (navLinks && burger && !navLinks.contains(e.target) && !burger.contains(e.target)) {
+      navLinks.classList.remove('open');
       burger.classList.remove('open');
       burger.setAttribute('aria-expanded', 'false');
+      document.body.style.overflow = '';
     }
   });
 
   /* --- Fermer le menu sur resize --- */
   window.addEventListener('resize', function () {
-    if (window.innerWidth > 768 && navMenu) {
-      navMenu.classList.remove('open');
+    if (window.innerWidth > 960 && navLinks) {
+      navLinks.classList.remove('open');
       if (burger) {
         burger.classList.remove('open');
         burger.setAttribute('aria-expanded', 'false');
       }
+      document.body.style.overflow = '';
     }
   });
 
@@ -55,18 +47,6 @@
     const href = link.getAttribute('href');
     if (href && href !== '#' && href === currentPage) {
       link.classList.add('active');
-      const parent = link.closest('.nav__dropdown');
-      if (parent) {
-        const parentLink = parent.querySelector(':scope > .nav__link');
-        if (parentLink) parentLink.classList.add('active');
-      }
-    }
-  });
-  document.querySelectorAll('.nav__submenu a').forEach(function (link) {
-    if (link.getAttribute('href') === currentPage) {
-      link.style.color = 'var(--text-d1)';
-      const parentLink = link.closest('.nav__dropdown')?.querySelector(':scope > .nav__link');
-      if (parentLink) parentLink.classList.add('active');
     }
   });
 
@@ -78,10 +58,23 @@
         observer.unobserve(entry.target);
       }
     });
-  }, { threshold: 0.12 });
+  }, { threshold: 0.1 });
 
   document.querySelectorAll('.fade-up').forEach(function (el) {
     observer.observe(el);
+  });
+
+  /* --- FAQ accordion --- */
+  document.querySelectorAll('.faq-btn').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      const item = btn.closest('.faq-item');
+      const isOpen = item.classList.contains('open');
+      // Fermer tous les autres
+      document.querySelectorAll('.faq-item.open').forEach(function (openItem) {
+        if (openItem !== item) openItem.classList.remove('open');
+      });
+      item.classList.toggle('open', !isOpen);
+    });
   });
 
   /* --- Pré-sélection du formulaire via paramètres URL --- */
@@ -89,59 +82,11 @@
   if (formule) {
     const params = new URLSearchParams(window.location.search);
     const objet  = params.get('objet');
-    const niveau = params.get('niveau');
-    const valid  = ['presentation', 'initier', 'evaluation', 'devis', 'indetermine'];
+    const valid  = ['presentation', 'initier', 'evaluation', 'devis', 'indetermine',
+                    'offre-base', 'offre-operationnel', 'offre-premium', 'programme-mobile', 'sur-mesure'];
     if (objet && valid.includes(objet)) {
       formule.value = objet;
-    } else if (niveau) {
-      // niveau=renforce / unite / territorial → map to devis
-      formule.value = 'devis';
     }
-  }
-
-  /* --- Formulaire de contact --- */
-  const form = document.getElementById('contactForm');
-  if (form) {
-    form.addEventListener('submit', function (e) {
-      e.preventDefault();
-
-      const btn = form.querySelector('button[type="submit"]');
-      const notice = document.getElementById('formNotice');
-      const originalText = btn.textContent;
-
-      // Validation basique
-      const required = form.querySelectorAll('[required]');
-      let valid = true;
-      required.forEach(function (field) {
-        field.style.borderColor = '';
-        if (!field.value.trim()) {
-          field.style.borderColor = '#c0392b';
-          valid = false;
-        }
-      });
-
-      if (!valid) {
-        if (notice) {
-          notice.textContent = 'Veuillez remplir tous les champs obligatoires.';
-          notice.style.color = '#c0392b';
-        }
-        return;
-      }
-
-      // Simulation envoi
-      btn.disabled = true;
-      btn.textContent = 'Envoi en cours…';
-
-      setTimeout(function () {
-        btn.disabled = false;
-        btn.textContent = originalText;
-        form.reset();
-        if (notice) {
-          notice.textContent = 'Votre message a bien été envoyé. Nous vous répondrons dans les 48 heures.';
-          notice.style.color = '#2a7a2a';
-        }
-      }, 1200);
-    });
   }
 
   /* --- Smooth scroll pour ancres internes --- */
@@ -154,5 +99,11 @@
       }
     });
   });
+
+  /* --- Cookie banner --- */
+  const cookieBanner = document.getElementById('cookie-banner');
+  if (cookieBanner && localStorage.getItem('cookies_accepted')) {
+    cookieBanner.style.display = 'none';
+  }
 
 })();

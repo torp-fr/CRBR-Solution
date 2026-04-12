@@ -3,50 +3,44 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Programme d'entraînement — DST System</title>
-  <meta name="description" content="Le programme d'entraînement DST System : séances régulières en cycle annuel, directement au sein de vos unités. Démarrage immédiat, entraînement récurrent, bilan documenté.">
+  <title>Notre démarche — DST System</title>
+  <meta name="description" content="De l'analyse de vos missions à l'installation permanente et au suivi continu — la démarche DST System en six étapes claires.">
   <meta name="robots" content="index, follow">
-  <meta property="og:title" content="Programme annuel — DST System">
-  <meta property="og:description" content="Un programme annuel structuré pour le maintien des compétences opérationnelles de vos agents.">
+  <meta property="og:title" content="Notre démarche — DST System">
+  <meta property="og:description" content="De l'analyse à l'installation, la démarche DST System pour déployer votre solution d'entraînement opérationnel.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://dst-system.fr/programme.html">
-  <meta property="og:image" content="https://dst-system.fr/img/DST-Light.png">
-  <meta property="og:locale" content="fr_FR">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
-<script>
-(function(){try{var s=JSON.parse(localStorage.getItem('dst_config_settings')||'{}');var fav=s.entreprise&&s.entreprise.faviconBase64;if(fav){var l=document.querySelector("link[rel*='icon']")||document.createElement('link');l.rel='icon';l.href=fav;l.type=(s.entreprise&&s.entreprise.faviconMime)||'image/png';if(!l.parentNode)document.head.appendChild(l);}}catch(e){}})();
-</script>
 </head>
 <body>
 
 <!-- NAVIGATION -->
 <nav class="nav" id="nav">
-  <div class="container nav__inner">
-    <a href="index.html" class="nav__logo"><strong>DST</strong> <span>System</span></a>
+  <div class="nav__inner">
+    <a href="index.html" class="nav__logo">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/><line x1="12" y1="2" x2="12" y2="5"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="2" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="22" y2="12"/></svg>
+      <strong>DST</strong> System
+    </a>
+    <ul class="nav__links" id="navLinks">
+      <li><a href="offres.html" class="nav__link">Nos solutions</a></li>
+      <li><a href="programme.html" class="nav__link">Notre démarche</a></li>
+      <li><a href="a-propos.html" class="nav__link">À propos</a></li>
+      <li><a href="contact.html" class="nav__link">Contact</a></li>
+      <li class="nav__mobile-actions">
+        <a href="contact.html?objet=presentation" class="btn btn--tactical btn--sm">Demander une présentation</a>
+        <a href="connexion.html" class="btn btn--connexion btn--sm">🔐 Connexion</a>
+      </li>
+    </ul>
+    <div class="nav__actions">
+      <a href="contact.html?objet=presentation" class="btn btn--tactical btn--sm">Demander une présentation</a>
+      <a href="connexion.html" class="btn btn--connexion btn--sm">🔐 Connexion</a>
+    </div>
     <button class="nav__burger" id="navBurger" aria-label="Ouvrir le menu" aria-expanded="false">
       <span></span><span></span><span></span>
     </button>
-    <ul class="nav__menu" id="navMenu">
-      <li class="nav__dropdown">
-        <a href="#" class="nav__link">
-          Notre approche
-          <svg class="nav__chevron" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </a>
-        <ul class="nav__submenu">
-          <li><a href="probleme.html">Le problème</a></li>
-          <li><a href="solution.html">La solution</a></li>
-        </ul>
-      </li>
-      <li><a href="offres.html" class="nav__link">Nos solutions</a></li>
-      <li><a href="programme.html" class="nav__link active">Notre démarche</a></li>
-      <li><a href="fonctionnement.html" class="nav__link">Fonctionnement</a></li>
-      <li><a href="a-propos.html" class="nav__link">À propos</a></li>
-      <li><a href="contact.html" class="btn btn--red btn--sm">Prendre contact</a></li>
-      <li><a href="connexion.html" class="btn btn--sm nav-connexion" style="background:#1a1a2e;color:#ffffff;border-radius:4px;padding:4px 12px;font-weight:600;">🔐 Connexion</a></li>
-    </ul>
   </div>
 </nav>
 <div class="nav-spacer"></div>
@@ -54,238 +48,134 @@
 <!-- PAGE HERO -->
 <section class="page-hero">
   <div class="container">
-    <div class="breadcrumb">
-      <a href="index.html">Accueil</a>
-      <span class="breadcrumb__sep">/</span>
-      <span>Notre démarche</span>
-    </div>
     <span class="section-label">Notre démarche</span>
-    <h1>Notre approche.<br>De l'installation au suivi.</h1>
-    <p>
-      De la mise en place du simulateur dans vos locaux à la transmission des bilans au commandement :
-      voici comment fonctionne concrètement la relation avec DST System — du premier contact
-      à la continuité opérationnelle sur le long terme.
-    </p>
+    <h1>De l'analyse à l'entraînement<br>permanent. Six étapes.</h1>
+    <p>DST System ne vend pas un produit — nous déployons une solution. Chaque engagement suit un processus structuré, du premier contact jusqu'au suivi continu de votre dispositif.</p>
   </div>
 </section>
 
-<!-- SECTION 1 : LA LOGIQUE DU PROGRAMME -->
-<section class="section section--white">
+<!-- LA LOGIQUE -->
+<section class="section">
   <div class="container">
-    <div class="grid-2" style="gap: 72px; align-items: center;">
+    <div class="approach-grid">
       <div class="fade-up">
         <span class="section-label">La logique du programme</span>
-        <h2>La régularité, pas l'intensité.<br>La répétition, pas le stage.</h2>
-        <p style="color: var(--text-l2); margin-top: 16px; margin-bottom: 20px;">
-          Un stage intensif de deux jours produit des effets réels — qui s'estompent en quelques semaines
-          si rien ne vient les consolider. La compétence opérationnelle ne s'acquiert pas sur la durée d'une session.
-          Elle s'ancre dans le temps, par la répétition régulière de gestes, de protocoles et de prises de décision.
+        <h2>La régularité, pas l'intensité.<br><span style="color:var(--fg-muted);font-weight:800;">La répétition, pas le stage.</span></h2>
+        <p class="text-muted" style="margin-top:16px;">
+          Les compétences opérationnelles ne se maintiennent pas par des sessions intensives annuelles. Elles se construisent par la répétition régulière, dans des conditions proches de la réalité — sans contrainte logistique, sans déplacement, sans coût de munitions.
         </p>
-        <p style="color: var(--text-l2); margin-bottom: 24px;">
-          C'est le principe fondateur du programme DST : 1 à 2 séances par mois sur le cycle annuel
-          sont plus efficaces qu'un cycle intense et rare. L'organisme et le cerveau intègrent les automatismes
-          par la réexposition fréquente — pas par l'intensité d'un effort isolé.
+        <p class="text-muted" style="margin-top:16px;">
+          C'est pourquoi DST System déploie des solutions permanentes, installées chez vous. Un dispositif disponible à tout moment, utilisable par vos référents internes, qui produit des résultats mesurables sur la durée.
         </p>
-        <div class="insight">
-          <p>Un cycle annuel représente 12 à 24 séances d'entraînement. C'est cette accumulation régulière qui produit des compétences durables, mobilisables en situation réelle.</p>
+        <div class="stats-row" style="margin-top:40px;">
+          <div class="stat-cell">
+            <div class="stat-cell__num">0</div>
+            <div class="stat-cell__label">Déplacement nécessaire</div>
+          </div>
+          <div class="stat-cell">
+            <div class="stat-cell__num">24h</div>
+            <div class="stat-cell__label">Disponible en permanence</div>
+          </div>
+          <div class="stat-cell">
+            <div class="stat-cell__num">∞</div>
+            <div class="stat-cell__label">Entraînements illimités</div>
+          </div>
+          <div class="stat-cell">
+            <div class="stat-cell__num">48h</div>
+            <div class="stat-cell__label">Délai de réponse max</div>
+          </div>
         </div>
       </div>
-      <div class="fade-up">
-        <div style="display: flex; flex-direction: column; gap: 16px;">
-          <div style="background: var(--bg-grey); border: 1px solid var(--bd-light-md); border-radius: var(--radius-lg); padding: 28px 32px;">
-            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
-              <span style="font-size: 0.78rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-l3);">Stage ponctuel</span>
-              <span style="font-size: 0.72rem; padding: 3px 8px; background: var(--bd-light-md); border-radius: 2px; color: var(--text-l3);">Approche classique</span>
-            </div>
-            <div style="display: flex; flex-direction: column; gap: 10px;">
-              <div style="display: flex; gap: 10px; font-size: 0.87rem; color: var(--text-l2); align-items: center;">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text-l3)" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-                1 à 2 sessions intensives par an
-              </div>
-              <div style="display: flex; gap: 10px; font-size: 0.87rem; color: var(--text-l2); align-items: center;">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text-l3)" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-                Effet de pointe, déclin rapide
-              </div>
-              <div style="display: flex; gap: 10px; font-size: 0.87rem; color: var(--text-l2); align-items: center;">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text-l3)" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-                Déplacement, logistique, coût élevé
-              </div>
-              <div style="display: flex; gap: 10px; font-size: 0.87rem; color: var(--text-l2); align-items: center;">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text-l3)" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-                Pas de suivi de progression
-              </div>
-            </div>
-          </div>
-          <div style="background: rgba(192,57,43,0.04); border: 1.5px solid var(--red-border); border-radius: var(--radius-lg); padding: 28px 32px;">
-            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
-              <span style="font-size: 0.78rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--red);">Programme DST</span>
-              <span style="font-size: 0.72rem; padding: 3px 8px; background: var(--red-muted); border-radius: 2px; color: var(--red); font-weight: 600;">Cycle annuel</span>
-            </div>
-            <div style="display: flex; flex-direction: column; gap: 10px;">
-              <div style="display: flex; gap: 10px; font-size: 0.87rem; color: var(--text-l1); align-items: center;">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
-                1 à 2 séances par mois, sur votre site
-              </div>
-              <div style="display: flex; gap: 10px; font-size: 0.87rem; color: var(--text-l1); align-items: center;">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
-                Progression continue, compétences ancrées
-              </div>
-              <div style="display: flex; gap: 10px; font-size: 0.87rem; color: var(--text-l1); align-items: center;">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
-                Zéro déplacement, zéro logistique
-              </div>
-              <div style="display: flex; gap: 10px; font-size: 0.87rem; color: var(--text-l1); align-items: center;">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
-                Suivi documenté, bilan au commandement
-              </div>
-            </div>
-          </div>
+      <div class="approach-img fade-up">
+        <img src="img/shooting-house.jpg" alt="Shooting house DST System" loading="lazy">
+        <div class="approach-badge">
+          <p>Installation permanente</p>
+          <p>Un dispositif dans vos locaux, disponible à tout moment pour vos équipes.</p>
         </div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- SECTION 2 : LES 4 PHASES (dark) -->
+<!-- LES 6 ÉTAPES -->
 <section class="section section--dark">
   <div class="container">
     <div class="section-header fade-up">
-      <span class="section-label">Notre démarche en 4 étapes</span>
-      <h2>De l'installation au suivi,<br>en quatre étapes claires.</h2>
-      <p>Chaque étape a un objectif précis. De la première visite de site à la reconduction du contrat, voici ce qui se passe concrètement.</p>
+      <span class="section-label">Notre démarche en 6 étapes</span>
+      <h2>De la prise de contact<br><span style="color:var(--fg-muted);font-weight:800;">à l'entraînement permanent.</span></h2>
     </div>
-
-    <!-- Phase 1 -->
-    <div class="fade-up" style="display: grid; grid-template-columns: 200px 1fr; gap: 0; border: 1px solid var(--bd-dark-md); border-radius: var(--radius-lg); overflow: hidden; margin-bottom: 2px;">
-      <div style="background: rgba(192,57,43,0.08); border-right: 1px solid var(--red-border); padding: 36px 28px; display: flex; flex-direction: column; justify-content: center;">
-        <div style="font-size: 0.7rem; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: var(--red); margin-bottom: 8px;">Étape 1</div>
-        <div style="font-size: 1.2rem; font-weight: 800; color: var(--text-d1); line-height: 1.2; margin-bottom: 6px;">Évaluation et installation</div>
-        <div style="font-size: 0.82rem; color: var(--text-d3);">Semaines 1 – 3</div>
-      </div>
-      <div style="background: var(--bg-card); padding: 36px 40px;">
-        <p style="color: var(--text-d2); font-size: 0.95rem; line-height: 1.7; margin-bottom: 20px;">
-          Après un échange avec votre unité pour comprendre vos besoins, nous vous proposons une solution
-          adaptée — sans déplacement préalable nécessaire. Une fois le contrat signé, la livraison
-          et mise en place sont planifiées sous 3 semaines.
-        </p>
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
-          <div style="display: flex; gap: 10px; font-size: 0.87rem; color: var(--text-d2);">
-            <span style="color: var(--red); flex-shrink: 0;">→</span>
-            Échange à distance et analyse de vos besoins
+    <div class="grid-2 fade-up">
+      <div class="process-steps">
+        <div class="process-step">
+          <div class="process-step__num">01</div>
+          <div>
+            <h3>Premier échange à distance</h3>
+            <p>Un appel ou un échange par email pour comprendre votre contexte : effectifs, missions, infrastructure disponible, contraintes budgétaires. Aucun déplacement requis à ce stade.</p>
+            <div class="process-step__tags">
+              <span class="process-step__tag">Appel ou email</span>
+              <span class="process-step__tag">Sans engagement</span>
+              <span class="process-step__tag">48h de réponse</span>
+            </div>
           </div>
-          <div style="display: flex; gap: 10px; font-size: 0.87rem; color: var(--text-d2);">
-            <span style="color: var(--red); flex-shrink: 0;">→</span>
-            Choix de la solution et signature du contrat
+        </div>
+        <div class="process-step">
+          <div class="process-step__num">02</div>
+          <div>
+            <h3>Proposition sur mesure</h3>
+            <p>Sur la base de votre analyse de besoin, nous construisons une proposition adaptée — combinant les solutions les plus pertinentes pour votre réalité opérationnelle.</p>
+            <div class="process-step__tags">
+              <span class="process-step__tag">Solution personnalisée</span>
+              <span class="process-step__tag">Devis détaillé</span>
+            </div>
           </div>
-          <div style="display: flex; gap: 10px; font-size: 0.87rem; color: var(--text-d2);">
-            <span style="color: var(--red); flex-shrink: 0;">→</span>
-            Livraison et mise en place du dispositif sur site
-          </div>
-          <div style="display: flex; gap: 10px; font-size: 0.87rem; color: var(--text-d2);">
-            <span style="color: var(--red); flex-shrink: 0;">→</span>
-            Mise en service et vérification de l'ensemble
+        </div>
+        <div class="process-step">
+          <div class="process-step__num">03</div>
+          <div>
+            <h3>Visite &amp; validation sur site</h3>
+            <p>Nous nous déplaçons pour valider la faisabilité technique, préparer l'installation et finaliser les modalités. Cette étape confirme la proposition et lance le déploiement.</p>
+            <div class="process-step__tags">
+              <span class="process-step__tag">Visite technique</span>
+              <span class="process-step__tag">Validation finale</span>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-
-    <!-- Phase 2 -->
-    <div class="fade-up" style="display: grid; grid-template-columns: 200px 1fr; gap: 0; border: 1px solid var(--bd-dark-md); border-radius: var(--radius-lg); overflow: hidden; margin-bottom: 2px;">
-      <div style="background: rgba(192,57,43,0.12); border-right: 1px solid var(--red-border); padding: 36px 28px; display: flex; flex-direction: column; justify-content: center;">
-        <div style="font-size: 0.7rem; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: var(--red); margin-bottom: 8px;">Étape 2</div>
-        <div style="font-size: 1.2rem; font-weight: 800; color: var(--text-d1); line-height: 1.2; margin-bottom: 6px;">Prise en main</div>
-        <div style="font-size: 0.82rem; color: var(--text-d3);">Semaine 3 – 4</div>
-      </div>
-      <div style="background: var(--bg-card); padding: 36px 40px;">
-        <p style="color: var(--text-d2); font-size: 0.95rem; line-height: 1.7; margin-bottom: 20px;">
-          Nous formons vos référents internes à l'utilisation autonome du simulateur.
-          Dès cette étape, vos personnels peuvent commencer à s'entraîner librement.
-          La première séance structurée est organisée pour lancer le programme.
-        </p>
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
-          <div style="display: flex; gap: 10px; font-size: 0.87rem; color: var(--text-d2);">
-            <span style="color: var(--red); flex-shrink: 0;">→</span>
-            Formation des référents internes à l'utilisation autonome
-          </div>
-          <div style="display: flex; gap: 10px; font-size: 0.87rem; color: var(--text-d2);">
-            <span style="color: var(--red); flex-shrink: 0;">→</span>
-            Présentation des scénarios et modules disponibles
-          </div>
-          <div style="display: flex; gap: 10px; font-size: 0.87rem; color: var(--text-d2);">
-            <span style="color: var(--red); flex-shrink: 0;">→</span>
-            Première séance structurée avec un instructeur DST
-          </div>
-          <div style="display: flex; gap: 10px; font-size: 0.87rem; color: var(--text-d2);">
-            <span style="color: var(--red); flex-shrink: 0;">→</span>
-            Évaluation initiale du niveau des personnels
+      <div class="process-steps">
+        <div class="process-step">
+          <div class="process-step__num">04</div>
+          <div>
+            <h3>Installation &amp; mise en service</h3>
+            <p>Notre équipe installe le dispositif dans vos locaux. Configuration des scénarios adaptés à vos missions, tests complets, et formation initiale de vos référents internes.</p>
+            <div class="process-step__tags">
+              <span class="process-step__tag">Installation complète</span>
+              <span class="process-step__tag">Formation référents</span>
+              <span class="process-step__tag">Tests &amp; validation</span>
+            </div>
           </div>
         </div>
-      </div>
-    </div>
-
-    <!-- Phase 3 -->
-    <div class="fade-up" style="display: grid; grid-template-columns: 200px 1fr; gap: 0; border: 1px solid var(--bd-dark-md); border-radius: var(--radius-lg); overflow: hidden; margin-bottom: 2px;">
-      <div style="background: rgba(192,57,43,0.16); border-right: 1px solid var(--red-border); padding: 36px 28px; display: flex; flex-direction: column; justify-content: center;">
-        <div style="font-size: 0.7rem; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: var(--red); margin-bottom: 8px;">Étape 3</div>
-        <div style="font-size: 1.2rem; font-weight: 800; color: var(--text-d1); line-height: 1.2; margin-bottom: 6px;">Entraînement continu</div>
-        <div style="font-size: 0.82rem; color: var(--text-d3);">En continu — toute la durée du contrat</div>
-      </div>
-      <div style="background: var(--bg-card); padding: 36px 40px;">
-        <p style="color: var(--text-d2); font-size: 0.95rem; line-height: 1.7; margin-bottom: 20px;">
-          C'est le cœur du dispositif. Vos personnels s'entraînent sur le simulateur en autonomie,
-          selon leur rythme. Si votre formule inclut un instructeur (Programme Mobile), des séances structurées
-          sont planifiées mensuellement sur votre site.
-        </p>
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
-          <div style="display: flex; gap: 10px; font-size: 0.87rem; color: var(--text-d2);">
-            <span style="color: var(--red); flex-shrink: 0;">→</span>
-            Entraînement autonome illimité sur le simulateur
-          </div>
-          <div style="display: flex; gap: 10px; font-size: 0.87rem; color: var(--text-d2);">
-            <span style="color: var(--red); flex-shrink: 0;">→</span>
-            Scénarios progressifs intégrés dans le logiciel
-          </div>
-          <div style="display: flex; gap: 10px; font-size: 0.87rem; color: var(--text-d2);">
-            <span style="color: var(--red); flex-shrink: 0;">→</span>
-            Séances avec instructeur si Programme Mobile
-          </div>
-          <div style="display: flex; gap: 10px; font-size: 0.87rem; color: var(--text-d2);">
-            <span style="color: var(--red); flex-shrink: 0;">→</span>
-            Suivi automatique des séances et résultats
+        <div class="process-step">
+          <div class="process-step__num">05</div>
+          <div>
+            <h3>Entraînement autonome</h3>
+            <p>Vos personnels s'entraînent en autonomie, guidés par vos référents formés. Accès libre 24h/24, séances structurées ou libres, suivi des progressions si souhaité.</p>
+            <div class="process-step__tags">
+              <span class="process-step__tag">Accès 24h/24</span>
+              <span class="process-step__tag">Usage illimité</span>
+              <span class="process-step__tag">Autonomie complète</span>
+            </div>
           </div>
         </div>
-      </div>
-    </div>
-
-    <!-- Phase 4 -->
-    <div class="fade-up" style="display: grid; grid-template-columns: 200px 1fr; gap: 0; border: 1px solid var(--bd-dark-md); border-radius: var(--radius-lg); overflow: hidden;">
-      <div style="background: rgba(192,57,43,0.06); border-right: 1px solid var(--red-border); padding: 36px 28px; display: flex; flex-direction: column; justify-content: center;">
-        <div style="font-size: 0.7rem; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: var(--red); margin-bottom: 8px;">Étape 4</div>
-        <div style="font-size: 1.2rem; font-weight: 800; color: var(--text-d1); line-height: 1.2; margin-bottom: 6px;">Suivi et renouvellement</div>
-        <div style="font-size: 0.82rem; color: var(--text-d3);">Bilans réguliers + fin de contrat</div>
-      </div>
-      <div style="background: var(--bg-card); padding: 36px 40px;">
-        <p style="color: var(--text-d2); font-size: 0.95rem; line-height: 1.7; margin-bottom: 20px;">
-          La relation avec DST System ne s'arrête pas à la mise en service. Maintenance, mises à jour,
-          évolutions du dispositif et proposition de renouvellement : nous assurons la continuité
-          tout au long du contrat.
-        </p>
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
-          <div style="display: flex; gap: 10px; font-size: 0.87rem; color: var(--text-d2);">
-            <span style="color: var(--red); flex-shrink: 0;">→</span>
-            Maintenance proactive incluse — aucune intervention à gérer
-          </div>
-          <div style="display: flex; gap: 10px; font-size: 0.87rem; color: var(--text-d2);">
-            <span style="color: var(--red); flex-shrink: 0;">→</span>
-            Mises à jour de scénarios et évolutions logicielles
-          </div>
-          <div style="display: flex; gap: 10px; font-size: 0.87rem; color: var(--text-d2);">
-            <span style="color: var(--red); flex-shrink: 0;">→</span>
-            Évolution possible du dispositif en cours de contrat
-          </div>
-          <div style="display: flex; gap: 10px; font-size: 0.87rem; color: var(--text-d2);">
-            <span style="color: var(--red); flex-shrink: 0;">→</span>
-            Proposition de renouvellement et montée en gamme
+        <div class="process-step">
+          <div class="process-step__num">06</div>
+          <div>
+            <h3>Suivi &amp; maintenance continue</h3>
+            <p>Maintenance préventive et corrective, mises à jour des scénarios, accompagnement des référents. DST System reste présent sur toute la durée du contrat.</p>
+            <div class="process-step__tags">
+              <span class="process-step__tag">Maintenance incluse</span>
+              <span class="process-step__tag">Mises à jour scénarios</span>
+              <span class="process-step__tag">Support continu</span>
+            </div>
           </div>
         </div>
       </div>
@@ -293,198 +183,71 @@
   </div>
 </section>
 
-<!-- SECTION 3 : ADAPTATION -->
-<section class="section section--grey">
-  <div class="container">
-    <div class="section-header fade-up">
-      <span class="section-label">Adaptation à votre contexte</span>
-      <h2>Le programme s'adapte à vos effectifs, vos missions et vos contraintes terrain.</h2>
-      <p>Il n'existe pas de programme DST standard. Chaque déploiement est construit selon la réalité de votre structure.</p>
-    </div>
-    <div class="grid-3 fade-up">
-      <div class="feature-card">
-        <div class="feature-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="9" cy="7" r="4" stroke-width="1.5"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75" stroke-width="1.5" stroke-linecap="round"/></svg>
-        </div>
-        <h3>Selon les effectifs</h3>
-        <p style="color: var(--text-l2); margin-bottom: 16px;">La taille du groupe, la composition des équipes et la rotation des personnels sont pris en compte dès la phase initiale.</p>
-        <ul class="checklist">
-          <li>Groupes de 8 à 16 personnels par séance</li>
-          <li>Possibilité de segmenter les effectifs en plusieurs groupes</li>
-          <li>Protocole adapté si renouvellement partiel en cours d'année</li>
-        </ul>
-      </div>
-      <div class="feature-card">
-        <div class="feature-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10" stroke-width="1.5"/><circle cx="12" cy="12" r="3" stroke-width="1.5"/><line x1="12" y1="2" x2="12" y2="5" stroke-width="1.5" stroke-linecap="round"/><line x1="12" y1="19" x2="12" y2="22" stroke-width="1.5" stroke-linecap="round"/><line x1="2" y1="12" x2="5" y2="12" stroke-width="1.5" stroke-linecap="round"/><line x1="19" y1="12" x2="22" y2="12" stroke-width="1.5" stroke-linecap="round"/></svg>
-        </div>
-        <h3>Selon les missions</h3>
-        <p style="color: var(--text-l2); margin-bottom: 16px;">Le contenu des séances est calé sur les contextes d'intervention spécifiques de votre unité.</p>
-        <ul class="checklist">
-          <li>Analyse des missions prioritaires en phase initiale</li>
-          <li>Séances orientées vers vos contextes d'intervention réels</li>
-          <li>Protocoles adaptés si votre unité évolue ou change de mission</li>
-        </ul>
-      </div>
-      <div class="feature-card">
-        <div class="feature-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="4" width="18" height="18" rx="2" ry="2" stroke-width="1.5"/><line x1="16" y1="2" x2="16" y2="6" stroke-width="1.5" stroke-linecap="round"/><line x1="8" y1="2" x2="8" y2="6" stroke-width="1.5" stroke-linecap="round"/><line x1="3" y1="10" x2="21" y2="10" stroke-width="1.5" stroke-linecap="round"/></svg>
-        </div>
-        <h3>Selon les contraintes terrain</h3>
-        <p style="color: var(--text-l2); margin-bottom: 16px;">Planning de service, espace disponible, budget, localisation : nous nous adaptons à ce que vous avez.</p>
-        <ul class="checklist">
-          <li>Calendrier intégré au planning de service dès le départ</li>
-          <li>Séances adaptables à l'espace disponible sur votre site</li>
-          <li>Tarification compatible avec les cadres budgétaires publics</li>
-        </ul>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- SECTION 4 : CE QUE LE PROGRAMME DÉVELOPPE -->
-<section class="section section--white">
-  <div class="container">
-    <div class="section-header fade-up">
-      <span class="section-label">Compétences développées</span>
-      <h2>Ce que vos personnels gagnent,<br>séance après séance.</h2>
-      <p>Le programme DST travaille six dimensions de la performance opérationnelle — en situation réelle, c'est leur combinaison qui compte.</p>
-    </div>
-    <div class="fade-up" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--bd-light-md); border: 1px solid var(--bd-light-md); border-radius: var(--radius-lg); overflow: hidden;">
-      <div style="background: white; padding: 32px 28px;">
-        <div style="font-size: 0.7rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--red); margin-bottom: 14px;">01</div>
-        <h3 style="font-size: 1rem; margin-bottom: 10px;">Réactivité sous pression</h3>
-        <p style="font-size: 0.87rem; color: var(--text-l2); line-height: 1.65;">Maintien de la capacité d'action en situation d'urgence, réduction des temps de latence décisionnelle.</p>
-      </div>
-      <div style="background: white; padding: 32px 28px;">
-        <div style="font-size: 0.7rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--red); margin-bottom: 14px;">02</div>
-        <h3 style="font-size: 1rem; margin-bottom: 10px;">Maîtrise du stress physiologique</h3>
-        <p style="font-size: 0.87rem; color: var(--text-l2); line-height: 1.65;">Techniques de régulation de la réponse au stress, maintien de la lucidité et de la coordination motrice.</p>
-      </div>
-      <div style="background: white; padding: 32px 28px;">
-        <div style="font-size: 0.7rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--red); margin-bottom: 14px;">03</div>
-        <h3 style="font-size: 1rem; margin-bottom: 10px;">Protocoles d'intervention</h3>
-        <p style="font-size: 0.87rem; color: var(--text-l2); line-height: 1.65;">Révision et consolidation des procédures opérationnelles, ancrage des réflexes procéduraux par la répétition.</p>
-      </div>
-      <div style="background: white; padding: 32px 28px;">
-        <div style="font-size: 0.7rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--red); margin-bottom: 14px;">04</div>
-        <h3 style="font-size: 1rem; margin-bottom: 10px;">Positionnement et déplacements</h3>
-        <p style="font-size: 0.87rem; color: var(--text-l2); line-height: 1.65;">Postures sécurisées, déplacements adaptés aux contextes d'intervention, gestion de l'espace collectif.</p>
-      </div>
-      <div style="background: white; padding: 32px 28px;">
-        <div style="font-size: 0.7rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--red); margin-bottom: 14px;">05</div>
-        <h3 style="font-size: 1rem; margin-bottom: 10px;">Communication opérationnelle</h3>
-        <p style="font-size: 0.87rem; color: var(--text-l2); line-height: 1.65;">Coordination d'équipe en situation dégradée, transmission d'information, cohérence d'action collective.</p>
-      </div>
-      <div style="background: white; padding: 32px 28px;">
-        <div style="font-size: 0.7rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--red); margin-bottom: 14px;">06</div>
-        <h3 style="font-size: 1rem; margin-bottom: 10px;">Décision en situation dégradée</h3>
-        <p style="font-size: 0.87rem; color: var(--text-l2); line-height: 1.65;">Entraînement à la prise de décision rapide avec information incomplète, sous contrainte de temps et d'environnement.</p>
-      </div>
-    </div>
-    <div class="insight" style="margin-top: 28px;">
-      <p>Ces compétences ne sont pas travaillées de manière cloisonnée. Le programme DST les intègre dans des situations d'entraînement qui reproduisent la complexité des contextes opérationnels réels.</p>
-    </div>
-  </div>
-</section>
-
-<!-- SCHEMA : CYCLE ANNUEL -->
-<section class="section section--grey">
+<!-- ADAPTATION CONTEXTE -->
+<section class="section">
   <div class="container">
     <div class="section-header section-header--center fade-up">
-      <span class="section-label">Calendrier de déploiement</span>
-      <h2>Le cycle annuel, mois par mois.</h2>
-      <p>Visualisation d'un déploiement type sur le cycle annuel pour une unité.</p>
+      <span class="section-label">Adaptation à votre contexte</span>
+      <h2>Le programme s'adapte<br><span style="color:var(--fg-muted);font-weight:800;">à vos missions et contraintes terrain.</span></h2>
+      <p>Chaque structure a ses propres réalités opérationnelles. DST System ne propose pas un programme générique — nous construisons une solution qui s'intègre dans votre fonctionnement quotidien.</p>
     </div>
-    <div class="cycle fade-up">
-      <div class="cycle__track">
-
-        <!-- Phase initiale -->
-        <div class="cycle__phase">
-          <div class="cycle__phase-head cycle__phase-head--init">
-            <div class="cycle__phase-label">Phase 1</div>
-            <div class="cycle__phase-name">Démarrage</div>
-            <div class="cycle__phase-months">Immédiat</div>
-          </div>
-          <div class="cycle__phase-body">
-            <div class="cycle__sessions">
-              <div class="cycle__session-dot cycle__session-dot--active">S1</div>
-              <div class="cycle__session-dot cycle__session-dot--active">S2</div>
-            </div>
-            <p class="cycle__phase-desc">Évaluation progressive dès les premières séances. Programme ajusté en continu selon les niveaux observés.</p>
-          </div>
+    <div class="formula-grid fade-up">
+      <div class="formula-card">
+        <div class="formula-card__icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
         </div>
-
-        <!-- Entraînement récurrent -->
-        <div class="cycle__phase">
-          <div class="cycle__phase-head cycle__phase-head--main">
-            <div class="cycle__phase-label">Phase 2 — Cœur du programme</div>
-            <div class="cycle__phase-name">Entraînement récurrent</div>
-            <div class="cycle__phase-months">Cycle annuel · 1 à 2 séances par mois</div>
-          </div>
-          <div class="cycle__phase-body cycle__phase-body--main">
-            <div class="cycle__sessions">
-              <div class="cycle__session-dot cycle__session-dot--active">M3</div>
-              <div class="cycle__session-dot cycle__session-dot--active">M4</div>
-              <div class="cycle__session-dot cycle__session-dot--active">M5</div>
-              <div class="cycle__session-dot cycle__session-dot--active">M6</div>
-              <div class="cycle__session-dot cycle__session-dot--active">M7</div>
-              <div class="cycle__session-dot cycle__session-dot--active">M8</div>
-              <div class="cycle__session-dot cycle__session-dot--active">M9</div>
-              <div class="cycle__session-dot cycle__session-dot--active">M10</div>
-            </div>
-            <p class="cycle__phase-desc">Séances mensuelles sur votre site. Chaque séance : briefing, exercices progressifs, débrief. Bilan trimestriel transmis au commandement.</p>
-          </div>
-        </div>
-
-        <!-- Bilan -->
-        <div class="cycle__phase">
-          <div class="cycle__phase-head cycle__phase-head--bilan">
-            <div class="cycle__phase-label">Phase 3</div>
-            <div class="cycle__phase-name">Bilan</div>
-            <div class="cycle__phase-months">Fin de cycle</div>
-          </div>
-          <div class="cycle__phase-body">
-            <div class="cycle__sessions">
-              <div class="cycle__session-dot" style="font-size: 0.55rem;">Bilan</div>
-            </div>
-            <p class="cycle__phase-desc">Rapport annuel complet. Évaluation de la progression. Proposition de reconduction ou d'évolution du dispositif.</p>
-          </div>
-        </div>
-
+        <h3>Effectifs &amp; groupes</h3>
+        <p>Organisation en rotations adaptée à vos effectifs. Petites unités, groupes alternés, sessions individuelles ou collectives — la solution s'organise selon votre rythme de service.</p>
       </div>
-
-      <!-- Légende -->
-      <div style="padding: 16px 24px; background: var(--bg-white); border-top: 1px solid var(--bd-light-md); display: flex; gap: 28px; flex-wrap: wrap; align-items: center;">
-        <div style="display: flex; align-items: center; gap: 8px;">
-          <div style="width: 12px; height: 12px; border-radius: 2px; background: var(--red-muted); border: 1px solid var(--red-border);"></div>
-          <span style="font-size: 0.78rem; color: var(--text-l2);">Séance sur site</span>
+      <div class="formula-card">
+        <div class="formula-card__icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/><line x1="12" y1="2" x2="12" y2="5"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="2" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="22" y2="12"/></svg>
         </div>
-        <div style="display: flex; align-items: center; gap: 8px;">
-          <div style="width: 12px; height: 12px; border-radius: 2px; background: white; border: 1.5px solid var(--bd-light-md);"></div>
-          <span style="font-size: 0.78rem; color: var(--text-l2);">Rapport / bilan</span>
-        </div>
-        <span style="font-size: 0.78rem; color: var(--text-l3); margin-left: auto;">Le calendrier est établi dès la première séance, en accord avec le planning de service.</span>
+        <h3>Missions &amp; scénarios</h3>
+        <p>Scénarios calibrés sur vos missions réelles. Intervention urbaine, tir de précision, gestion de crise, confrontation dynamique — nous configurons le contenu selon votre contexte.</p>
       </div>
+      <div class="formula-card">
+        <div class="formula-card__icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+        </div>
+        <h3>Infrastructure disponible</h3>
+        <p>Aucun travaux requis. Que vous disposiez d'une salle dédiée, d'un gymnase ou d'un espace polyvalent — nous adaptons l'installation à ce que vous avez, sans contrainte structurelle.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- QUOTE -->
+<section class="section section--dark">
+  <div class="container" style="max-width:720px;text-align:center;">
+    <div class="fade-up">
+      <span class="section-label" style="text-align:center;display:block;margin-bottom:32px;">Notre conviction</span>
+      <blockquote style="font-size:clamp(1.2rem,2.5vw,1.6rem);font-weight:700;line-height:1.4;letter-spacing:-0.02em;color:var(--fg);margin-bottom:24px;">
+        "L'entraînement opérationnel ne doit pas être réservé aux unités qui ont les moyens de se déplacer. Il doit aller à celles qui n'en ont pas le temps — et idéalement être là en permanence."
+      </blockquote>
+      <p style="font-size:0.85rem;color:var(--amber);font-weight:700;text-transform:uppercase;letter-spacing:0.1em;">Fondateur — DST System</p>
     </div>
   </div>
 </section>
 
 <!-- CTA -->
-<section class="cta-section">
+<section class="section">
   <div class="container">
-    <div class="fade-up">
-      <span class="section-label">Étape suivante</span>
-      <h2>Un simulateur dans vos locaux.<br>On en parle ?</h2>
-      <p>Décrivez-nous votre contexte. Nous vous proposons une formule adaptée à vos effectifs, votre espace et vos contraintes budgétaires.</p>
-      <div class="btn-group" style="justify-content: center;">
-        <a href="contact.html?objet=presentation" class="btn btn--red btn--lg">Demander une présentation</a>
-        <a href="offres.html" class="btn btn--ghost btn--lg">Voir nos formules</a>
+    <div class="cta-block fade-up">
+      <div class="glow-bg"></div>
+      <h2>Démarrons votre<br><span class="text-gradient">premier échange.</span></h2>
+      <p>Un appel suffit pour démarrer. Nous analysons votre situation et vous proposons une solution adaptée — gratuitement, sans engagement.</p>
+      <div class="cta-block__btns">
+        <a href="contact.html?objet=presentation" class="btn btn--tactical btn--lg">
+          Prendre contact
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </a>
+        <a href="offres.html" class="btn btn--outline btn--lg">Voir les formules</a>
       </div>
-      <div class="cta-micro" style="justify-content: center; margin-top: 16px;">
-        <span><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>Réponse sous 48h</span>
-        <span><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>Échange sans engagement</span>
-        <span><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>Adapté à votre organisation</span>
+      <div class="cta-block__micro">
+        <span>Réponse sous 48h</span>
+        <span>Sans engagement</span>
+        <span>Premier échange gratuit</span>
       </div>
     </div>
   </div>
@@ -493,42 +256,27 @@
 <!-- FOOTER -->
 <footer class="footer">
   <div class="container">
-    <div class="footer__grid">
+    <div class="footer__inner">
       <div class="footer__brand">
-        <div class="footer__logo"><strong>DST</strong> System</div>
-        <p>Location de simulateurs d'entraînement opérationnel à demeure pour les forces de sécurité et services publics armés.</p>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/><line x1="12" y1="2" x2="12" y2="5"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="2" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="22" y2="12"/></svg>
+        <strong>DST</strong> System
+        <span style="margin-left:8px;font-weight:400;">— Drill &amp; Skills Training</span>
       </div>
-      <div class="footer__col">
-        <h4>Navigation</h4>
-        <ul>
-          <li><a href="offres.html">Nos solutions</a></li>
-          <li><a href="programme.html">Notre démarche</a></li>
-          <li><a href="fonctionnement.html">Fonctionnement</a></li>
-          <li><a href="a-propos.html">À propos</a></li>
-          <li><a href="contact.html">Contact</a></li>
-          <li><a href="templates/plaquette-template.html" target="_blank" onclick="DSTTrack?.event('download', 'plaquette_pdf')">Plaquette PDF</a></li>
-        </ul>
-      </div>
-      <div class="footer__col">
-        <h4>Contact</h4>
-        <p>dst-system@hotmail.com<br>06 65 44 52 26</p>
-      </div>
-    </div>
-    <div class="footer__bottom">
-      <p>© 2026 DST System — Drill &amp; Skills Training. Tous droits réservés.</p>
-      <p>Location de simulateurs d'entraînement opérationnel</p>
-      <p style="font-size:12px;color:#6b7280;margin-top:8px;">
-        <a href="mentions-legales.html" style="color:#6b7280;text-decoration:none;">Mentions légales</a>
-        &nbsp;·&nbsp;
-        <a href="confidentialite.html" style="color:#6b7280;text-decoration:none;">Politique de confidentialité</a>
-        &nbsp;·&nbsp;
-        <a href="cgv.html" style="color:#6b7280;text-decoration:none;">CGV</a>
-      </p>
+      <nav class="footer__links">
+        <a href="offres.html">Nos solutions</a>
+        <a href="programme.html">Notre démarche</a>
+        <a href="a-propos.html">À propos</a>
+        <a href="contact.html">Contact</a>
+        <a href="mentions-legales.html">Mentions légales</a>
+        <a href="cgv.html">CGV</a>
+        <a href="confidentialite.html">Confidentialité</a>
+      </nav>
+      <p class="footer__copy">&copy; <script>document.write(new Date().getFullYear())</script> DST System. Tous droits réservés.</p>
     </div>
   </div>
 </footer>
 
-<script src="js/main.js"></script>
+<script src="js/main.js" defer></script>
 <script src="js/tracker.js" defer></script>
 </body>
 </html>

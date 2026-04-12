@@ -3,470 +3,295 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>DST System — Simulateur d'entraînement opérationnel à demeure pour forces de sécurité</title>
-  <meta name="description" content="DST System installe un simulateur de tir permanent dans vos locaux. Entraînement illimité, zéro logistique, tout inclus. La solution pour maintenir les compétences opérationnelles en continu.">
+  <title>DST System — Solutions d'entraînement opérationnel à demeure pour forces de sécurité</title>
+  <meta name="description" content="DST System déploie des solutions d'entraînement opérationnel permanentes pour les forces de sécurité : simulateurs de tir, shooting house, munitions marquantes. Installé dans vos locaux, tout inclus.">
   <meta name="robots" content="index, follow">
   <meta name="google-site-verification" content="SHRwsvUSN2VxaA7wQs3Irzh3_ibCvF2v69WMa0WQPfc" />
-  <meta property="og:title" content="DST System — Simulateur d'entraînement opérationnel à demeure">
-  <meta property="og:description" content="Un simulateur de tir installé dans vos locaux, pour un entraînement illimité, sans déplacement, sans logistique. Tout inclus.">
+  <meta property="og:title" content="DST System — Solutions d'entraînement opérationnel à demeure">
+  <meta property="og:description" content="Simulateurs de tir, shooting house, munitions marquantes — installés dans vos locaux pour un entraînement illimité, sans contrainte.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://dst-system.fr/">
   <meta property="og:image" content="https://dst-system.fr/img/DST-Light.png">
   <meta property="og:locale" content="fr_FR">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
-<script>
-(function(){try{var s=JSON.parse(localStorage.getItem('dst_config_settings')||'{}');var fav=s.entreprise&&s.entreprise.faviconBase64;if(fav){var l=document.querySelector("link[rel*='icon']")||document.createElement('link');l.rel='icon';l.href=fav;l.type=(s.entreprise&&s.entreprise.faviconMime)||'image/png';if(!l.parentNode)document.head.appendChild(l);}}catch(e){}})();
-</script>
+  <script>
+  (function(){try{var s=JSON.parse(localStorage.getItem('dst_config_settings')||'{}');var fav=s.entreprise&&s.entreprise.faviconBase64;if(fav){var l=document.querySelector("link[rel*='icon']")||document.createElement('link');l.rel='icon';l.href=fav;l.type=(s.entreprise&&s.entreprise.faviconMime)||'image/png';if(!l.parentNode)document.head.appendChild(l);}}catch(e){}})();
+  </script>
 </head>
 <body>
 
 <!-- NAVIGATION -->
 <nav class="nav" id="nav">
-  <div class="container nav__inner">
-    <a href="index.html" class="nav__logo"><strong>DST</strong> <span>System</span></a>
+  <div class="nav__inner">
+    <a href="index.html" class="nav__logo">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/><line x1="12" y1="2" x2="12" y2="5"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="2" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="22" y2="12"/></svg>
+      <strong>DST</strong> System
+    </a>
+    <ul class="nav__links" id="navLinks">
+      <li><a href="offres.html" class="nav__link">Nos solutions</a></li>
+      <li><a href="programme.html" class="nav__link">Notre démarche</a></li>
+      <li><a href="a-propos.html" class="nav__link">À propos</a></li>
+      <li><a href="contact.html" class="nav__link">Contact</a></li>
+      <li class="nav__mobile-actions">
+        <a href="contact.html?objet=presentation" class="btn btn--tactical btn--sm">Demander une présentation</a>
+        <a href="connexion.html" class="btn btn--connexion btn--sm">🔐 Connexion</a>
+      </li>
+    </ul>
+    <div class="nav__actions">
+      <a href="contact.html?objet=presentation" class="btn btn--tactical btn--sm">Demander une présentation</a>
+      <a href="connexion.html" class="btn btn--connexion btn--sm">🔐 Connexion</a>
+    </div>
     <button class="nav__burger" id="navBurger" aria-label="Ouvrir le menu" aria-expanded="false">
       <span></span><span></span><span></span>
     </button>
-    <ul class="nav__menu" id="navMenu">
-      <li class="nav__dropdown">
-        <a href="#" class="nav__link">
-          Notre approche
-          <svg class="nav__chevron" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </a>
-        <ul class="nav__submenu">
-          <li><a href="probleme.html">Le problème</a></li>
-          <li><a href="solution.html">La solution</a></li>
-        </ul>
-      </li>
-      <li><a href="offres.html" class="nav__link">Nos solutions</a></li>
-      <li><a href="programme.html" class="nav__link">Notre démarche</a></li>
-      <li><a href="fonctionnement.html" class="nav__link">Fonctionnement</a></li>
-      <li><a href="a-propos.html" class="nav__link">À propos</a></li>
-      <li><a href="contact.html" class="btn btn--red btn--sm">Prendre contact</a></li>
-      <li><a href="connexion.html" class="btn btn--sm nav-connexion" style="background:#1a1a2e;color:#ffffff;border-radius:4px;padding:4px 12px;font-weight:600;">🔐 Connexion</a></li>
-    </ul>
   </div>
 </nav>
 <div class="nav-spacer"></div>
 
 <!-- HERO -->
 <section class="hero">
+  <div class="hero__bg">
+    <img src="img/hero-simulator.jpg" alt="Simulateur de tir DST System" width="1920" height="1080" loading="eager">
+  </div>
   <div class="container">
-    <div class="hero__inner">
-      <div class="hero__tag">Location de simulateur à demeure</div>
-      <h1>Optimisez les compétences opérationnelles<br>de vos effectifs — sur votre site, en permanence.</h1>
-      <p class="hero__subtitle">
-        DST System livre et installe une solution d'entraînement professionnel directement dans vos locaux.
-        Vos personnels s'entraînent quand ils le souhaitent, sans déplacement, sans logistique,
-        sans limite de munitions. Maintenance, assurance et mises à jour incluses.
+    <div class="hero__content">
+      <div class="hero__badge animate-hero">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        Consultant en solutions opérationnelles
+      </div>
+      <h1 class="hero__title animate-hero-1">
+        Drill &amp; Skills Training<br>
+        <span class="text-gradient">Renforcer la capacité opérationnelle.</span>
+      </h1>
+      <p class="hero__subtitle animate-hero-2">
+        DST System déploie des solutions permettant aux unités de s'entraîner plus, de pratiquer davantage et d'élever leur niveau réel — sur votre site, en permanence.
       </p>
-      <div class="hero__cta">
-        <div>
-          <a href="contact.html?objet=presentation" class="btn btn--red btn--lg" onclick="DSTTrack?.event('cta_click','demande_presentation')">Demander une présentation</a>
-          <div class="cta-micro">
-            <span>
-              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
-              Réponse sous 48h
-            </span>
-            <span>
-              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
-              Sans engagement
-            </span>
-          </div>
-        </div>
-        <a href="offres.html" class="btn btn--ghost btn--lg">Découvrir nos solutions</a>
+      <div class="hero__cta animate-hero-2">
+        <a href="contact.html?objet=presentation" class="btn btn--tactical btn--lg" onclick="DSTTrack?.event('cta_click','hero_presentation')">
+          Demander une présentation
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </a>
+        <a href="offres.html" class="btn btn--outline btn--lg">Découvrir nos solutions</a>
       </div>
-      <div class="hero__trust">
-        <div class="hero__trust-item">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><polyline points="9 22 9 12 15 12 15 22" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          Simulateur permanent dans vos locaux
-        </div>
-        <div class="hero__trust-item">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          Zéro munition réelle
-        </div>
-        <div class="hero__trust-item">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="9 11 12 14 22 4" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          Tout inclus — maintenance et mises à jour
-        </div>
-        <div class="hero__trust-item">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="4" width="18" height="18" rx="2" ry="2" stroke-width="1.5"/><line x1="16" y1="2" x2="16" y2="6" stroke-width="1.5" stroke-linecap="round"/><line x1="8" y1="2" x2="8" y2="6" stroke-width="1.5" stroke-linecap="round"/><line x1="3" y1="10" x2="21" y2="10" stroke-width="1.5" stroke-linecap="round"/></svg>
-          Séances illimitées, sans préavis
-        </div>
+      <div class="hero__trust animate-hero-2">
+        <span class="hero__trust-item">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          Réponse sous 48h
+        </span>
+        <span class="hero__trust-item">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          Sans engagement
+        </span>
+        <span class="hero__trust-item">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          Location longue durée
+        </span>
       </div>
     </div>
   </div>
 </section>
 
-<!-- SECTION 1 : 4 PILIERS -->
-<section class="section section--grey">
-  <div class="container">
-    <div class="section-header fade-up">
-      <span class="section-label">La rupture avec le modèle classique</span>
-      <h2>Un simulateur chez vous change tout.</h2>
-      <p>La location à demeure supprime structurellement les obstacles qui rendent l'entraînement régulier impossible dans les modèles classiques.</p>
-    </div>
-    <div class="pillar-grid fade-up">
-      <div class="pillar-card">
-        <span class="pillar-card__num">01</span>
-        <h3>Disponibilité permanente</h3>
-        <p>Le simulateur est dans vos locaux, prêt à fonctionner. Vos personnels s'entraînent lors des temps libres, entre deux missions, à l'heure qui convient — sans rien organiser à l'avance.</p>
-      </div>
-      <div class="pillar-card">
-        <span class="pillar-card__num">02</span>
-        <h3>Zéro contrainte logistique</h3>
-        <p>Plus de réservation de stand, plus de transport, plus de commande de munitions. L'entraînement se déroule là où travaillent vos agents. Aucune procédure de sécurité active requise.</p>
-      </div>
-      <div class="pillar-card">
-        <span class="pillar-card__num">03</span>
-        <h3>Tout inclus, sans surprise</h3>
-        <p>Installation, maintenance préventive et corrective, assurance, mises à jour logicielles et de scénarios : tout est compris dans l'abonnement mensuel. Un seul interlocuteur, un seul contrat.</p>
-      </div>
-      <div class="pillar-card">
-        <span class="pillar-card__num">04</span>
-        <h3>Séances illimitées — zéro contrainte de munitions</h3>
-        <p>Vos agents tirent autant qu'ils le souhaitent, autant de fois qu'ils en ont besoin. Le volume d'entraînement n'est plus contraint par un budget cartouches ou un quota de séances.</p>
-      </div>
-    </div>
-    <div class="fade-up" style="text-align: center; margin-top: 36px;">
-      <a href="probleme.html" class="btn btn--ghost-dark">Comprendre les obstacles du modèle classique</a>
-    </div>
-  </div>
-</section>
-
-<!-- SECTION 2 : NOS SOLUTIONS (4 offres) -->
-<section class="section section--white">
+<!-- SOLUTIONS -->
+<section class="section" id="solutions">
+  <div class="glow-bg"></div>
   <div class="container">
     <div class="section-header section-header--center fade-up">
       <span class="section-label">Nos solutions</span>
-      <h2>Quatre formules, une logique commune.</h2>
-      <p>Chaque formule repose sur la même infrastructure de base. Choisissez le niveau d'équipement adapté à vos missions et à la superficie disponible.</p>
+      <h2>Un arsenal complet<br><span style="color:var(--fg-muted);font-weight:800;">pour chaque mission.</span></h2>
+      <p>Nous ne revendons pas une marque unique. Nous travaillons avec vous pour assembler le dispositif qui correspond exactement à votre réalité opérationnelle.</p>
     </div>
-    <div class="offer-cards fade-up">
+    <div class="solutions-grid fade-up">
 
-      <!-- Offre Base -->
-      <div class="offer-card">
-        <div class="offer-card__title">Offre Base</div>
-        <div class="offer-card__subtitle">L'essentiel pour démarrer un entraînement structuré sur armes de poing.</div>
-        <ul class="offer-checklist">
-          <li>1 simulateur de tir professionnel</li>
-          <li>Armes de poing (répliques laser)</li>
-          <li>Scénarios tir de précision et réflexe</li>
-          <li>Installation et mise en service</li>
-          <li>Maintenance incluse</li>
-          <li>Mises à jour logicielles</li>
-          <li>Suivi et rapports de progression</li>
-        </ul>
-        <a href="contact.html?objet=offre-base" class="btn btn--ghost-dark">Demander un devis</a>
-      </div>
-
-      <!-- Offre Opérationnel (featured) -->
-      <div class="offer-card offer-card--featured">
-        <div class="offer-card__tag">
-          <span class="badge badge--red">Recommandé</span>
+      <!-- Simulateurs de tir -->
+      <div class="solution-card">
+        <div class="solution-card__img">
+          <img src="img/hero-simulator.jpg" alt="Simulateurs de tir professionnels DST System" loading="lazy">
+          <div class="solution-card__icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg>
+          </div>
         </div>
-        <div class="offer-card__title">Offre Opérationnel</div>
-        <div class="offer-card__subtitle">Le cœur de métier : armes de poing, cibles individuelles, CQB et humanoïdes.</div>
-        <ul class="offer-checklist">
-          <li>1 simulateur de tir professionnel</li>
-          <li>Armes de poing (répliques laser)</li>
-          <li>Cibles individuelles et groupes</li>
-          <li>Module CQB — close quarters battle</li>
-          <li>Humanoïdes articulés (montée en charge)</li>
-          <li>Scénarios stress et décision</li>
-          <li>Installation et mise en service</li>
-          <li>Maintenance et assurance incluses</li>
-          <li>Mises à jour scénarios et logiciel</li>
-          <li>Suivi, bilans, rapports commandement</li>
-        </ul>
-        <a href="contact.html?objet=offre-operationnel" class="btn btn--red">Demander un devis</a>
+        <div class="solution-card__body">
+          <h3>Simulateurs de tir</h3>
+          <p>Systèmes de simulation professionnels adaptés à vos besoins. Scénarios CQB, tir de précision, gestion du stress et prise de décision. Zéro munition réelle, entraînement illimité.</p>
+        </div>
       </div>
 
-      <!-- Offre Premium -->
-      <div class="offer-card">
-        <div class="offer-card__title">Offre Premium</div>
-        <div class="offer-card__subtitle">L'Offre Opérationnel augmentée avec le module airsoft complet pour l'entraînement dynamique.</div>
-        <ul class="offer-checklist">
-          <li>Tout l'Offre Opérationnel</li>
-          <li class="offer-checklist__extra">+ Module airsoft complet</li>
-          <li class="offer-checklist__extra">+ Équipements de protection airsoft</li>
-          <li class="offer-checklist__extra">+ Scénarios confrontation dynamique</li>
-          <li class="offer-checklist__extra">+ Entraînement inter-équipes</li>
-          <li>Maintenance et assurance incluses</li>
-          <li>Suivi, bilans, rapports commandement</li>
-        </ul>
-        <a href="contact.html?objet=offre-premium" class="btn btn--ghost-dark">Demander un devis</a>
+      <!-- Munitions marquantes -->
+      <div class="solution-card">
+        <div class="solution-card__img">
+          <img src="img/airsoft-equipment.jpg" alt="Munitions marquantes et airsoft" loading="lazy">
+          <div class="solution-card__icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          </div>
+        </div>
+        <div class="solution-card__body">
+          <h3>Munitions marquantes</h3>
+          <p>Solutions à impact physique pour un réalisme maximum, sans danger ni létalité. Idéal pour l'entraînement dynamique et la mise en situation réelle des opérateurs.</p>
+        </div>
       </div>
 
-      <!-- Programme Mobile -->
-      <div class="offer-card">
-        <div class="offer-card__title">Programme Mobile</div>
-        <div class="offer-card__subtitle">Un instructeur DST se déplace sur votre site avec l'équipement nécessaire.</div>
-        <ul class="offer-checklist">
-          <li>Instructeur certifié sur site</li>
-          <li>Équipement mobile complet apporté</li>
-          <li>Programme structuré sur cycle annuel</li>
-          <li>1 à 2 séances par mois</li>
-          <li>Organisation en groupes alternés</li>
-          <li>Compte-rendu après chaque séance</li>
-          <li>Bilans trimestriels commandement</li>
-          <li>Rapport annuel de progression</li>
-        </ul>
-        <a href="contact.html?objet=programme-mobile" class="btn btn--ghost-dark">Demander un devis</a>
+      <!-- Shooting house -->
+      <div class="solution-card">
+        <div class="solution-card__img">
+          <img src="img/shooting-house.jpg" alt="Shooting house modulaire CQB" loading="lazy">
+          <div class="solution-card__icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          </div>
+        </div>
+        <div class="solution-card__body">
+          <h3>Shooting house modulaire</h3>
+          <p>Structures en panneaux modulaires, reconfigurables selon vos scénarios. CQB, intervention bâtiment, progression tactique — installation à demeure ou déplaçable.</p>
+        </div>
       </div>
 
-    </div>
-    <p class="fade-up" style="text-align: center; margin-top: 24px; font-size: 0.85rem; color: var(--text-l3);">
-      Plusieurs sites à équiper ? Des formules multi-postes sont disponibles sur demande.
-    </p>
-    <div class="fade-up" style="text-align: center; margin-top: 16px;">
-      <a href="offres.html" class="btn btn--ghost-dark">Comparer les formules en détail</a>
+      <!-- Solutions sur-mesure -->
+      <div class="solution-card">
+        <div class="solution-card__img">
+          <img src="img/breach-door.jpg" alt="Solutions sur-mesure et équipements tactiques" loading="lazy">
+          <div class="solution-card__icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/></svg>
+          </div>
+        </div>
+        <div class="solution-card__body">
+          <h3>Solutions sur-mesure</h3>
+          <p>Portes d'entraînement aux effractions, kits spécialisés, équipements complémentaires. Chaque besoin opérationnel trouve sa réponse. Le client exprime un besoin, DST System conçoit la réponse.</p>
+        </div>
+      </div>
+
     </div>
   </div>
 </section>
 
-<!-- SECTION 3 : VISUAL SECTION -->
-<section class="section section--dark">
+<!-- APPROCHE -->
+<section class="section section--dark" id="approche">
   <div class="container">
-    <div class="section-visual fade-up">
-      <div class="section-visual__logo">
-        <img src="img/logo principal DST.png" alt="DST System" style="height:48px;width:auto;" />
-      </div>
-      <div class="section-visual__content">
-        <h2>Une solution d'entraînement professionnel.<br>Une présence permanente.</h2>
-        <p>
-          Nos solutions d'entraînement sont de niveau professionnel, conçues pour la formation
-          des forces de sécurité. Simulateurs laser, systèmes airsoft, équipements CQB :
-          tout est dimensionné pour ancrer des réflexes opérationnels durables — pas pour reproduire un
-          entraînement de loisir.
+    <div class="approach-grid">
+      <div class="fade-up">
+        <span class="section-label">Notre approche</span>
+        <h2>On analyse vos missions.<br><span style="color:var(--fg-muted);font-weight:800;">On conçoit votre solution.</span></h2>
+        <p class="text-muted" style="margin-top:16px;margin-bottom:0;font-size:1rem;">
+          DST System est un consultant en solutions opérationnelles. Nous analysons vos missions, vos contraintes, vos objectifs — puis nous construisons le dispositif adapté, en combinant les meilleures technologies disponibles.
         </p>
-        <a href="solution.html" class="btn btn--ghost">Voir la solution en détail</a>
+        <div class="approach-steps">
+          <div class="approach-step">
+            <div class="approach-step__num">01</div>
+            <div>
+              <h4>Analyse de vos missions</h4>
+              <p>Compréhension de votre contexte opérationnel, menaces, effectifs et infrastructure.</p>
+            </div>
+          </div>
+          <div class="approach-step">
+            <div class="approach-step__num">02</div>
+            <div>
+              <h4>Conception sur-mesure</h4>
+              <p>Sélection et assemblage des technologies adaptées — simulateur, munitions marquantes, CQB, équipements.</p>
+            </div>
+          </div>
+          <div class="approach-step">
+            <div class="approach-step__num">03</div>
+            <div>
+              <h4>Déploiement &amp; suivi</h4>
+              <p>Installation à demeure, formation de vos référents, maintenance et suivi continu inclus.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="approach-img fade-up">
+        <img src="img/custom-analysis.jpg" alt="Analyse de mission DST System" loading="lazy">
+        <div class="approach-badge">
+          <p>Consultant &amp; intégrateur</p>
+          <p>Un expert qui combine les meilleures solutions du marché pour répondre exactement à vos besoins.</p>
+        </div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- SECTION 4 : POURQUOI DST SYSTEM -->
-<section class="section section--grey">
+<!-- FORMULE -->
+<section class="section" id="formule">
   <div class="container">
     <div class="section-header section-header--center fade-up">
-      <span class="section-label">Pourquoi DST System</span>
-      <h2>Ce que nous faisons différemment.</h2>
-      <p>Pas un prestataire de formation de plus. Un partenaire d'équipement opérationnel, avec un modèle pensé pour la réalité du terrain.</p>
+      <span class="section-label">Notre formule</span>
+      <h2>Installé chez vous.<br><span style="color:var(--fg-muted);font-weight:800;">Sans investissement lourd.</span></h2>
+      <p>Nous déployons les solutions directement dans vos locaux, en formule longue durée. Un dispositif permanent, avec maintenance et suivi inclus — pour que vos équipes s'entraînent sans contrainte.</p>
     </div>
-    <div class="grid-3 fade-up">
-      <div class="feature-card">
-        <div class="feature-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <div class="formula-grid fade-up">
+      <div class="formula-card">
+        <div class="formula-card__icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
         </div>
-        <h3>Un modèle tout inclus</h3>
-        <p>
-          Installation, maintenance préventive et corrective, assurance du matériel, mises à jour
-          de scénarios et du logiciel — tout est compris. Vous n'avez pas à gérer un parc d'équipement :
-          c'est notre rôle.
-        </p>
+        <h3>Dispositif permanent</h3>
+        <p>Un système déployé à demeure dans vos locaux. Un coût maîtrisé et prévisible, adapté aux contraintes des structures publiques et privées.</p>
       </div>
-      <div class="feature-card">
-        <div class="feature-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10" stroke-width="1.5"/><polyline points="12 6 12 12 16 14" stroke-width="1.5" stroke-linecap="round"/></svg>
+      <div class="formula-card">
+        <div class="formula-card__icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 010 14.14M4.93 4.93a10 10 0 000 14.14"/></svg>
         </div>
-        <h3>Entraînement sans limite de temps</h3>
-        <p>
-          Contrairement aux formules à la séance, la location à demeure ne vous impose aucun quota.
-          Vos personnels utilisent le simulateur aussi souvent qu'ils le souhaitent, au rythme
-          qui convient à votre organisation.
-        </p>
+        <h3>Maintenance &amp; suivi</h3>
+        <p>Entretien régulier, mises à jour des scénarios, remplacement du matériel si nécessaire. Vous vous concentrez sur l'entraînement.</p>
       </div>
-      <div class="feature-card">
-        <div class="feature-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10" stroke-width="1.5"/><path d="M12 8v4m0 4h.01" stroke-width="1.5" stroke-linecap="round"/></svg>
+      <div class="formula-card">
+        <div class="formula-card__icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
         </div>
-        <h3>Aucune contrainte de munitions</h3>
-        <p>
-          Zéro munition réelle, zéro commande, zéro stockage. Vos agents s'entraînent
-          autant qu'ils le souhaitent — le volume d'entraînement n'est plus limité
-          par un budget cartouches ou une contrainte logistique.
-        </p>
+        <h3>Formation continue</h3>
+        <p>Accompagnement de vos référents internes, actualisation des programmes selon l'évolution de vos missions et menaces.</p>
       </div>
+    </div>
+    <div class="formula-quote fade-up">
+      <blockquote>"La préparation opérationnelle est un investissement continu. Notre rôle est de la rendre accessible et permanente."</blockquote>
+      <cite>DST System — Consultant en solutions opérationnelles</cite>
     </div>
   </div>
 </section>
 
-<!-- SECTION 5 : PUBLIC CONCERNÉ -->
-<section class="section section--white">
+<!-- POUR QUI -->
+<section class="section section--dark" id="clients">
   <div class="container">
     <div class="section-header section-header--center fade-up">
       <span class="section-label">Pour qui</span>
-      <h2>Pour les forces de sécurité<br>et les services publics armés.</h2>
-      <p>La location à demeure s'adapte à toutes les structures disposant de locaux et d'un effectif à former en continu.</p>
+      <h2>Forces armées, sécurité publique<br><span style="color:var(--fg-muted);font-weight:800;">&amp; opérateurs privés.</span></h2>
+      <p>Entraînement continu des opérateurs, équipes de visite en navigation, maintien en condition opérationnelle — un dispositif permanent adapté au rythme de chaque structure.</p>
     </div>
-    <div class="fade-up" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: var(--bd-light-md); border: 1px solid var(--bd-light-md); border-radius: var(--radius-lg); overflow: hidden;">
-      <div style="background: white; padding: 28px 24px; transition: background 0.2s;" onmouseover="this.style.background='var(--bg-grey)'" onmouseout="this.style.background='white'">
-        <div style="width: 36px; height: 36px; background: var(--red-muted); border-radius: var(--radius); display: flex; align-items: center; justify-content: center; margin-bottom: 14px;">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
-        </div>
-        <h3 style="font-size: 0.97rem; margin-bottom: 6px;">Police municipale</h3>
-        <p style="font-size: 0.83rem; color: var(--text-l2); line-height: 1.6;">Missions de proximité, maintien de l'ordre local, protection des espaces publics.</p>
-      </div>
-      <div style="background: white; padding: 28px 24px; transition: background 0.2s;" onmouseover="this.style.background='var(--bg-grey)'" onmouseout="this.style.background='white'">
-        <div style="width: 36px; height: 36px; background: var(--red-muted); border-radius: var(--radius); display: flex; align-items: center; justify-content: center; margin-bottom: 14px;">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="1.75" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-        </div>
-        <h3 style="font-size: 0.97rem; margin-bottom: 6px;">Police nationale</h3>
-        <p style="font-size: 0.83rem; color: var(--text-l2); line-height: 1.6;">Maintien des compétences opérationnelles entre les formations institutionnelles.</p>
-      </div>
-      <div style="background: white; padding: 28px 24px; transition: background 0.2s;" onmouseover="this.style.background='var(--bg-grey)'" onmouseout="this.style.background='white'">
-        <div style="width: 36px; height: 36px; background: var(--red-muted); border-radius: var(--radius); display: flex; align-items: center; justify-content: center; margin-bottom: 14px;">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="1.75" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
-        </div>
-        <h3 style="font-size: 0.97rem; margin-bottom: 6px;">Gendarmerie</h3>
-        <p style="font-size: 0.83rem; color: var(--text-l2); line-height: 1.6;">Couverture des territoires ruraux et périurbains, disponibilité sur site.</p>
-      </div>
-      <div style="background: white; padding: 28px 24px; transition: background 0.2s;" onmouseover="this.style.background='var(--bg-grey)'" onmouseout="this.style.background='white'">
-        <div style="width: 36px; height: 36px; background: var(--red-muted); border-radius: var(--radius); display: flex; align-items: center; justify-content: center; margin-bottom: 14px;">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="1.75" stroke-linecap="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v16"/></svg>
-        </div>
-        <h3 style="font-size: 0.97rem; margin-bottom: 6px;">Administration pénitentiaire</h3>
-        <p style="font-size: 0.83rem; color: var(--text-l2); line-height: 1.6;">Personnels de surveillance et d'intervention en milieu pénitentiaire.</p>
-      </div>
-      <div style="background: white; padding: 28px 24px; transition: background 0.2s;" onmouseover="this.style.background='var(--bg-grey)'" onmouseout="this.style.background='white'">
-        <div style="width: 36px; height: 36px; background: var(--red-muted); border-radius: var(--radius); display: flex; align-items: center; justify-content: center; margin-bottom: 14px;">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="1.75" stroke-linecap="round"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>
-        </div>
-        <h3 style="font-size: 0.97rem; margin-bottom: 6px;">Douanes</h3>
-        <p style="font-size: 0.83rem; color: var(--text-l2); line-height: 1.6;">Personnels armés conduisant des opérations de contrôle, de surveillance et d'intervention.</p>
-      </div>
-      <div style="background: white; padding: 28px 24px; transition: background 0.2s;" onmouseover="this.style.background='var(--bg-grey)'" onmouseout="this.style.background='white'">
-        <div style="width: 36px; height: 36px; background: var(--red-muted); border-radius: var(--radius); display: flex; align-items: center; justify-content: center; margin-bottom: 14px;">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="1.75" stroke-linecap="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
-        </div>
-        <h3 style="font-size: 0.97rem; margin-bottom: 6px;">Convoyeurs de fonds</h3>
-        <p style="font-size: 0.83rem; color: var(--text-l2); line-height: 1.6;">Personnels opérationnels exposés à des risques d'agression dans l'exercice de leurs missions.</p>
-      </div>
-      <div style="background: white; padding: 28px 24px; transition: background 0.2s;" onmouseover="this.style.background='var(--bg-grey)'" onmouseout="this.style.background='white'">
-        <div style="width: 36px; height: 36px; background: var(--red-muted); border-radius: var(--radius); display: flex; align-items: center; justify-content: center; margin-bottom: 14px;">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="1.75" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg>
-        </div>
-        <h3 style="font-size: 0.97rem; margin-bottom: 6px;">Sécurité privée armée</h3>
-        <p style="font-size: 0.83rem; color: var(--text-l2); line-height: 1.6;">Structures autorisées assurant des missions de protection de sites et de personnels sensibles.</p>
-      </div>
-      <div style="background: var(--bg-grey); padding: 28px 24px; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 8px;">
-        <p style="font-size: 0.85rem; color: var(--text-l2); text-align: center; line-height: 1.65;">Votre structure n'est pas listée ?</p>
-        <a href="contact.html" style="font-size: 0.85rem; font-weight: 600; color: var(--red); display: flex; align-items: center; gap: 6px;">Contactez-nous
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+    <div class="clients-pills fade-up">
+      <span class="pill">Armée de Terre</span>
+      <span class="pill">Marine Nationale</span>
+      <span class="pill">Gendarmerie</span>
+      <span class="pill">Police nationale</span>
+      <span class="pill">Police municipale</span>
+      <span class="pill">Administration pénitentiaire</span>
+      <span class="pill">Douanes</span>
+      <span class="pill">Sécurité privée armée</span>
+      <span class="pill">Convoyeurs de fonds</span>
+    </div>
+    <p class="text-center text-muted fade-up" style="font-size:0.88rem;">
+      Votre structure n'est pas listée ? <a href="contact.html" style="color:var(--amber);text-decoration:underline;text-underline-offset:3px;">Contactez-nous</a> — nous adaptons nos solutions à tout besoin opérationnel.
+    </p>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="section">
+  <div class="container">
+    <div class="cta-block fade-up">
+      <div class="glow-bg"></div>
+      <h2>Prêt à transformer<br><span class="text-gradient">votre entraînement ?</span></h2>
+      <p>Présentez-nous vos locaux et vos besoins. Nous vous proposons la formule adaptée — installée chez vous, en location longue durée, avec suivi et maintenance.</p>
+      <div class="cta-block__btns">
+        <a href="contact.html?objet=presentation" class="btn btn--tactical btn--lg" onclick="DSTTrack?.event('cta_click','bottom_presentation')">
+          Demander une présentation
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
         </a>
+        <a href="offres.html" class="btn btn--outline btn--lg">Découvrir nos formules</a>
       </div>
-    </div>
-  </div>
-</section>
-
-<!-- SECTION 6 : MAÎTRISE BUDGÉTAIRE -->
-<section class="section section--grey">
-  <div class="container">
-    <div class="grid-2 fade-up" style="gap: 72px; align-items: start;">
-      <div>
-        <span class="section-label">Dimension budgétaire</span>
-        <h2 style="margin-top: 12px; margin-bottom: 20px;">Un abonnement mensuel,<br>zéro surprise.</h2>
-        <p style="color: var(--text-l2); margin-bottom: 32px;">
-          La location à demeure fonctionne comme un abonnement tout inclus. Pour un DGS ou un élu
-          en charge des finances, cela signifie un poste budgétaire connu à l'avance, intégrable
-          dans le vote des crédits de l'exercice — sans variable imprévisible.
-        </p>
-        <div style="display: flex; flex-direction: column; gap: 24px;">
-          <div style="display: flex; gap: 16px; align-items: flex-start;">
-            <div style="width: 36px; height: 36px; flex-shrink: 0; background: var(--red-muted); border-radius: var(--radius); display: flex; align-items: center; justify-content: center; margin-top: 2px;">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-            </div>
-            <div>
-              <h3 style="font-size: 0.97rem; margin-bottom: 6px;">Budget fixé dès la signature</h3>
-              <p style="font-size: 0.88rem; color: var(--text-l2); margin: 0; line-height: 1.75;">
-                Loyer mensuel fixe, tout inclus. Aucune facturation variable, aucun surcoût d'intervention,
-                aucune facture de maintenance imprévue. Une seule ligne budgétaire.
-              </p>
-            </div>
-          </div>
-          <div style="display: flex; gap: 16px; align-items: flex-start;">
-            <div style="width: 36px; height: 36px; flex-shrink: 0; background: var(--red-muted); border-radius: var(--radius); display: flex; align-items: center; justify-content: center; margin-top: 2px;">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
-            </div>
-            <div>
-              <h3 style="font-size: 0.97rem; margin-bottom: 6px;">Coûts indirects éliminés</h3>
-              <p style="font-size: 0.88rem; color: var(--text-l2); margin: 0; line-height: 1.75;">
-                Déplacements au stand, munitions, location de salle, heures supplémentaires d'organisation :
-                tout ce qui coûtait de l'argent sans apparaître clairement dans les lignes formation disparaît.
-              </p>
-            </div>
-          </div>
-          <div style="display: flex; gap: 16px; align-items: flex-start;">
-            <div style="width: 36px; height: 36px; flex-shrink: 0; background: var(--red-muted); border-radius: var(--radius); display: flex; align-items: center; justify-content: center; margin-top: 2px;">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
-            </div>
-            <div>
-              <h3 style="font-size: 0.97rem; margin-bottom: 6px;">Compatible procédures de commande publique</h3>
-              <p style="font-size: 0.88rem; color: var(--text-l2); margin: 0; line-height: 1.75;">
-                Le contrat de location peut s'inscrire dans le cadre d'un marché à procédure adaptée (MAPA).
-                Devis détaillé fourni avec toutes les pièces nécessaires à la constitution du dossier.
-              </p>
-            </div>
-          </div>
-        </div>
+      <div class="cta-block__micro">
+        <span>Réponse sous 48h</span>
+        <span>Échange sans engagement</span>
+        <span>Location longue durée avec maintenance</span>
       </div>
-      <div style="display: flex; flex-direction: column; gap: 20px;">
-        <div class="feature-card" style="background: white;">
-          <div style="font-size: 0.7rem; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase; color: var(--red); margin-bottom: 12px;">Pilotage budgétaire</div>
-          <h3 style="font-size: 1rem; margin-bottom: 12px;">Un poste formation prévisible et justifiable</h3>
-          <p style="font-size: 0.88rem; color: var(--text-l2); margin: 0; line-height: 1.75;">
-            La structure d'abonnement permet d'inscrire la dépense dans le budget primitif de l'exercice,
-            de la défendre en commission des finances et d'en justifier la récurrence d'une année sur l'autre.
-          </p>
-        </div>
-        <div class="feature-card" style="background: white;">
-          <div style="font-size: 0.7rem; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase; color: var(--red); margin-bottom: 12px;">Responsabilité employeur</div>
-          <h3 style="font-size: 1rem; margin-bottom: 12px;">Une obligation traçable, pas une contrainte subie</h3>
-          <p style="font-size: 0.88rem; color: var(--text-l2); margin: 0; line-height: 1.75;">
-            Les bilans de séances et le rapport annuel produits par DST constituent une documentation
-            opposable sur le maintien des compétences, transmissible à l'autorité de tutelle.
-          </p>
-        </div>
-        <div class="insight">
-          <p>DST System établit un devis détaillé sur demande, avec toutes les pièces nécessaires à la constitution du dossier de commande publique (MAPA).</p>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- CTA FINAL -->
-<section class="cta-section">
-  <div class="container">
-    <div class="fade-up">
-      <span class="section-label">Étape suivante</span>
-      <h2>Un premier échange pour<br>évaluer votre projet.</h2>
-      <p>Présentez-nous vos locaux et vos besoins. Nous vous proposons la formule adaptée à vos effectifs, votre organisation et vos contraintes.</p>
-      <div class="btn-group" style="justify-content: center;">
-        <a href="contact.html?objet=presentation" class="btn btn--red btn--lg">Demander une présentation</a>
-        <a href="offres.html" class="btn btn--ghost btn--lg">Voir nos formules</a>
-      </div>
-      <div class="cta-micro" style="justify-content: center; margin-top: 16px;">
-        <span>
-          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
-          Réponse sous 48h
-        </span>
-        <span>
-          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
-          Échange sans engagement
-        </span>
-        <span>
-          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
-          Adapté à votre organisation
-        </span>
-      </div>
-      <p style="margin-top: 28px; font-size: 0.8rem; color: rgba(255,255,255,0.28); max-width: 540px; margin-left: auto; margin-right: auto; line-height: 1.7; text-align: center;">
-        DST System est en phase de déploiement et accompagne ses premiers partenaires dans la mise en place de dispositifs territoriaux.
-      </p>
     </div>
   </div>
 </section>
@@ -474,77 +299,40 @@
 <!-- FOOTER -->
 <footer class="footer">
   <div class="container">
-    <div class="footer__grid">
+    <div class="footer__inner">
       <div class="footer__brand">
-        <div class="footer__logo"><strong>DST</strong> System</div>
-        <p>Location de simulateurs d'entraînement opérationnel à demeure pour les forces de sécurité et services publics armés.</p>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/><line x1="12" y1="2" x2="12" y2="5"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="2" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="22" y2="12"/></svg>
+        <strong>DST</strong> System
+        <span style="margin-left:8px;font-weight:400;">— Drill &amp; Skills Training</span>
       </div>
-      <div class="footer__col">
-        <h4>Navigation</h4>
-        <ul>
-          <li><a href="offres.html">Nos solutions</a></li>
-          <li><a href="programme.html">Notre démarche</a></li>
-          <li><a href="fonctionnement.html">Fonctionnement</a></li>
-          <li><a href="a-propos.html">À propos</a></li>
-          <li><a href="contact.html">Contact</a></li>
-          <li><a href="templates/plaquette-template.html" target="_blank" onclick="DSTTrack?.event('download', 'plaquette_pdf')">Plaquette PDF</a></li>
-        </ul>
-      </div>
-      <div class="footer__col">
-        <h4>Contact</h4>
-        <p>dst-system@hotmail.com<br>06 65 44 52 26<br><br>Lundi – Vendredi, 9h – 18h</p>
-      </div>
-    </div>
-    <div class="footer__bottom">
-      <p>© 2026 DST System — Drill &amp; Skills Training. Tous droits réservés.</p>
-      <p>Location de simulateurs d'entraînement opérationnel</p>
-      <p style="font-size:12px;color:#6b7280;margin-top:8px;">
-        <a href="mentions-legales.html" style="color:#6b7280;text-decoration:none;">Mentions légales</a>
-        &nbsp;·&nbsp;
-        <a href="confidentialite.html" style="color:#6b7280;text-decoration:none;">Politique de confidentialité</a>
-        &nbsp;·&nbsp;
-        <a href="cgv.html" style="color:#6b7280;text-decoration:none;">CGV</a>
-      </p>
+      <nav class="footer__links">
+        <a href="offres.html">Nos solutions</a>
+        <a href="programme.html">Notre démarche</a>
+        <a href="a-propos.html">À propos</a>
+        <a href="contact.html">Contact</a>
+        <a href="mentions-legales.html">Mentions légales</a>
+        <a href="cgv.html">CGV</a>
+        <a href="confidentialite.html">Confidentialité</a>
+      </nav>
+      <p class="footer__copy">&copy; <script>document.write(new Date().getFullYear())</script> DST System. Tous droits réservés.</p>
     </div>
   </div>
 </footer>
 
-<script src="js/main.js"></script>
-<script src="js/tracker.js" defer></script>
-
-<!-- BANDEAU COOKIES -->
-<div id="cookie-banner"
-     style="position:fixed;bottom:0;left:0;right:0;
-            background:#1a1a2e;color:#e8eaf0;
-            padding:14px 24px;
-            display:flex;align-items:center;
-            justify-content:space-between;
-            font-size:13px;z-index:9999;
-            border-top:1px solid rgba(255,255,255,0.08);
-            gap:16px;">
-  <span>
-    Ce site utilise des cookies techniques nécessaires
-    à son fonctionnement (formulaires, espaces personnels).
-    <a href="confidentialite.html"
-       style="color:#ff6b74;text-decoration:none;">
-      En savoir plus
-    </a>
-  </span>
-  <button onclick="
-    document.getElementById('cookie-banner')
-      .style.display='none';
-    localStorage.setItem('cookies_accepted','1');"
-    style="background:#e63946;color:#fff;border:none;
-           padding:8px 16px;border-radius:4px;
-           font-size:12px;font-weight:600;cursor:pointer;
-           white-space:nowrap;">
-    Accepter
-  </button>
+<!-- COOKIE BANNER -->
+<div id="cookie-banner" style="display:none;">
+  <p>Ce site utilise des cookies techniques nécessaires à son fonctionnement. Aucune donnée personnelle n'est collectée sans votre consentement.</p>
+  <button onclick="localStorage.setItem('cookies_accepted','1');document.getElementById('cookie-banner').style.display='none';">Accepter</button>
 </div>
+
+<script src="js/main.js" defer></script>
+<script src="js/tracker.js" defer></script>
 <script>
-  if (localStorage.getItem('cookies_accepted')) {
-    document.getElementById('cookie-banner').style.display = 'none';
-  }
+  (function(){
+    if (!localStorage.getItem('cookies_accepted')) {
+      document.getElementById('cookie-banner').style.display = 'block';
+    }
+  })();
 </script>
 </body>
 </html>
