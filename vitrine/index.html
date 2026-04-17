@@ -36,11 +36,13 @@
       <li><a href="a-propos.html" class="nav__link">À propos</a></li>
       <li><a href="contact.html" class="nav__link">Contact</a></li>
       <li class="nav__mobile-actions">
+        <button class="nav__lang" id="langToggleMobile" onclick="CRBRi18n.toggle()">🇬🇧 EN</button>
         <a href="contact.html?objet=presentation" class="btn btn--tactical btn--sm">Demander une présentation</a>
         <a href="connexion.html" class="btn btn--connexion btn--sm">🔐 Connexion</a>
       </li>
     </ul>
     <div class="nav__actions">
+      <button class="nav__lang" id="langToggle" onclick="CRBRi18n.toggle()">🇬🇧 EN</button>
       <a href="contact.html?objet=presentation" class="btn btn--tactical btn--sm">Demander une présentation</a>
       <a href="connexion.html" class="btn btn--connexion btn--sm">🔐 Connexion</a>
     </div>
@@ -325,6 +327,7 @@
   <button onclick="localStorage.setItem('cookies_accepted','1');document.getElementById('cookie-banner').style.display='none';">Accepter</button>
 </div>
 
+<script src="js/i18n.js" defer></script>
 <script src="js/main.js" defer></script>
 <script src="js/tracker.js" defer></script>
 <script>
