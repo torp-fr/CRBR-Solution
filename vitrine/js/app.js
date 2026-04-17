@@ -228,7 +228,7 @@ const App = (() => {
           '<span style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--text-muted);margin-top:2px;">SOLUTIONS OPÉRATIONNELLES</span>' +
         '</div>';
       container.innerHTML =
-        '<img src="../img/logo-cerbere-or.png"' +
+        '<img src="../img/Logo CRBR Solutions avec tête de loup.png"' +
         ' onerror="this.style.display=\'none\';this.nextSibling.style.display=\'flex\';"' +
         ' style="max-height:40px;max-width:160px;object-fit:contain;">' +
         fallbackDiv;
