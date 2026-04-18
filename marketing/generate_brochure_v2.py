@@ -228,79 +228,79 @@ def step_circle(c, cx, cy, num, r=18):
 
 def generate_qr():
     """
-    QR code scannable garanti.
+    QR code scannable : modules SOMBRES (#111114) sur fond OR (#C9A84C).
 
-    Principe : make_image() standard (modules carres, pas de gap) -> inversion
-    des couleurs via PIL mask (noir->or, blanc->noir).
-    Les patterns de detection (3 carres coins) restent intacts — le scanner lit
-    exactement la meme structure qu'un QR standard.
-    L'esthetique or/noir + logo Cerbere or est conservee.
+    Regle QR (ISO 18004) : les modules de donnees doivent etre plus SOMBRES
+    que le fond. V2 precedente avait l'inverse (or clair sur noir fonce) ->
+    le scanner lisait les donnees a l'envers -> echec.
+
+    Solution : fill_color=noir (modules sombres), back_color=or (fond clair).
+    Meme esthetique CRBR (couleur or dominante), orientation correcte.
+    Logo Cerbere noir au centre sur cercle or.
     URL : https://www.crbr-solution.fr/
     """
-    print("Generation QR code (standard scannable, or/noir, logo Cerbere or)...")
+    print("Generation QR code (modules sombres/fond or — scannable)...")
     from PIL import ImageDraw
 
-    # ── 1. QR standard — structure garantie scannable ────────────────────────
+    NOIR = (17, 17, 20, 255)
+    OR   = (201, 168, 76, 255)
+
+    # ── 1. QR direct : modules noirs sur fond or ─────────────────────────────
     qr = qrcode.QRCode(
         version=None,
         error_correction=qrcode.constants.ERROR_CORRECT_H,
-        box_size=16,   # 16px par module -> image ~650px
-        border=4,      # quiet zone reglementaire
+        box_size=16,
+        border=4,
     )
     qr.add_data("https://www.crbr-solution.fr/")
     qr.make(fit=True)
 
-    # Image en niveaux de gris : module=0 (noir), fond=255 (blanc)
-    qr_bw = qr.make_image(fill_color="black", back_color="white").convert("L")
-    W_qr, H_qr = qr_bw.size
+    # fill_color = couleur des modules (sombre) / back_color = fond (clair)
+    qr_img = qr.make_image(
+        fill_color="#111114",   # modules : noir/sombre  -> LU comme "data" ✓
+        back_color="#C9A84C",   # fond    : or clair     -> LU comme "vide"  ✓
+    ).convert("RGBA")
 
-    # ── 2. Conversion couleurs : module noir -> or, fond blanc -> noir ───────
-    NOIR = (17, 17, 20, 255)
-    OR   = (201, 168, 76, 255)
+    W_qr, H_qr = qr_img.size
 
-    img = PILImage.new("RGBA", (W_qr, H_qr), NOIR)
-    gold_layer = PILImage.new("RGBA", (W_qr, H_qr), OR)
-    # mask 255 la ou le module est present (pixel noir dans qr_bw)
-    module_mask = qr_bw.point(lambda p: 0 if p > 128 else 255)
-    img.paste(gold_layer, mask=module_mask)
-
-    # ── 3. Logo Cerbere teinte or, zone centrale ─────────────────────────────
+    # ── 2. Logo Cerbere : fond or, Cerbere sombre au centre ─────────────────
     logo_path = ip("CRBR.logo_qr_code.png")
     if os.path.exists(logo_path):
         logo_orig = PILImage.open(logo_path).convert("RGBA")
 
-        # Teinture or : conserver alpha, remplacer RGB par #C9A84C
+        # Logo original est sombre sur fond transparent -> parfait sur fond or
+        # On garde le logo tel quel (sombre sur or = lisible et contraste)
         _, _, _, a_ch = logo_orig.split()
-        gold_logo = PILImage.merge("RGBA", (
-            PILImage.new("L", logo_orig.size, 201),
-            PILImage.new("L", logo_orig.size, 168),
-            PILImage.new("L", logo_orig.size, 76),
-            a_ch,
+        dark_logo = PILImage.merge("RGBA", (
+            PILImage.new("L", logo_orig.size, 17),   # R = #111114
+            PILImage.new("L", logo_orig.size, 17),   # G
+            PILImage.new("L", logo_orig.size, 20),   # B
+            a_ch,                                     # alpha original
         ))
 
-        # Logo 22% (limite safe error_correct_H = 30%)
+        # Logo 22% du QR (limite safe avec ERROR_CORRECT_H)
         logo_size = int(W_qr * 0.22)
-        gold_logo = gold_logo.resize((logo_size, logo_size), PILImage.LANCZOS)
+        dark_logo = dark_logo.resize((logo_size, logo_size), PILImage.LANCZOS)
 
-        # Cercle fond noir + anneau or
+        # Cercle fond or (harmonieux avec le fond QR) + anneau sombre
         pad      = 18
         circle_d = logo_size + pad * 2
         bg       = PILImage.new("RGBA", (circle_d, circle_d), (0, 0, 0, 0))
         dc       = ImageDraw.Draw(bg)
-        dc.ellipse([0, 0, circle_d - 1, circle_d - 1], fill=NOIR)
+        dc.ellipse([0, 0, circle_d - 1, circle_d - 1], fill=OR)
         dc.ellipse([2, 2, circle_d - 3, circle_d - 3],
-                   outline=(201, 168, 76, 220), width=3)
+                   outline=(17, 17, 20, 200), width=3)
 
         lx = (circle_d - logo_size) // 2
         ly = (circle_d - logo_size) // 2
-        bg.paste(gold_logo, (lx, ly), gold_logo)
+        bg.paste(dark_logo, (lx, ly), dark_logo)
 
         cx = (W_qr - circle_d) // 2
         cy = (H_qr - circle_d) // 2
-        img.paste(bg, (cx, cy), bg)
+        qr_img.paste(bg, (cx, cy), bg)
 
-    img.save(QR_PATH)
-    print(f"  OK: {QR_PATH}  ({W_qr}x{H_qr}px | modules carres or/noir | logo 22%)")
+    qr_img.save(QR_PATH)
+    print(f"  OK: {QR_PATH}  ({W_qr}x{H_qr}px | modules sombres/fond or | logo 22%)")
 
 # ─── PAGE 1 — COUVERTURE (image directe) ─────────────────────────────────────
 
