@@ -228,55 +228,48 @@ def step_circle(c, cx, cy, num, r=18):
 
 def generate_qr():
     """
-    QR code scannable : matrice generee manuellement, modules rectangles arrondis or,
-    fond noir, logo Cerbere or au centre.
-    Approche : get_matrix() -> dessin pixel par pixel -> garantit la scannabilite.
+    QR code scannable garanti.
+
+    Principe : make_image() standard (modules carres, pas de gap) -> inversion
+    des couleurs via PIL mask (noir->or, blanc->noir).
+    Les patterns de detection (3 carres coins) restent intacts — le scanner lit
+    exactement la meme structure qu'un QR standard.
+    L'esthetique or/noir + logo Cerbere or est conservee.
     URL : https://www.crbr-solution.fr/
     """
-    print("Generation QR code V2 (matrice manuelle, modules arrondis or/noir)...")
+    print("Generation QR code (standard scannable, or/noir, logo Cerbere or)...")
     from PIL import ImageDraw
 
-    # ── 1. Generer la matrice QR ─────────────────────────────────────────────
+    # ── 1. QR standard — structure garantie scannable ────────────────────────
     qr = qrcode.QRCode(
         version=None,
-        error_correction=qrcode.constants.ERROR_CORRECT_H,  # 30% recuperable
-        border=4,   # quiet zone reglementaire (4 modules)
+        error_correction=qrcode.constants.ERROR_CORRECT_H,
+        box_size=16,   # 16px par module -> image ~650px
+        border=4,      # quiet zone reglementaire
     )
     qr.add_data("https://www.crbr-solution.fr/")
     qr.make(fit=True)
 
-    matrix = qr.get_matrix()   # liste 2D bool, inclut le quiet zone
-    n = len(matrix)            # nb total de modules (data + quiet zone)
+    # Image en niveaux de gris : module=0 (noir), fond=255 (blanc)
+    qr_bw = qr.make_image(fill_color="black", back_color="white").convert("L")
+    W_qr, H_qr = qr_bw.size
 
-    # ── 2. Taille image & parametres visuels ────────────────────────────────
-    target_px  = 600
-    module_px  = target_px // n          # px par module
-    img_size   = module_px * n           # taille reelle (multiple exact)
-    gap        = max(1, module_px // 10) # espace inter-modules (1–2px)
-    radius     = max(2, module_px // 4)  # arrondi 25% — lisible et propre
-
+    # ── 2. Conversion couleurs : module noir -> or, fond blanc -> noir ───────
     NOIR = (17, 17, 20, 255)
     OR   = (201, 168, 76, 255)
 
-    # ── 3. Dessiner les modules sur fond noir ───────────────────────────────
-    img  = PILImage.new("RGBA", (img_size, img_size), NOIR)
-    draw = ImageDraw.Draw(img)
+    img = PILImage.new("RGBA", (W_qr, H_qr), NOIR)
+    gold_layer = PILImage.new("RGBA", (W_qr, H_qr), OR)
+    # mask 255 la ou le module est present (pixel noir dans qr_bw)
+    module_mask = qr_bw.point(lambda p: 0 if p > 128 else 255)
+    img.paste(gold_layer, mask=module_mask)
 
-    for row in range(n):
-        for col in range(n):
-            if matrix[row][col]:   # module sombre = or
-                x0 = col * module_px + gap
-                y0 = row * module_px + gap
-                x1 = x0 + module_px - gap * 2 - 1
-                y1 = y0 + module_px - gap * 2 - 1
-                draw.rounded_rectangle([x0, y0, x1, y1], radius=radius, fill=OR)
-
-    # ── 4. Logo Cerbere teinte or, zone centrale ─────────────────────────────
+    # ── 3. Logo Cerbere teinte or, zone centrale ─────────────────────────────
     logo_path = ip("CRBR.logo_qr_code.png")
     if os.path.exists(logo_path):
         logo_orig = PILImage.open(logo_path).convert("RGBA")
 
-        # Teinter : remplacer R/G/B par or, conserver alpha original
+        # Teinture or : conserver alpha, remplacer RGB par #C9A84C
         _, _, _, a_ch = logo_orig.split()
         gold_logo = PILImage.merge("RGBA", (
             PILImage.new("L", logo_orig.size, 201),
@@ -285,31 +278,29 @@ def generate_qr():
             a_ch,
         ))
 
-        # Logo : 22% de la taille QR — dans la limite des 30% d'erreur H
-        logo_size  = int(img_size * 0.22)
-        gold_logo  = gold_logo.resize((logo_size, logo_size), PILImage.LANCZOS)
+        # Logo 22% (limite safe error_correct_H = 30%)
+        logo_size = int(W_qr * 0.22)
+        gold_logo = gold_logo.resize((logo_size, logo_size), PILImage.LANCZOS)
 
-        # Cercle noir (zone propre) + anneau or autour
-        pad        = 16
-        circle_d   = logo_size + pad * 2
-        bg_circle  = PILImage.new("RGBA", (circle_d, circle_d), (0, 0, 0, 0))
-        dc         = ImageDraw.Draw(bg_circle)
+        # Cercle fond noir + anneau or
+        pad      = 18
+        circle_d = logo_size + pad * 2
+        bg       = PILImage.new("RGBA", (circle_d, circle_d), (0, 0, 0, 0))
+        dc       = ImageDraw.Draw(bg)
         dc.ellipse([0, 0, circle_d - 1, circle_d - 1], fill=NOIR)
         dc.ellipse([2, 2, circle_d - 3, circle_d - 3],
-                   outline=(201, 168, 76, 210), width=3)
+                   outline=(201, 168, 76, 220), width=3)
 
-        # Coller logo or au centre du cercle
         lx = (circle_d - logo_size) // 2
         ly = (circle_d - logo_size) // 2
-        bg_circle.paste(gold_logo, (lx, ly), gold_logo)
+        bg.paste(gold_logo, (lx, ly), gold_logo)
 
-        # Centrer le cercle sur le QR
-        cx = (img_size - circle_d) // 2
-        cy = (img_size - circle_d) // 2
-        img.paste(bg_circle, (cx, cy), bg_circle)
+        cx = (W_qr - circle_d) // 2
+        cy = (H_qr - circle_d) // 2
+        img.paste(bg, (cx, cy), bg)
 
     img.save(QR_PATH)
-    print(f"  OK: {QR_PATH}  ({img_size}x{img_size}px | {n}x{n} modules | logo 22%)")
+    print(f"  OK: {QR_PATH}  ({W_qr}x{H_qr}px | modules carres or/noir | logo 22%)")
 
 # ─── PAGE 1 — COUVERTURE (image directe) ─────────────────────────────────────
 
