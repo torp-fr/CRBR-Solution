@@ -228,77 +228,88 @@ def step_circle(c, cx, cy, num, r=18):
 
 def generate_qr():
     """
-    QR code : fond noir, modules arrondis ores, logo Cerbere teinte or au centre.
-    URL cible : https://www.crbr-solution.fr/
+    QR code scannable : matrice generee manuellement, modules rectangles arrondis or,
+    fond noir, logo Cerbere or au centre.
+    Approche : get_matrix() -> dessin pixel par pixel -> garantit la scannabilite.
+    URL : https://www.crbr-solution.fr/
     """
-    print("Generation QR code V2 (noir/or, logo Cerbere or)...")
+    print("Generation QR code V2 (matrice manuelle, modules arrondis or/noir)...")
+    from PIL import ImageDraw
 
-    from qrcode.image.styledpil import StyledPilImage
-    from qrcode.image.styles.moduledrawers.pil import RoundedModuleDrawer
-    from qrcode.image.styles.colormasks import SolidFillColorMask
-    from PIL import ImageDraw, ImageFilter
-
+    # ── 1. Generer la matrice QR ─────────────────────────────────────────────
     qr = qrcode.QRCode(
-        version=3,
-        error_correction=qrcode.constants.ERROR_CORRECT_H,
-        box_size=14,
-        border=3,
+        version=None,
+        error_correction=qrcode.constants.ERROR_CORRECT_H,  # 30% recuperable
+        border=4,   # quiet zone reglementaire (4 modules)
     )
     qr.add_data("https://www.crbr-solution.fr/")
     qr.make(fit=True)
 
-    # Modules arrondis or (#C9A84C) sur fond noir (#111114)
-    qr_img = qr.make_image(
-        image_factory=StyledPilImage,
-        module_drawer=RoundedModuleDrawer(radius_ratio=0.55),
-        color_mask=SolidFillColorMask(
-            back_color=(17, 17, 20),
-            front_color=(201, 168, 76),
-        ),
-    ).convert("RGBA")
+    matrix = qr.get_matrix()   # liste 2D bool, inclut le quiet zone
+    n = len(matrix)            # nb total de modules (data + quiet zone)
 
-    qr_size = qr_img.size[0]
+    # ── 2. Taille image & parametres visuels ────────────────────────────────
+    target_px  = 600
+    module_px  = target_px // n          # px par module
+    img_size   = module_px * n           # taille reelle (multiple exact)
+    gap        = max(1, module_px // 10) # espace inter-modules (1–2px)
+    radius     = max(2, module_px // 4)  # arrondi 25% — lisible et propre
 
-    # ── Logo Cerbere teinte or ────────────────────────────────────────────────
+    NOIR = (17, 17, 20, 255)
+    OR   = (201, 168, 76, 255)
+
+    # ── 3. Dessiner les modules sur fond noir ───────────────────────────────
+    img  = PILImage.new("RGBA", (img_size, img_size), NOIR)
+    draw = ImageDraw.Draw(img)
+
+    for row in range(n):
+        for col in range(n):
+            if matrix[row][col]:   # module sombre = or
+                x0 = col * module_px + gap
+                y0 = row * module_px + gap
+                x1 = x0 + module_px - gap * 2 - 1
+                y1 = y0 + module_px - gap * 2 - 1
+                draw.rounded_rectangle([x0, y0, x1, y1], radius=radius, fill=OR)
+
+    # ── 4. Logo Cerbere teinte or, zone centrale ─────────────────────────────
     logo_path = ip("CRBR.logo_qr_code.png")
     if os.path.exists(logo_path):
         logo_orig = PILImage.open(logo_path).convert("RGBA")
 
-        # Teinter en or (R=201, G=168, B=76) en preservant l'alpha de forme
-        r_ch, g_ch, b_ch, a_ch = logo_orig.split()
+        # Teinter : remplacer R/G/B par or, conserver alpha original
+        _, _, _, a_ch = logo_orig.split()
         gold_logo = PILImage.merge("RGBA", (
-            PILImage.new("L", logo_orig.size, 201),  # R
-            PILImage.new("L", logo_orig.size, 168),  # G
-            PILImage.new("L", logo_orig.size, 76),   # B
-            a_ch,                                     # Alpha original
+            PILImage.new("L", logo_orig.size, 201),
+            PILImage.new("L", logo_orig.size, 168),
+            PILImage.new("L", logo_orig.size, 76),
+            a_ch,
         ))
 
-        # Logo large : 32% du QR pour etre bien visible
-        logo_size = int(qr_size * 0.32)
-        gold_logo = gold_logo.resize((logo_size, logo_size), PILImage.LANCZOS)
+        # Logo : 22% de la taille QR — dans la limite des 30% d'erreur H
+        logo_size  = int(img_size * 0.22)
+        gold_logo  = gold_logo.resize((logo_size, logo_size), PILImage.LANCZOS)
 
-        # Cercle de fond noir derriere le logo (zone propre, separation des modules)
-        pad_circle = 18
-        circle_d = logo_size + pad_circle * 2
-        bg_circle = PILImage.new("RGBA", (circle_d, circle_d), (0, 0, 0, 0))
-        draw = ImageDraw.Draw(bg_circle)
-        draw.ellipse([0, 0, circle_d - 1, circle_d - 1], fill=(17, 17, 20, 255))
+        # Cercle noir (zone propre) + anneau or autour
+        pad        = 16
+        circle_d   = logo_size + pad * 2
+        bg_circle  = PILImage.new("RGBA", (circle_d, circle_d), (0, 0, 0, 0))
+        dc         = ImageDraw.Draw(bg_circle)
+        dc.ellipse([0, 0, circle_d - 1, circle_d - 1], fill=NOIR)
+        dc.ellipse([2, 2, circle_d - 3, circle_d - 3],
+                   outline=(201, 168, 76, 210), width=3)
 
-        # Anneau or fin autour du cercle (2px)
-        draw.ellipse([1, 1, circle_d - 2, circle_d - 2], outline=(201, 168, 76, 220), width=3)
-
-        # Coller le logo or sur le cercle
+        # Coller logo or au centre du cercle
         lx = (circle_d - logo_size) // 2
         ly = (circle_d - logo_size) // 2
         bg_circle.paste(gold_logo, (lx, ly), gold_logo)
 
-        # Centrer l'ensemble sur le QR
-        cx = (qr_size - circle_d) // 2
-        cy = (qr_size - circle_d) // 2
-        qr_img.paste(bg_circle, (cx, cy), bg_circle)
+        # Centrer le cercle sur le QR
+        cx = (img_size - circle_d) // 2
+        cy = (img_size - circle_d) // 2
+        img.paste(bg_circle, (cx, cy), bg_circle)
 
-    qr_img.save(QR_PATH)
-    print(f"  OK: {QR_PATH} ({qr_size}x{qr_size}px, or sur noir, logo Cerbere or)")
+    img.save(QR_PATH)
+    print(f"  OK: {QR_PATH}  ({img_size}x{img_size}px | {n}x{n} modules | logo 22%)")
 
 # ─── PAGE 1 — COUVERTURE (image directe) ─────────────────────────────────────
 
