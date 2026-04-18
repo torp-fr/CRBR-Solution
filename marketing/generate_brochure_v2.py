@@ -227,31 +227,78 @@ def step_circle(c, cx, cy, num, r=18):
 # ─── QR CODE V2 ──────────────────────────────────────────────────────────────
 
 def generate_qr():
-    print("Generation QR code V2...")
+    """
+    QR code : fond noir, modules arrondis ores, logo Cerbere teinte or au centre.
+    URL cible : https://www.crbr-solution.fr/
+    """
+    print("Generation QR code V2 (noir/or, logo Cerbere or)...")
+
+    from qrcode.image.styledpil import StyledPilImage
+    from qrcode.image.styles.moduledrawers.pil import RoundedModuleDrawer
+    from qrcode.image.styles.colormasks import SolidFillColorMask
+    from PIL import ImageDraw, ImageFilter
+
     qr = qrcode.QRCode(
         version=3,
         error_correction=qrcode.constants.ERROR_CORRECT_H,
-        box_size=11,
+        box_size=14,
         border=3,
     )
-    qr.add_data("https://www.crbr-solution.fr/contact.html")
+    qr.add_data("https://www.crbr-solution.fr/")
     qr.make(fit=True)
-    qr_img = qr.make_image(fill_color="#111114", back_color="white").convert("RGBA")
 
+    # Modules arrondis or (#C9A84C) sur fond noir (#111114)
+    qr_img = qr.make_image(
+        image_factory=StyledPilImage,
+        module_drawer=RoundedModuleDrawer(radius_ratio=0.55),
+        color_mask=SolidFillColorMask(
+            back_color=(17, 17, 20),
+            front_color=(201, 168, 76),
+        ),
+    ).convert("RGBA")
+
+    qr_size = qr_img.size[0]
+
+    # ── Logo Cerbere teinte or ────────────────────────────────────────────────
     logo_path = ip("CRBR.logo_qr_code.png")
     if os.path.exists(logo_path):
-        logo = PILImage.open(logo_path).convert("RGBA")
-        qr_size = qr_img.size[0]
-        logo_size = int(qr_size * 0.20)
-        logo = logo.resize((logo_size, logo_size), PILImage.LANCZOS)
-        pad = 8
-        bg = PILImage.new("RGBA", (logo_size + pad * 2, logo_size + pad * 2), (255, 255, 255, 255))
-        bg.paste(logo, (pad, pad), logo)
-        pos = ((qr_size - bg.size[0]) // 2, (qr_size - bg.size[1]) // 2)
-        qr_img.paste(bg, pos, bg)
+        logo_orig = PILImage.open(logo_path).convert("RGBA")
+
+        # Teinter en or (R=201, G=168, B=76) en preservant l'alpha de forme
+        r_ch, g_ch, b_ch, a_ch = logo_orig.split()
+        gold_logo = PILImage.merge("RGBA", (
+            PILImage.new("L", logo_orig.size, 201),  # R
+            PILImage.new("L", logo_orig.size, 168),  # G
+            PILImage.new("L", logo_orig.size, 76),   # B
+            a_ch,                                     # Alpha original
+        ))
+
+        # Logo large : 32% du QR pour etre bien visible
+        logo_size = int(qr_size * 0.32)
+        gold_logo = gold_logo.resize((logo_size, logo_size), PILImage.LANCZOS)
+
+        # Cercle de fond noir derriere le logo (zone propre, separation des modules)
+        pad_circle = 18
+        circle_d = logo_size + pad_circle * 2
+        bg_circle = PILImage.new("RGBA", (circle_d, circle_d), (0, 0, 0, 0))
+        draw = ImageDraw.Draw(bg_circle)
+        draw.ellipse([0, 0, circle_d - 1, circle_d - 1], fill=(17, 17, 20, 255))
+
+        # Anneau or fin autour du cercle (2px)
+        draw.ellipse([1, 1, circle_d - 2, circle_d - 2], outline=(201, 168, 76, 220), width=3)
+
+        # Coller le logo or sur le cercle
+        lx = (circle_d - logo_size) // 2
+        ly = (circle_d - logo_size) // 2
+        bg_circle.paste(gold_logo, (lx, ly), gold_logo)
+
+        # Centrer l'ensemble sur le QR
+        cx = (qr_size - circle_d) // 2
+        cy = (qr_size - circle_d) // 2
+        qr_img.paste(bg_circle, (cx, cy), bg_circle)
 
     qr_img.save(QR_PATH)
-    print(f"  OK: {QR_PATH}")
+    print(f"  OK: {QR_PATH} ({qr_size}x{qr_size}px, or sur noir, logo Cerbere or)")
 
 # ─── PAGE 1 — COUVERTURE (image directe) ─────────────────────────────────────
 
@@ -1209,7 +1256,7 @@ def page_contact(c):
                     preserveAspectRatio=True, mask='auto')
         c.setFont("Helvetica-Bold", 8)
         c.setFillColor(C_BG)
-        c.drawCentredString(W / 2, qr_y + 11, "www.crbr-solution.fr/contact")
+        c.drawCentredString(W / 2, qr_y + 11, "www.crbr-solution.fr")
 
     # Tagline
     tg_y = H - 610
