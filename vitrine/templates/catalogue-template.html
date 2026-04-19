@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Catalogue Solutions Modulaires - CRBR Solutions</title>
+  <style>
+    @page { size: A4; margin: 0; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Helvetica, Arial, sans-serif; font-size: 10pt; color: #F0EFE9; background: #111114; line-height: 1.5; }
+    #btn-print { position: fixed; top: 16px; right: 16px; padding: 10px 20px; background: #C9A84C; color: #111114; border: none; border-radius: 3px; font-size: 12px; cursor: pointer; z-index: 1000; font-weight: 700; }
+    #btn-print:hover { background: #E2C068; }
+    @media print { #btn-print { display: none; } }
+    .page { width: 210mm; min-height: 297mm; max-height: 297mm; margin: 0 auto 8mm; background: #111114; position: relative; overflow: hidden; page-break-after: always; break-after: page; }
+    .page:last-child { page-break-after: auto; break-after: auto; margin-bottom: 0; }
+    @media print { body { background: #111114; } .page { margin: 0; max-height: none; box-shadow: none; } }
+    @media screen { body { background: #0a0a0c; padding: 16px 0 40px; } .page { box-shadow: 0 4px 32px rgba(0,0,0,0.8); } }
+    :root {
+      --gold: #C9A84C; --gold-light: #E2C068; --gold-dark: #9C7A2E;
+      --gold-a10: rgba(201,168,76,0.10); --gold-a20: rgba(201,168,76,0.20); --gold-a35: rgba(201,168,76,0.35);
+      --bg: #111114; --bg2: #1a1a1e; --card: #1f1f26; --card2: #16161B; --accent: #2A2A35;
+      --white: #F0EFE9; --grey: #8A8A96; --grey-light: #C0C0CA; --border: rgba(201,168,76,0.18);
+    }
+    .page-header { height: 18mm; display: flex; justify-content: space-between; align-items: center; padding: 0 18mm; border-bottom: 1px solid var(--border); position: relative; background: var(--bg2); }
+    .page-header::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, var(--gold), transparent); opacity: 0.4; }
+    .page-header .logo-text { font-size: 10.5pt; font-weight: 700; color: var(--white); letter-spacing: 1px; }
+    .page-header .logo-text span { color: var(--gold); }
+    .page-header .page-label { font-size: 7pt; color: var(--grey); text-transform: uppercase; letter-spacing: 2px; }
+    .page-footer { position: absolute; bottom: 0; left: 0; right: 0; height: 10mm; padding: 0 18mm; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border); font-size: 6.5pt; color: var(--grey); }
+    .page-content { padding: 7mm 18mm 14mm; }
+    .section-label { display: inline-block; font-size: 6.5pt; font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase; color: var(--bg); background: var(--gold); padding: 2px 8px; border-radius: 2px; margin-bottom: 6px; }
+    h2.section-title { font-size: 18pt; font-weight: 700; color: var(--white); line-height: 1.2; margin-bottom: 8px; }
+    h2.section-title em { color: var(--gold); font-style: normal; }
+    h3.sub-title { font-size: 11pt; font-weight: 700; color: var(--white); margin-bottom: 5px; }
+    p.body-text { font-size: 9pt; color: var(--grey-light); line-height: 1.65; margin-bottom: 8px; }
+    .gold-rule { border: none; border-top: 1px solid var(--border); margin: 7mm 0; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 5mm; }
+    .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 4mm; }
+    .card { background: var(--card); border-radius: 3px; padding: 5mm 6mm; border: 1px solid rgba(255,255,255,0.04); }
+    .card.gold-border { border-left: 3px solid var(--gold); }
+    .card.featured { border-color: var(--gold); }
+    .card-label { font-size: 6.5pt; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--gold); margin-bottom: 4px; }
+    .card h4 { font-size: 9.5pt; font-weight: 700; color: var(--white); margin-bottom: 3px; line-height: 1.3; }
+    .card p { font-size: 8.5pt; color: var(--grey-light); line-height: 1.5; }
+    .level-card { border-radius: 4px; overflow: hidden; border: 1px solid rgba(255,255,255,0.06); }
+    .level-card.featured { border-color: var(--gold); }
+    .level-card__header { padding: 5mm 6mm; background: var(--accent); }
+    .level-card.featured .level-card__header { background: var(--gold); }
+    .level-card__header .level-badge { font-size: 6pt; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--grey); margin-bottom: 2px; }
+    .level-card.featured .level-card__header .level-badge { color: rgba(17,17,20,0.7); }
+    .level-card__header h4 { font-size: 12pt; font-weight: 700; color: var(--white); }
+    .level-card.featured .level-card__header h4 { color: #111114; }
+    .level-card__header .level-sub { font-size: 8pt; color: var(--grey); margin-top: 1px; }
+    .level-card.featured .level-card__header .level-sub { color: rgba(17,17,20,0.65); }
+    .level-card__body { padding: 5mm 6mm; background: var(--card); }
+    .spec-row { display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.05); padding: 2.5px 0; font-size: 8pt; }
+    .spec-row:last-child { border-bottom: none; }
+    .spec-key { color: var(--grey); }
+    .spec-val { font-weight: 700; color: var(--white); }
+    .use-list { list-style: none; padding: 0; margin: 4mm 0 0; }
+    .use-list li { font-size: 7.5pt; color: var(--grey-light); padding: 2px 0 2px 11px; position: relative; line-height: 1.4; }
+    .use-list li::before { content: "\25B8"; position: absolute; left: 0; color: var(--gold); }
+    .cfg-list { list-style: none; padding: 0; margin: 0; }
+    .cfg-list li { font-size: 8pt; color: var(--grey-light); padding: 2.5px 0 2.5px 14px; position: relative; line-height: 1.45; border-bottom: 1px solid rgba(255,255,255,0.04); }
+    .cfg-list li:last-child { border-bottom: none; }
+    .cfg-list li::before { content: "\2713"; position: absolute; left: 0; color: var(--gold); font-weight: 700; }
+    .info-pill { display: inline-flex; align-items: center; gap: 5px; background: var(--accent); border-radius: 20px; padding: 3px 10px; font-size: 7.5pt; color: var(--grey-light); margin: 2px 2px 2px 0; border: 1px solid rgba(201,168,76,0.15); }
+    .info-pill .dot { width: 5px; height: 5px; background: var(--gold); border-radius: 50%; flex-shrink: 0; }
+    .gold-tag { display: inline-block; font-size: 6pt; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: #111114; background: var(--gold); padding: 2px 7px; border-radius: 2px; }
+    .img-overlay { position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(17,17,20,0.2) 0%, rgba(17,17,20,0.75) 100%); }
+    .img-overlay-l { position: absolute; inset: 0; background: linear-gradient(to right, rgba(17,17,20,0.85) 0%, rgba(17,17,20,0.3) 60%, transparent 100%); }
+    .cover { min-height: 297mm; background: var(--bg); display: flex; flex-direction: column; padding: 0; position: relative; overflow: hidden; }
+    .cover__bg-img { position: absolute; inset: 0; overflow: hidden; }
+    .cover__bg-img img { width: 100%; height: 100%; object-fit: cover; opacity: 0.25; }
+    .cover__bg-overlay { position: absolute; inset: 0; background: linear-gradient(135deg, rgba(17,17,20,0.95) 0%, rgba(17,17,20,0.7) 50%, rgba(17,17,20,0.9) 100%); }
+    .cover__content { position: relative; z-index: 2; display: flex; flex-direction: column; justify-content: space-between; height: 100%; min-height: 297mm; padding: 14mm 18mm 10mm; }
+    .cover__top { display: flex; justify-content: space-between; align-items: flex-start; }
+    .cover-logo-text { font-size: 14pt; font-weight: 700; color: var(--white); letter-spacing: 1.5px; }
+    .cover-logo-text span { color: var(--gold); }
+    .cover-doc-tag { font-size: 6.5pt; font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase; color: var(--gold); background: var(--gold-a10); padding: 4px 12px; border-radius: 2px; border: 1px solid var(--gold-a35); }
+    .cover__main { flex: 1; display: flex; flex-direction: column; justify-content: center; padding: 10mm 0; }
+    .cover__eyebrow { font-size: 7pt; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: var(--gold); margin-bottom: 5mm; }
+    .cover__title { font-size: 28pt; font-weight: 700; color: var(--white); line-height: 1.15; margin-bottom: 6mm; }
+    .cover__title em { color: var(--gold); font-style: normal; display: block; font-size: 22pt; }
+    .cover__desc { font-size: 10pt; color: var(--grey-light); line-height: 1.7; max-width: 145mm; margin-bottom: 8mm; }
+    .cover__pills { display: flex; flex-wrap: wrap; gap: 4px; }
+    .cover__pill { padding: 4px 10px; border: 1px solid var(--gold-a20); border-radius: 20px; font-size: 7.5pt; color: var(--grey-light); background: var(--gold-a10); }
+    .cover__deco { position: absolute; bottom: 60mm; right: 0; width: 80mm; height: 80mm; overflow: hidden; pointer-events: none; }
+    .cover__deco-line { position: absolute; width: 200mm; height: 1px; background: var(--gold); opacity: 0.12; transform-origin: right center; }
+    .cover__bottom { border-top: 1px solid var(--border); padding-top: 5mm; display: flex; justify-content: space-between; align-items: flex-end; }
+    .cover__contact { font-size: 8.5pt; color: var(--grey); line-height: 1.9; }
+    .cover__contact strong { color: var(--grey-light); }
+    .cover__notice { font-size: 7pt; color: rgba(138,138,150,0.5); text-align: right; line-height: 1.6; }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+</head>
+<body>
+<button id="btn-print" onclick="downloadCatalogue()">Telecharger le catalogue</button>
+<div id="catalogue-content">
+
+<!-- PAGE 1 - COUVERTURE -->
+<div class="page">
+  <div class="cover">
+    <div class="cover__bg-img"><img src="../img/shooting-house.jpg" alt="" /></div>
+    <div class="cover__bg-overlay"></div>
+    <div class="cover__deco">
+      <div class="cover__deco-line" style="top:0;transform:rotate(-25deg);"></div>
+      <div class="cover__deco-line" style="top:22px;transform:rotate(-25deg);"></div>
+      <div class="cover__deco-line" style="top:44px;transform:rotate(-25deg);"></div>
+      <div class="cover__deco-line" style="top:66px;transform:rotate(-25deg);"></div>
+      <div class="cover__deco-line" style="top:88px;transform:rotate(-25deg);"></div>
+    </div>
+    <div class="cover__content">
+      <div class="cover__top">
+        <div>
+          <img src="../img/logo-cerbere-or-metallique.png" alt="CRBR Solutions" style="height:44px;width:auto;margin-bottom:6px;" />
+          <div class="cover-logo-text"><strong>CRBR</strong> <span>Solutions</span></div>
+        </div>
+        <div class="cover-doc-tag">Catalogue Complementaire 2026</div>
+      </div>
+      <div class="cover__main">
+        <div class="cover__eyebrow">Solutions Modulaires &amp; Equipements Sur-Mesure</div>
+        <h1 class="cover__title">Explorez toutes<br>les configurations possibles.<br><em>Sur-mesure. Sur-demande.</em></h1>
+        <p class="cover__desc">Ce catalogue presente l'ensemble des structures, equipements et solutions d'installation disponibles pour composer votre dispositif selon vos besoins operationnels, votre contexte et votre budget.</p>
+        <div class="cover__pills">
+          <div class="cover__pill">Shooting House Modulaire</div>
+          <div class="cover__pill">Kit Effraction &amp; Portes</div>
+          <div class="cover__pill">Structures de Progression</div>
+          <div class="cover__pill">Equipements Tactiques</div>
+          <div class="cover__pill">Configurations Cles en Main</div>
+          <div class="cover__pill">Sur-mesure &amp; Sur-demande</div>
+        </div>
+      </div>
+      <div class="cover__bottom">
+        <div class="cover__contact"><strong>CRBR Solutions</strong><br>info@crbr-solution.fr &nbsp;&middot;&nbsp; 06 65 44 52 26<br>crbr-solution.fr</div>
+        <div class="cover__notice">Document confidentiel - usage commercial<br>Configurations indicatives - a valider en audit<br>&copy; 2026 CRBR Solutions</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 2 - INTRODUCTION -->
+<div class="page">
+  <div class="page-header"><div class="logo-text"><strong>CRBR</strong> <span>Solutions</span></div><div class="page-label">Introduction - Catalogue 2 / 12</div></div>
+  <div class="page-content">
+    <div class="section-label">Ce document</div>
+    <h2 class="section-title">La plaquette presente <em>qui nous sommes</em>.<br>Ce catalogue detaille ce que nous pouvons deployer.</h2>
+    <p class="body-text">Document complementaire a la plaquette CRBR Solutions. Il presente l'ensemble des equipements physiques, structures modulaires et configurations possibles pour votre site, y compris les options sur-commande non detaillees dans la presentation principale.</p>
+    <div class="gold-rule"></div>
+    <div class="section-label">Sommaire</div>
+    <div style="margin-top:5mm;" class="grid-2">
+      <div style="display:flex;flex-direction:column;gap:3mm;">
+        <div class="card gold-border"><div class="card-label">Pages 3-4</div><h4>Shooting House Modulaire</h4><p>Trois niveaux BASIC / PRO / PREMIUM. Specs, use cases, layouts, options et variantes.</p></div>
+        <div class="card gold-border"><div class="card-label">Pages 5-6</div><h4>Portes &amp; Kit Effraction</h4><p>Portes d'entrainement (4 modeles), battering rams, outils d'acces hydrauliques, kits complets.</p></div>
+        <div class="card gold-border"><div class="card-label">Page 7</div><h4>Structures de Progression</h4><p>Tour de rappel, mur d'escalade, corde lisse, obstacle course - modulaire, certifie.</p></div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:3mm;">
+        <div class="card gold-border"><div class="card-label">Pages 8-9</div><h4>Equipements Tactiques &amp; Terrain</h4><p>IFAK, protection balistique, pyrotechnie d'entrainement, systemes simulation, audio, video.</p></div>
+        <div class="card gold-border"><div class="card-label">Pages 10-11</div><h4>Configurations Cles en Main</h4><p>Exemples par type d'unite : PM, Gendarmerie, Commando, Armee. Budget et delai indicatifs.</p></div>
+        <div class="card gold-border"><div class="card-label">Page 12</div><h4>Au-dela du Catalogue</h4><p>Demandes sur-mesure, partenariats specialises, logistique multi-sites, formations maison.</p></div>
+      </div>
+    </div>
+    <div style="margin-top:6mm;background:var(--card2);border-radius:3px;padding:5mm 7mm;display:flex;gap:8mm;align-items:center;border:1px solid var(--border);">
+      <div style="flex:1;"><div style="font-size:6.5pt;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:4px;">Approche CRBR Solutions</div><p style="font-size:8.5pt;color:var(--grey-light);line-height:1.55;margin:0;">Chaque configuration presentee est un point de depart. CRBR Solutions realise un audit de vos locaux, contraintes et objectifs avant de proposer la solution adaptee. Aucun catalogue ne remplace cet echange terrain.</p></div>
+      <div style="flex:0 0 auto;text-align:center;border-left:1px solid var(--border);padding-left:8mm;"><div style="font-size:6.5pt;color:var(--gold);font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">Audit prealable</div><div style="font-size:9pt;color:var(--white);font-weight:700;">Gratuit<br>Sans engagement</div></div>
+    </div>
+  </div>
+  <div class="page-footer"><span>CRBR Solutions - Catalogue Solutions Modulaires 2026</span><span>info@crbr-solution.fr &nbsp;&middot;&nbsp; 06 65 44 52 26</span></div>
+</div>
+
+<!-- PAGE 3 - SHOOTING HOUSE BASIC & PRO -->
+<div class="page">
+  <div class="page-header"><div class="logo-text"><strong>CRBR</strong> <span>Solutions</span></div><div class="page-label">Shooting House Modulaire - Catalogue 3 / 12</div></div>
+  <div class="page-content">
+    <div class="section-label">Structure principale</div>
+    <h2 class="section-title">Shooting House Modulaire<br><span style="font-size:13pt;font-weight:400;color:var(--grey-light);">Trois architectures. Infinite de configurations.</span></h2>
+    <p class="body-text">Structure reconfigurable, transportable, deployable sans infrastructure lourde. Les panneaux s'assemblent sans outillage specialise. Chaque niveau est evolutif.</p>
+    <div style="height:35mm;margin:4mm 0 5mm;border-radius:4px;overflow:hidden;position:relative;">
+      <img src="../img/shooting-house.jpg" alt="Shooting House" style="width:100%;height:100%;object-fit:cover;" />
+      <div class="img-overlay-l"></div>
+      <div style="position:absolute;left:8mm;top:50%;transform:translateY(-50%);z-index:2;"><div style="font-size:6.5pt;color:var(--gold);font-weight:700;text-transform:uppercase;letter-spacing:2px;margin-bottom:3px;">Structure reconfigurable</div><div style="font-size:13pt;font-weight:700;color:var(--white);line-height:1.2;">Panneaux modulaires<br>haute-densite balistique</div></div>
+    </div>
+    <div class="grid-2">
+      <div class="level-card">
+        <div class="level-card__header"><div class="level-badge">Niveau 01</div><h4>BASIC</h4><div class="level-sub">~38-42 m2 - Fondamentaux CQB</div></div>
+        <div class="level-card__body">
+          <div class="spec-row"><span class="spec-key">Surface</span><span class="spec-val">38-42 m2</span></div>
+          <div class="spec-row"><span class="spec-key">Panneaux</span><span class="spec-val">38-42 unites</span></div>
+          <div class="spec-row"><span class="spec-key">Portes</span><span class="spec-val">3-4 emplacements</span></div>
+          <div class="spec-row"><span class="spec-key">Fenetres</span><span class="spec-val">2-4 emplacements</span></div>
+          <div class="spec-row"><span class="spec-key">Montage</span><span class="spec-val">4-6 heures</span></div>
+          <div class="spec-row"><span class="spec-key">Transport</span><span class="spec-val">1 vehicule leger</span></div>
+          <ul class="use-list"><li>Police Municipale - entrainement de base</li><li>Fondamentaux CQB et gestion couloir</li><li>Prise de contact, annonce, entree dynamique</li><li>Locaux : 50-60 m2 suffisants</li></ul>
+          <div style="margin-top:4mm;padding:3mm 4mm;background:var(--accent);border-radius:2px;font-size:7.5pt;color:var(--grey);">Layouts : couloir simple - T-junction - piece + couloir - angle 90</div>
+        </div>
+      </div>
+      <div class="level-card featured">
+        <div class="level-card__header"><div class="level-badge">Niveau 02 - Recommandee</div><h4>PRO</h4><div class="level-sub">~70-85 m2 - Operationnalite complete</div></div>
+        <div class="level-card__body">
+          <div class="spec-row"><span class="spec-key">Surface</span><span class="spec-val">70-85 m2</span></div>
+          <div class="spec-row"><span class="spec-key">Panneaux</span><span class="spec-val">75-85 unites</span></div>
+          <div class="spec-row"><span class="spec-key">Portes</span><span class="spec-val">5-7 emplacements</span></div>
+          <div class="spec-row"><span class="spec-key">Fenetres</span><span class="spec-val">4-8 emplacements</span></div>
+          <div class="spec-row"><span class="spec-key">Montage</span><span class="spec-val">6-10 heures</span></div>
+          <div class="spec-row"><span class="spec-key">Transport</span><span class="spec-val">Remorque / fourgon</span></div>
+          <ul class="use-list"><li>Gendarmerie, unites BI, compagnies operationnelles</li><li>Scenarios complexes multi-pieces</li><li>Entrainement binome et groupe 4-8</li><li>Progressions non-lineaires, reconfiguration rapide</li></ul>
+          <div style="margin-top:4mm;padding:3mm 4mm;background:rgba(201,168,76,0.15);border-radius:2px;font-size:7.5pt;color:#C9A84C;border:1px solid rgba(201,168,76,0.25);"><strong>Configuration recommandee</strong> - couvre 95% des scenarios d'entrainement operationnel</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="page-footer"><span>CRBR Solutions - Catalogue Solutions Modulaires 2026</span><span>info@crbr-solution.fr &nbsp;&middot;&nbsp; 06 65 44 52 26</span></div>
+</div>
+
+<!-- PAGE 4 - SHOOTING HOUSE PREMIUM -->
+<div class="page">
+  <div class="page-header"><div class="logo-text"><strong>CRBR</strong> <span>Solutions</span></div><div class="page-label">Shooting House PREMIUM - Catalogue 4 / 12</div></div>
+  <div class="page-content">
+    <div class="level-card" style="border-color:rgba(201,168,76,0.3);margin-bottom:5mm;">
+      <div class="level-card__header" style="background:var(--card2);"><div class="level-badge" style="color:var(--gold);">Niveau 03 - Forces Specialisees</div><h4>PREMIUM</h4><div class="level-sub" style="color:var(--grey-light);">~110-120 m2 - Armee, Forces Speciales, Interventions Majeures</div></div>
+      <div class="level-card__body">
+        <div class="grid-2" style="gap:4mm;">
+          <div>
+            <div class="spec-row"><span class="spec-key">Surface</span><span class="spec-val">110-120 m2</span></div>
+            <div class="spec-row"><span class="spec-key">Panneaux</span><span class="spec-val">120-130 unites</span></div>
+            <div class="spec-row"><span class="spec-key">Portes</span><span class="spec-val">8-12 emplacements</span></div>
+            <div class="spec-row"><span class="spec-key">Fenetres</span><span class="spec-val">6-12 emplacements</span></div>
+            <div class="spec-row"><span class="spec-key">Montage equipe</span><span class="spec-val">1-2 jours</span></div>
+            <div class="spec-row"><span class="spec-key">Transport</span><span class="spec-val">Semi-remorque ou modulaire</span></div>
+          </div>
+          <ul class="use-list" style="margin-top:0;"><li>Armee de Terre - Forces Speciales</li><li>RAID, GIGN, BRI, unites d'elite</li><li>Entrainements multi-groupes simultanes</li><li>Simulation batiment entier (etages possibles)</li><li>Integration tour de rappel possible</li><li>Deploiement perenne ou temporaire</li></ul>
+        </div>
+      </div>
+    </div>
+    <div class="gold-rule"></div>
+    <div class="section-label">Options &amp; Variantes</div>
+    <div class="grid-3" style="margin:5mm 0;">
+      <div class="card"><div class="card-label">Option A</div><h4>Structure Gonflable</h4><p>Pneumatique, coffre de vehicule. Deploiement 30 min. Exterieur sans infrastructure. 40-80 m2.</p></div>
+      <div class="card"><div class="card-label">Option B</div><h4>Reconfiguration Rapide</h4><p>Charnieres et fixations rapides - modification en 45 min sans demontage complet. Rotations de groupes.</p></div>
+      <div class="card"><div class="card-label">Option C</div><h4>Integration Systemes</h4><p>Supports pour cibles electroniques, eclairage tactique, capteurs d'impact. Compatible CRBR System.</p></div>
+    </div>
+    <div style="background:var(--card2);border-radius:3px;padding:5mm 6mm;border:1px solid var(--border);">
+      <div style="font-size:6.5pt;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:4mm;">Tableau comparatif</div>
+      <table style="width:100%;border-collapse:collapse;font-size:8pt;">
+        <thead><tr style="border-bottom:1px solid var(--border);">
+          <th style="text-align:left;padding:3px 6px;color:var(--grey);font-weight:700;">Critere</th>
+          <th style="text-align:center;padding:3px 6px;color:var(--grey);font-weight:700;">BASIC</th>
+          <th style="text-align:center;padding:3px 6px;color:var(--gold);font-weight:700;">PRO</th>
+          <th style="text-align:center;padding:3px 6px;color:var(--grey);font-weight:700;">PREMIUM</th>
+        </tr></thead>
+        <tbody>
+          <tr style="border-bottom:1px solid rgba(255,255,255,0.04);"><td style="padding:3px 6px;color:var(--grey);">Surface</td><td style="text-align:center;padding:3px 6px;color:var(--grey-light);">38-42 m2</td><td style="text-align:center;padding:3px 6px;color:var(--gold);font-weight:700;">70-85 m2</td><td style="text-align:center;padding:3px 6px;color:var(--grey-light);">110-120 m2</td></tr>
+          <tr style="border-bottom:1px solid rgba(255,255,255,0.04);"><td style="padding:3px 6px;color:var(--grey);">Groupes</td><td style="text-align:center;padding:3px 6px;color:var(--grey-light);">1-2</td><td style="text-align:center;padding:3px 6px;color:var(--gold);font-weight:700;">2-3</td><td style="text-align:center;padding:3px 6px;color:var(--grey-light);">3-6</td></tr>
+          <tr style="border-bottom:1px solid rgba(255,255,255,0.04);"><td style="padding:3px 6px;color:var(--grey);">Layouts</td><td style="text-align:center;padding:3px 6px;color:var(--grey-light);">3-4</td><td style="text-align:center;padding:3px 6px;color:var(--gold);font-weight:700;">4-6</td><td style="text-align:center;padding:3px 6px;color:var(--grey-light);">6-12</td></tr>
+          <tr><td style="padding:3px 6px;color:var(--grey);">Cibles</td><td style="text-align:center;padding:3px 6px;color:var(--grey-light);">PM, GN</td><td style="text-align:center;padding:3px 6px;color:var(--gold);font-weight:700;">GN, PN, BI</td><td style="text-align:center;padding:3px 6px;color:var(--grey-light);">Armee, Elite</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="page-footer"><span>CRBR Solutions - Catalogue Solutions Modulaires 2026</span><span>info@crbr-solution.fr &nbsp;&middot;&nbsp; 06 65 44 52 26</span></div>
+</div>
+
+<!-- PAGE 5 - PORTES D'ENTRAINEMENT -->
+<div class="page">
+  <div class="page-header"><div class="logo-text"><strong>CRBR</strong> <span>Solutions</span></div><div class="page-label">Portes d'Entrainement - Catalogue 5 / 12</div></div>
+  <div class="page-content">
+    <div class="section-label">Acces &amp; Effraction</div>
+    <h2 class="section-title">Portes d'Entrainement<br><span style="font-size:13pt;font-weight:400;color:var(--grey-light);">Realisme integral. Repetitions illimitees.</span></h2>
+    <p class="body-text">La maitrise de l'entree dynamique requiert des equipements reproduisant fidelement les conditions reelles. Compatibles shooting house et standalone - cadre autoportant, aucun percage.</p>
+    <div class="grid-2" style="gap:5mm;margin-top:4mm;">
+      <div>
+        <div style="height:38mm;border-radius:4px;overflow:hidden;margin-bottom:4mm;position:relative;">
+          <img src="../img/breach-door.jpg" alt="Porte d'entrainement" style="width:100%;height:100%;object-fit:cover;" />
+          <div class="img-overlay"></div>
+          <div style="position:absolute;bottom:4mm;left:5mm;z-index:2;"><span class="gold-tag">Portes d'entrainement</span></div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:3mm;">
+          <div class="card"><div class="card-label">Modele 01</div><h4>Porte Simple Bois</h4><p>Reproduction fidele porte residentielle. Charnieres renforcees, coupure possible. 900x2000 mm.</p></div>
+          <div class="card"><div class="card-label">Modele 02</div><h4>Porte Acier Renforcee</h4><p>Simulation local securise. Resistance impacts multiples. 900x2100 mm.</p></div>
+          <div class="card"><div class="card-label">Modele 03</div><h4>Porte Double</h4><p>Entree principale, etablissement public. Entree simultanee binome. 1800x2100 mm.</p></div>
+          <div class="card"><div class="card-label">Modele 04</div><h4>Porte Blindee</h4><p>Haute resistance. Formation outils hydrauliques et charges specialisees. Sur-commande.</p></div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:4mm;">
+        <div class="card gold-border"><h4>Cadre autoportant - aucun percage</h4><p>Installation sans travaux. Repositionnable. Fixation directe dans panneaux shooting house.</p></div>
+        <div class="card gold-border"><h4>Systeme verrou entrainement</h4><p>Resistance reglable, visualisation instructeur, reset rapide entre repetitions.</p></div>
+        <div class="card gold-border"><h4>5 000+ cycles garantis</h4><p>Usage intensif. Pieces de remplacement disponibles. Entretien autonome possible.</p></div>
+        <div class="card gold-border"><h4>Compatible toutes formules</h4><p>Standalone ou integree shooting house. Interchangeable sans outillage.</p></div>
+        <div style="background:var(--card2);border-radius:3px;padding:4mm 5mm;border:1px solid var(--border);">
+          <div style="font-size:6.5pt;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:5px;">Scenarios d'entrainement</div>
+          <div style="font-size:8pt;color:var(--grey-light);line-height:1.8;">Annonce + entree dynamique<br>Entree forcee - kicking &amp; belier<br>Entree silencieuse - douce<br>Gestion couloir vers piece<br>Double entree binome simultanee<br>Scenarios otage / personne a risque</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="page-footer"><span>CRBR Solutions - Catalogue Solutions Modulaires 2026</span><span>info@crbr-solution.fr &nbsp;&middot;&nbsp; 06 65 44 52 26</span></div>
+</div>
+
+<!-- PAGE 6 - KIT EFFRACTION -->
+<div class="page">
+  <div class="page-header"><div class="logo-text"><strong>CRBR</strong> <span>Solutions</span></div><div class="page-label">Kit Effraction - Catalogue 6 / 12</div></div>
+  <div class="page-content">
+    <div class="section-label">Outils professionnels</div>
+    <h2 class="section-title">Outils d'Acces &amp; Kit Effraction</h2>
+    <p class="body-text">Fournis par des fournisseurs certifies forces d'intervention. Disponibles a l'unite ou en kits complets.</p>
+    <div class="grid-2" style="gap:5mm;margin-top:4mm;">
+      <div style="display:flex;flex-direction:column;gap:3mm;">
+        <div class="card" style="display:flex;gap:4mm;align-items:flex-start;"><div style="flex:0 0 auto;width:11mm;height:11mm;background:var(--gold-a10);border-radius:3px;display:flex;align-items:center;justify-content:center;border:1px solid var(--border);font-size:14pt;">&#128296;</div><div><div class="card-label">Outil 01</div><h4>Battering Ram - Belier</h4><p>Monoprise ou biprise, acier traite. 3-8 kg. Usage mural + porte.</p></div></div>
+        <div class="card" style="display:flex;gap:4mm;align-items:flex-start;"><div style="flex:0 0 auto;width:11mm;height:11mm;background:var(--gold-a10);border-radius:3px;display:flex;align-items:center;justify-content:center;border:1px solid var(--border);font-size:14pt;">&#9986;</div><div><div class="card-label">Outil 02</div><h4>Coupe-Verrou Hydraulique</h4><p>Cisaillement rapide cadenas / grille. Compact, une main.</p></div></div>
+        <div class="card" style="display:flex;gap:4mm;align-items:flex-start;"><div style="flex:0 0 auto;width:11mm;height:11mm;background:var(--gold-a10);border-radius:3px;display:flex;align-items:center;justify-content:center;border:1px solid var(--border);font-size:14pt;">&#128295;</div><div><div class="card-label">Outil 03</div><h4>Pied-de-Biche &amp; Levier Pro</h4><p>Multi-usage. Acces fenetre, panneau, porte resistante. Aluminium haute resistance.</p></div></div>
+        <div class="card" style="display:flex;gap:4mm;align-items:flex-start;"><div style="flex:0 0 auto;width:11mm;height:11mm;background:var(--gold-a10);border-radius:3px;display:flex;align-items:center;justify-content:center;border:1px solid var(--border);font-size:14pt;">&#128118;</div><div><div class="card-label">Outil 04</div><h4>Echelle Assault / Tactique</h4><p>Aluminium, deploiement 3 sec. Acces fenetre, mur, toiture. 3 a 6 m.</p></div></div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:4mm;">
+        <div style="height:38mm;border-radius:4px;overflow:hidden;position:relative;">
+          <img src="../img/airsoft-equipment.jpg" alt="Equipement" style="width:100%;height:100%;object-fit:cover;" />
+          <div class="img-overlay"></div>
+          <div style="position:absolute;bottom:4mm;left:5mm;z-index:2;"><span class="gold-tag">Equipements certifies</span></div>
+        </div>
+        <div style="background:var(--card2);border-radius:3px;padding:5mm 6mm;border:1px solid var(--border);">
+          <div style="font-size:6.5pt;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:4mm;">Kits complets disponibles</div>
+          <div style="display:flex;flex-direction:column;gap:3mm;">
+            <div style="display:flex;justify-content:space-between;align-items:center;padding-bottom:3mm;border-bottom:1px solid rgba(255,255,255,0.06);"><div><div style="font-size:8.5pt;font-weight:700;color:var(--white);">Kit Entry Standard</div><div style="font-size:7.5pt;color:var(--grey);">Belier + pied-de-biche + coupe-verrou</div></div><div style="font-size:8pt;color:var(--gold);font-weight:700;padding-left:5mm;">Sur devis</div></div>
+            <div style="display:flex;justify-content:space-between;align-items:center;padding-bottom:3mm;border-bottom:1px solid rgba(255,255,255,0.06);"><div><div style="font-size:8.5pt;font-weight:700;color:var(--white);">Kit Entry Pro</div><div style="font-size:7.5pt;color:var(--grey);">Standard + hydraulique + echelle tactique</div></div><div style="font-size:8pt;color:var(--gold);font-weight:700;padding-left:5mm;">Sur devis</div></div>
+            <div style="display:flex;justify-content:space-between;align-items:center;"><div><div style="font-size:8.5pt;font-weight:700;color:var(--white);">Station Complete</div><div style="font-size:7.5pt;color:var(--grey);">Portes 3 modeles + Kit Pro + supports</div></div><div style="font-size:8pt;color:var(--gold);font-weight:700;padding-left:5mm;">Sur devis</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="page-footer"><span>CRBR Solutions - Catalogue Solutions Modulaires 2026</span><span>info@crbr-solution.fr &nbsp;&middot;&nbsp; 06 65 44 52 26</span></div>
+</div>
+
+<!-- PAGE 7 - STRUCTURES DE PROGRESSION -->
+<div class="page">
+  <div class="page-header"><div class="logo-text"><strong>CRBR</strong> <span>Solutions</span></div><div class="page-label">Structures de Progression - Catalogue 7 / 12</div></div>
+  <div class="page-content">
+    <div class="section-label">Progression verticale</div>
+    <h2 class="section-title">Escalade, Rappel, Corde Lisse<br><span style="font-size:13pt;font-weight:400;color:var(--grey-light);">Structures modulaires certifiees - sans genie civil.</span></h2>
+    <p class="body-text">Ces structures preparent les operateurs aux interventions en hauteur, evacuations d'urgence et renforcement physique specifique.</p>
+    <div class="grid-2" style="gap:5mm;margin-top:4mm;">
+      <div style="display:flex;flex-direction:column;gap:4mm;">
+        <div class="level-card">
+          <div class="level-card__header"><div class="level-badge">Structure 01</div><h4>Tour de Rappel Modulaire</h4><div class="level-sub">5 a 15 m - interieur ou exterieur</div></div>
+          <div class="level-card__body">
+            <div class="spec-row"><span class="spec-key">Hauteur</span><span class="spec-val">5 / 8 / 12 / 15 m</span></div>
+            <div class="spec-row"><span class="spec-key">Materiau</span><span class="spec-val">Acier galvanise</span></div>
+            <div class="spec-row"><span class="spec-key">Charge max</span><span class="spec-val">200 kg / poste</span></div>
+            <div class="spec-row"><span class="spec-key">Postes simultanes</span><span class="spec-val">2-4</span></div>
+            <div class="spec-row"><span class="spec-key">Certification</span><span class="spec-val">EN 13814</span></div>
+            <ul class="use-list"><li>Descente en rappel technique</li><li>Evacuation d'urgence sur corde</li><li>Intervention fenetre / toiture</li><li>Commando, Forces Speciales, Pompiers</li></ul>
+          </div>
+        </div>
+        <div class="level-card">
+          <div class="level-card__header"><div class="level-badge">Structure 04</div><h4>Corde Lisse &amp; Progression</h4><div class="level-sub">2 a 8 m - plafond ou portique</div></div>
+          <div class="level-card__body">
+            <div class="spec-row"><span class="spec-key">Longueur</span><span class="spec-val">2-8 m</span></div>
+            <div class="spec-row"><span class="spec-key">Diametre</span><span class="spec-val">40 ou 50 mm</span></div>
+            <div class="spec-row"><span class="spec-key">Ancrage</span><span class="spec-val">Beton ou portique</span></div>
+            <ul class="use-list"><li>Progression verticale rapide</li><li>Endurance membre superieur</li><li>Preparation interventions hauteur</li></ul>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:4mm;">
+        <div class="level-card">
+          <div class="level-card__header"><div class="level-badge">Structure 02</div><h4>Mur d'Escalade Modulaire</h4><div class="level-sub">3 a 8 m - prises interchangeables</div></div>
+          <div class="level-card__body">
+            <div class="spec-row"><span class="spec-key">Hauteur</span><span class="spec-val">3 / 5 / 8 m</span></div>
+            <div class="spec-row"><span class="spec-key">Largeur</span><span class="spec-val">2-6 m</span></div>
+            <div class="spec-row"><span class="spec-key">Inclinaison</span><span class="spec-val">Vertical a surplomb 15</span></div>
+            <div class="spec-row"><span class="spec-key">Prises</span><span class="spec-val">Interchangeables (100+)</span></div>
+            <ul class="use-list"><li>Force membre superieur</li><li>Franchissement obstacle vertical</li><li>Combinable avec tour rappel</li></ul>
+          </div>
+        </div>
+        <div class="level-card">
+          <div class="level-card__header"><div class="level-badge">Structure 03</div><h4>Barres &amp; Obstacle Course</h4><div class="level-sub">Modulaire - interieur ou exterieur</div></div>
+          <div class="level-card__body">
+            <div class="spec-row"><span class="spec-key">Materiau</span><span class="spec-val">Acier peint anti-corrosion</span></div>
+            <div class="spec-row"><span class="spec-key">Usage</span><span class="spec-val">Solo ou circuit complet</span></div>
+            <ul class="use-list"><li>Renforcement physique specifique</li><li>Circuit d'entrainement combine</li></ul>
+          </div>
+        </div>
+        <div style="background:var(--gold-a10);border:1px solid var(--gold-a35);border-radius:3px;padding:4mm 5mm;"><div style="font-size:6.5pt;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:4px;">Integration possible</div><p style="font-size:8pt;color:var(--grey-light);margin:0;line-height:1.5;">La tour de rappel peut etre integree directement a un Shooting House PREMIUM. Contact sol-sommet inclus dans le deploiement standard.</p></div>
+      </div>
+    </div>
+  </div>
+  <div class="page-footer"><span>CRBR Solutions - Catalogue Solutions Modulaires 2026</span><span>info@crbr-solution.fr &nbsp;&middot;&nbsp; 06 65 44 52 26</span></div>
+</div>
+
+<!-- PAGE 8 - EQUIPEMENTS TACTIQUES -->
+<div class="page">
+  <div class="page-header"><div class="logo-text"><strong>CRBR</strong> <span>Solutions</span></div><div class="page-label">Equipements Tactiques - Catalogue 8 / 12</div></div>
+  <div class="page-content">
+    <div class="section-label">Equipements complementaires</div>
+    <h2 class="section-title">Sante, Protection &amp; Pyrotechnie</h2>
+    <p class="body-text">Ces equipements permettent d'integrer des scenarios avances : soins d'urgence sous stress, gestion de l'environnement complexe, progressions avec effets realistes.</p>
+    <div class="grid-2" style="gap:5mm;margin-top:4mm;">
+      <div style="display:flex;flex-direction:column;gap:4mm;">
+        <div class="card"><div class="card-label">Sante Operationnelle</div><h4>IFAK - Individual First Aid Kit</h4><p>Kit premiers secours tactiques certifie. Pouch MOLLE compatible tous gilets.</p>
+          <div style="margin-top:4mm;display:grid;grid-template-columns:1fr 1fr;gap:2mm;font-size:7.5pt;color:var(--grey-light);">
+            <div>&#10003; Garrot CAT</div><div>&#10003; Agent hemostatique</div>
+            <div>&#10003; Pansement compressif</div><div>&#10003; NPA nasopharynge</div>
+            <div>&#10003; Gants + ciseaux</div><div>&#10003; Pouch MOLLE inclus</div>
+          </div>
+          <div style="margin-top:3mm;font-size:7.5pt;color:var(--grey);font-style:italic;">Personnalisation : broderie unite, contenu specifique mission</div>
+        </div>
+        <div class="card"><div class="card-label">Protection Balistique</div><h4>Gilets &amp; Equipement de Protection</h4><p>Gilets d'intervention, casques tactiques, protections genoux/tibia. Compatible airsoft haute-velocite.</p>
+          <div style="margin-top:3mm;"><div class="info-pill"><span class="dot"></span>NIJ certifie</div><div class="info-pill"><span class="dot"></span>Taille S-XL</div><div class="info-pill"><span class="dot"></span>Broderie unite</div></div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:4mm;">
+        <div style="height:28mm;border-radius:4px;overflow:hidden;position:relative;"><img src="../img/operator-training.jpg" alt="Formation" style="width:100%;height:100%;object-fit:cover;object-position:center 30%;" /><div class="img-overlay"></div></div>
+        <div style="background:var(--card2);border-radius:3px;padding:5mm 6mm;border:1px solid var(--border);">
+          <div style="font-size:6.5pt;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:4mm;">Pyrotechnie d'Entrainement</div>
+          <p style="font-size:8.5pt;color:var(--white);font-weight:700;margin-bottom:4mm;line-height:1.3;">Effets realistes - conditions reglementees</p>
+          <div style="display:flex;flex-direction:column;gap:3mm;font-size:8pt;">
+            <div style="display:flex;gap:5mm;border-bottom:1px solid rgba(255,255,255,0.06);padding-bottom:3mm;"><div style="font-weight:700;color:var(--gold);min-width:12mm;">Fumee</div><div style="color:var(--grey-light);">Grenades fumee colorees. Duree 30-90s. Exterieur recommande.</div></div>
+            <div style="display:flex;gap:5mm;border-bottom:1px solid rgba(255,255,255,0.06);padding-bottom:3mm;"><div style="font-weight:700;color:var(--gold);min-width:12mm;">Lumiere</div><div style="color:var(--grey-light);">Simulateurs flashbang. Effet sonore + flash sans eclat. Certifies formation pro.</div></div>
+            <div style="display:flex;gap:5mm;"><div style="font-weight:700;color:var(--gold);min-width:12mm;">Charges</div><div style="color:var(--grey-light);">Petards d'effraction pour simulation entree dynamique sonore.</div></div>
+          </div>
+          <div style="margin-top:4mm;padding:3mm 4mm;background:rgba(255,255,255,0.03);border-radius:2px;font-size:7.5pt;color:var(--grey);font-style:italic;border-top:1px solid rgba(255,255,255,0.05);">Fournisseurs agrees certifies exclusivement. Reglementation precisee en audit.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="page-footer"><span>CRBR Solutions - Catalogue Solutions Modulaires 2026</span><span>info@crbr-solution.fr &nbsp;&middot;&nbsp; 06 65 44 52 26</span></div>
+</div>
+
+<!-- PAGE 9 - EQUIPEMENTS TERRAIN -->
+<div class="page">
+  <div class="page-header"><div class="logo-text"><strong>CRBR</strong> <span>Solutions</span></div><div class="page-label">Equipements Terrain - Catalogue 9 / 12</div></div>
+  <div class="page-content">
+    <div class="section-label">Simulation &amp; Terrain</div>
+    <h2 class="section-title">Equipements Terrain &amp; Simulation</h2>
+    <p class="body-text">Ces equipements enrichissent la qualite des sessions et permettent une montee progressive en complexite des scenarios. Disponibles a l'unite ou en lots.</p>
+    <div class="grid-3" style="margin:5mm 0;">
+      <div class="card"><div class="card-label">Munitions</div><h4>Munitions Marquantes</h4><p>Billes paintball, caoutchouc, CO2. Impact visible sur vetement et cible.</p></div>
+      <div class="card"><div class="card-label">Cibles</div><h4>Cibles Electroniques</h4><p>Capteur impact 5 mm. Score temps reel. Reseau multi-postes. Rechargeable, resistant eau.</p></div>
+      <div class="card"><div class="card-label">Eclairage</div><h4>Projecteurs Tactiques</h4><p>Basse luminosite reglable. Scenarios nuit / penombre. Rouge / blanc / UV.</p></div>
+      <div class="card"><div class="card-label">Audio</div><h4>Systeme Audio Ambiance</h4><p>Sons environnementaux : foule, alarmes, tirs. 4-16 HP. Controle instructeur temps reel.</p></div>
+      <div class="card"><div class="card-label">Video</div><h4>Enregistrement &amp; Debriefing</h4><p>Cameras grand-angle, replay post-action. Outil pedagogique collectif. Export local.</p></div>
+      <div class="card"><div class="card-label">Humanoïdes</div><h4>Cibles Articulees</h4><p>Silhouettes semi-rigides, humanoïdes articules, cibles mobiles sur rail.</p></div>
+    </div>
+    <div class="gold-rule"></div>
+    <div class="section-label">Simulation Armement</div>
+    <div class="grid-2" style="margin-top:4mm;gap:5mm;">
+      <div class="card gold-border"><h4>Systemes Laser Haute-Fidelite</h4><p>Repliques armes reelles avec emetteurs laser. Analyse comportementale temps reel : vitesse degainage, precision, regroupements. Compatible cibles CRBR.</p></div>
+      <div class="card gold-border"><h4>Systemes Airsoft Haute-Velocite</h4><p>Armement professionnel. Poids et equilibre identiques reel. Compatible protections balistiques et Shooting House. Scenarios hybrides laser + airsoft.</p></div>
+    </div>
+    <div style="margin-top:4mm;background:var(--card2);border-radius:3px;padding:4mm 6mm;font-size:8.5pt;color:var(--grey-light);border:1px solid var(--border);"><strong style="color:var(--white);">Progression par etapes :</strong> chaque equipement peut etre integre progressivement. Aucune obligation de tout deployer des le premier mois.</div>
+  </div>
+  <div class="page-footer"><span>CRBR Solutions - Catalogue Solutions Modulaires 2026</span><span>info@crbr-solution.fr &nbsp;&middot;&nbsp; 06 65 44 52 26</span></div>
+</div>
+
+<!-- PAGE 10 - CONFIGURATIONS PM & GN -->
+<div class="page">
+  <div class="page-header"><div class="logo-text"><strong>CRBR</strong> <span>Solutions</span></div><div class="page-label">Configurations Cles en Main - Catalogue 10 / 12</div></div>
+  <div class="page-content">
+    <div class="section-label">Solutions par type d'unite</div>
+    <h2 class="section-title">Configurations <em>Cles en Main</em></h2>
+    <p class="body-text" style="margin-bottom:5mm;">Exemples de composition pour chaque profil. Chaque installation est adaptee en audit selon vos locaux, effectifs et contraintes budgetaires.</p>
+    <div class="grid-2" style="gap:5mm;">
+      <div style="border:1px solid rgba(255,255,255,0.08);border-radius:4px;overflow:hidden;">
+        <div style="background:var(--accent);padding:5mm 6mm;"><div style="font-size:6pt;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--grey);margin-bottom:2px;">Police Municipale</div><div style="font-size:12pt;font-weight:700;color:var(--white);">Configuration Compacte</div><div style="font-size:8pt;color:var(--grey);margin-top:1px;">15 a 40 agents - locaux limites</div></div>
+        <div style="padding:5mm 6mm;background:var(--card);">
+          <ul class="cfg-list"><li>Shooting House BASIC (38-42 m2)</li><li>Systeme simulation laser - armes de poing</li><li>Cibles electroniques x4 reactives</li><li>Porte d'entrainement simple x1</li><li>Kit effraction entry standard</li><li>Camera enregistrement + debriefing</li></ul>
+          <div style="margin-top:4mm;padding:3mm 4mm;background:var(--accent);border-radius:2px;font-size:8pt;color:var(--grey-light);"><strong style="color:var(--white);">Resultat :</strong> Fondamentaux CQB, maniement arme, gestion couloir, entree dynamique. Autonomie complete.</div>
+          <div style="margin-top:3mm;display:flex;justify-content:space-between;font-size:7pt;color:var(--grey);"><span>Deploiement : 1-2 jours</span><span>Investissement : sur devis</span></div>
+        </div>
+      </div>
+      <div style="border:2px solid var(--gold);border-radius:4px;overflow:hidden;">
+        <div style="background:var(--gold);padding:5mm 6mm;"><div style="font-size:6pt;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(17,17,20,0.6);margin-bottom:2px;">Gendarmerie / PN - Recommandee</div><div style="font-size:12pt;font-weight:700;color:#111114;">Configuration Standard</div><div style="font-size:8pt;color:rgba(17,17,20,0.65);margin-top:1px;">30 a 80 agents - operationnalite complete</div></div>
+        <div style="padding:5mm 6mm;background:var(--card);">
+          <ul class="cfg-list"><li>Shooting House PRO (70-85 m2)</li><li>Systeme simulation laser avance (poing + epaule)</li><li>Cibles electroniques x8 + humanoïdes articules</li><li>Portes d'entrainement x3 (bois, acier, double)</li><li>Kit effraction PRO (belier + hydraulique + echelle)</li><li>Equipements protection airsoft x8</li><li>Systeme audio ambiance (8 HP)</li><li>Cameras debriefing x4</li></ul>
+          <div style="margin-top:4mm;padding:3mm 4mm;background:var(--gold-a10);border-radius:2px;font-size:8pt;color:var(--gold);border:1px solid var(--gold-a35);"><strong>Configuration recommandee</strong> - couvre l'ensemble des scenarios operationnels et tactiques.</div>
+          <div style="margin-top:3mm;display:flex;justify-content:space-between;font-size:7pt;color:var(--gold);"><span>Deploiement : 2-5 jours</span><span>Investissement : sur devis</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="page-footer"><span>CRBR Solutions - Catalogue Solutions Modulaires 2026</span><span>info@crbr-solution.fr &nbsp;&middot;&nbsp; 06 65 44 52 26</span></div>
+</div>
+
+<!-- PAGE 11 - CONFIGURATIONS COMMANDO & ARMEE -->
+<div class="page">
+  <div class="page-header"><div class="logo-text"><strong>CRBR</strong> <span>Solutions</span></div><div class="page-label">Configurations Specialisees - Catalogue 11 / 12</div></div>
+  <div class="page-content">
+    <div class="grid-2" style="gap:5mm;">
+      <div style="border:1px solid rgba(255,255,255,0.08);border-radius:4px;overflow:hidden;">
+        <div style="background:var(--card2);padding:5mm 6mm;border-bottom:1px solid var(--border);"><div style="font-size:6pt;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:2px;">Commando / RAID / BRI</div><div style="font-size:12pt;font-weight:700;color:var(--white);">Configuration Premium</div><div style="font-size:8pt;color:var(--grey);margin-top:1px;">Unites specialisees - haute complexite</div></div>
+        <div style="padding:5mm 6mm;background:var(--card);">
+          <ul class="cfg-list"><li>Shooting House PREMIUM (110-120 m2)</li><li>Systemes laser multi-postes haute-fidelite x12</li><li>Portes renforcees x5 (tous modeles)</li><li>Kit effraction Pro complet</li><li>Tour de rappel 8-12 m (integree)</li><li>Mur escalade 5 m</li><li>Cibles electroniques x12 + humanoïdes x4</li><li>Pyrotechnie (fumee + flashbang + charges)</li><li>Equipement sante IFAK x10</li><li>Audio + eclairage tactique + cameras x8</li><li>Programme pedagogique sur-mesure</li></ul>
+          <div style="margin-top:4mm;padding:3mm 4mm;background:var(--card2);border-radius:2px;font-size:7.5pt;color:var(--grey);font-style:italic;">Approche sur-mesure - definie apres audit de vos locaux et objectifs operationnels.</div>
+          <div style="margin-top:3mm;display:flex;justify-content:space-between;font-size:7pt;color:var(--grey);"><span>Deploiement : 1-2 semaines</span><span>Investissement : sur devis</span></div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:4mm;">
+        <div style="border:1px solid rgba(255,255,255,0.08);border-radius:4px;overflow:hidden;">
+          <div style="background:var(--accent);padding:4mm 6mm;border-bottom:1px solid var(--border);"><div style="font-size:6pt;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--grey);margin-bottom:1px;">Armee de Terre - Option A</div><div style="font-size:10pt;font-weight:700;color:var(--white);">Base + Progression Verticale</div><div style="font-size:7.5pt;color:var(--grey);">Regiment - point de depart evolutif</div></div>
+          <div style="padding:4mm 6mm;background:var(--card);"><ul class="cfg-list"><li>Shooting House PRO ou PREMIUM (selon site)</li><li>Simulation + cibles completes</li><li>Tour rappel 12 m + corde lisse</li><li>Kit effraction standard + cameras + audio</li></ul><div style="margin-top:3mm;font-size:7pt;color:var(--grey);font-style:italic;">Upgradable vers Option B - budget par etapes possible</div></div>
+        </div>
+        <div style="border:1px solid rgba(255,255,255,0.08);border-radius:4px;overflow:hidden;">
+          <div style="background:var(--accent);padding:4mm 6mm;border-bottom:1px solid var(--border);"><div style="font-size:6pt;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--grey);margin-bottom:1px;">Armee de Terre - Option B</div><div style="font-size:10pt;font-weight:700;color:var(--white);">Premium + Deploiement Mobile</div><div style="font-size:7.5pt;color:var(--grey);">Haute-intensite - multi-sites</div></div>
+          <div style="padding:4mm 6mm;background:var(--card);"><ul class="cfg-list"><li>Shooting House PREMIUM + gonflable (mobile)</li><li>Laser + airsoft complets</li><li>Tour rappel + escalade + corde</li><li>Pyrotechnie complete + medical tactique</li><li>Deploiement 2-5 regiments simultanes</li></ul><div style="margin-top:3mm;font-size:7pt;color:var(--grey);font-style:italic;">Logistique multi-sites sur-mesure - audit requis</div></div>
+        </div>
+        <div style="background:var(--gold-a10);border:1px solid var(--gold-a35);border-radius:3px;padding:4mm 5mm;"><div style="font-size:6.5pt;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:4px;">Progression budgetaire</div><p style="font-size:8pt;color:var(--grey-light);margin:0;line-height:1.5;">CRBR Solutions peut structurer l'investissement sur plusieurs exercices budgetaires. Chaque etape est operationnelle des livraison.</p></div>
+      </div>
+    </div>
+  </div>
+  <div class="page-footer"><span>CRBR Solutions - Catalogue Solutions Modulaires 2026</span><span>info@crbr-solution.fr &nbsp;&middot;&nbsp; 06 65 44 52 26</span></div>
+</div>
+
+<!-- PAGE 12 - AU-DELA DU CATALOGUE & CONTACT -->
+<div class="page">
+  <div class="page-header"><div class="logo-text"><strong>CRBR</strong> <span>Solutions</span></div><div class="page-label">Sur-mesure &amp; Contact - Catalogue 12 / 12</div></div>
+  <div class="page-content">
+    <div class="section-label">Au-dela du catalogue</div>
+    <h2 class="section-title">Votre besoin n'est pas<br>presente ici ?</h2>
+    <p class="body-text" style="margin-bottom:5mm;">CRBR Solutions travaille regulierement sur des demandes hors catalogue. Pas de demande trop specifique.</p>
+    <div class="grid-2" style="gap:4mm;margin-bottom:6mm;">
+      <div style="display:flex;flex-direction:column;gap:3mm;">
+        <div class="card gold-border"><h4>Infrastructure existante adaptee</h4><p>Locaux non-standard ? CRBR Solutions adapte chaque dispositif a votre contrainte de surface, hauteur et acces.</p></div>
+        <div class="card gold-border"><h4>Equipements personnalises</h4><p>Broderie d'unite, logos, couleurs, modifications dimensionnelles. Chaque equipement s'adapte a votre identite.</p></div>
+        <div class="card gold-border"><h4>Formations maison sur-mesure</h4><p>Programme adapte a votre contexte, vos RETEX, vos objectifs de certification ou evolutions reglementaires.</p></div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:3mm;">
+        <div class="card gold-border"><h4>Partenariats specialises</h4><p>Systemes proprietaires, armes alternatives, integrations avec equipement existant - CRBR coordonne les partenariats techniques.</p></div>
+        <div class="card gold-border"><h4>Logistique multi-sites</h4><p>Plusieurs sites, plusieurs unites - dispositifs coherents deployes en parallele avec un referent unique.</p></div>
+        <div class="card gold-border"><h4>Evolution &amp; montee en charge</h4><p>Chaque composant CRBR est concu pour etre augmente. Upgrade a tout moment sans demontage complet.</p></div>
+      </div>
+    </div>
+    <div style="background:var(--card2);border-radius:4px;padding:6mm 7mm;border:1px solid var(--border);">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:5mm;">
+        <div><div style="font-size:6.5pt;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:4px;">Prochaine etape</div><h3 style="font-size:13pt;font-weight:700;color:var(--white);margin:0;">Premier echange. Sans engagement.</h3><p style="font-size:8.5pt;color:var(--grey);margin-top:4px;margin-bottom:0;line-height:1.5;">Nous evaluons la faisabilite sur votre site et remettons une proposition dans les 5 jours ouvres.</p></div>
+        <img src="../img/logo-cerbere-or-metallique.png" alt="CRBR" style="height:36px;width:auto;opacity:0.8;margin-left:8mm;" />
+      </div>
+      <div style="display:flex;gap:6mm;">
+        <div style="flex:1;border-right:1px solid var(--border);padding-right:6mm;"><div style="font-size:6.5pt;color:var(--gold);font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:3px;">Email</div><div style="font-size:9.5pt;font-weight:700;color:var(--white);">info@crbr-solution.fr</div></div>
+        <div style="flex:1;border-right:1px solid var(--border);padding-right:6mm;"><div style="font-size:6.5pt;color:var(--gold);font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:3px;">Telephone</div><div style="font-size:9.5pt;font-weight:700;color:var(--white);">06 65 44 52 26</div></div>
+        <div style="flex:1;"><div style="font-size:6.5pt;color:var(--gold);font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:3px;">Site web</div><div style="font-size:9.5pt;font-weight:700;color:var(--white);">crbr-solution.fr</div></div>
+      </div>
+    </div>
+    <div style="margin-top:5mm;text-align:center;"><p style="font-size:7pt;color:var(--grey);">&copy; 2026 CRBR Solutions - Conception de Reponse Basees sur les Retex. Tous droits reserves.<br>Document a usage commercial - configurations et couts indicatifs - a valider en audit prealable. Document confidentiel destine aux forces de securite publique et services armes.</p></div>
+  </div>
+  <div class="page-footer"><span>CRBR Solutions - Catalogue Solutions Modulaires 2026</span><span>info@crbr-solution.fr &nbsp;&middot;&nbsp; 06 65 44 52 26</span></div>
+</div>
+
+</div>
+<script>
+function downloadCatalogue() {
+  var btn = document.getElementById('btn-print');
+  btn.textContent = 'Generation en cours...';
+  btn.disabled = true;
+  var pages = Array.from(document.querySelectorAll('.page'));
+  var pdf = new window.jspdf.jsPDF('p', 'mm', 'a4');
+  var imgWidth = 210;
+  var captures = pages.map(function(page) {
+    return html2canvas(page, { scale: 2, useCORS: true, allowTaint: true, backgroundColor: '#111114' });
+  });
+  Promise.all(captures).then(function(canvases) {
+    canvases.forEach(function(canvas, i) {
+      var imgData = canvas.toDataURL('image/jpeg', 0.95);
+      var imgHeight = (canvas.height * imgWidth) / canvas.width;
+      if (i > 0) pdf.addPage();
+      pdf.addImage(imgData, 'JPEG', 0, 0, imgWidth, imgHeight);
+    });
+    pdf.save('CRBR-Solutions-Catalogue-Complementaire.pdf');
+    btn.textContent = 'Telecharger le catalogue';
+    btn.disabled = false;
+  }).catch(function(err) {
+    console.error('PDF error:', err);
+    btn.textContent = 'Telecharger le catalogue';
+    btn.disabled = false;
+  });
+}
+</script>
+</body>
+</html>
