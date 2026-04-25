@@ -1,0 +1,986 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Devis CRBR Solutions — Modèle</title>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <style>
+    /* =====================================================
+       CRBR SOLUTIONS — DEVIS TEMPLATE
+       Format A4 — Institutionnel & sobre
+       ===================================================== */
+
+    :root {
+      --navy:        #0d1b3e;
+      --navy-mid:    #1a2f6b;
+      --navy-light:  #2a4a9b;
+      --accent:      #1565c0;
+      --text-dark:   #111827;
+      --text-mid:    #374151;
+      --text-light:  #6b7280;
+      --text-muted:  #9ca3af;
+      --border:      #d1d5db;
+      --bg-row:      #f8f9fb;
+      --bg-accent:   #eef2ff;
+      --white:       #ffffff;
+      --a4-w:        210mm;
+      --a4-h:        297mm;
+      --margin-h:    15mm;
+      --margin-top:  20mm;
+      --margin-bot:  15mm;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      font-size: 10pt;
+      color: var(--text-dark);
+      background: #e8eaed;
+      line-height: 1.45;
+    }
+
+    /* ---- Toolbar (masqué à l'impression) ---- */
+    #toolbar {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      background: var(--navy);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 24px;
+      z-index: 9999;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.4);
+      gap: 12px;
+    }
+
+    #toolbar .tb-brand {
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      white-space: nowrap;
+    }
+
+    #toolbar .tb-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .tb-btn {
+      padding: 7px 18px;
+      border: none;
+      border-radius: 4px;
+      font-family: 'Segoe UI', Arial, sans-serif;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s, opacity 0.15s;
+      white-space: nowrap;
+    }
+
+    .tb-btn-primary {
+      background: #1976d2;
+      color: #fff;
+    }
+    .tb-btn-primary:hover { background: #1565c0; }
+
+    .tb-btn-secondary {
+      background: rgba(255,255,255,0.12);
+      color: #fff;
+      border: 1px solid rgba(255,255,255,0.25);
+    }
+    .tb-btn-secondary:hover { background: rgba(255,255,255,0.2); }
+
+    #pdf-status {
+      font-size: 11px;
+      color: rgba(255,255,255,0.7);
+      min-width: 160px;
+      text-align: right;
+    }
+
+    /* ---- Zone de prévisualisation ---- */
+    #preview-zone {
+      padding: 60px 24px 40px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    /* ---- Page A4 ---- */
+    .a4-page {
+      width: var(--a4-w);
+      min-height: var(--a4-h);
+      background: var(--white);
+      box-shadow: 0 4px 32px rgba(0,0,0,0.22);
+      padding: var(--margin-top) var(--margin-h) var(--margin-bot);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ========== EN-TÊTE ========== */
+    .doc-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      padding-bottom: 14px;
+      border-bottom: 3px solid var(--navy);
+      margin-bottom: 20px;
+    }
+
+    .doc-header-left {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .hdr-logo {
+      height: 48px;
+      width: auto;
+      display: block;
+    }
+
+    .hdr-logo-fallback {
+      font-size: 15pt;
+      font-weight: 700;
+      color: var(--navy);
+      line-height: 1.1;
+    }
+
+    .hdr-tagline {
+      font-size: 8pt;
+      color: var(--text-light);
+      font-style: italic;
+      max-width: 260px;
+    }
+
+    .doc-header-right {
+      text-align: right;
+    }
+
+    .hdr-devis-label {
+      font-size: 28pt;
+      font-weight: 700;
+      color: var(--navy);
+      letter-spacing: 4px;
+      line-height: 1;
+      margin-bottom: 10px;
+    }
+
+    .hdr-meta-table {
+      border-collapse: collapse;
+      font-size: 8.5pt;
+    }
+
+    .hdr-meta-table td {
+      padding: 2px 0 2px 14px;
+    }
+
+    .hdr-meta-table td:first-child {
+      color: var(--text-light);
+      white-space: nowrap;
+    }
+
+    .hdr-meta-table td:last-child {
+      color: var(--text-dark);
+      font-weight: 500;
+    }
+
+    .field-placeholder {
+      color: var(--text-muted);
+      font-style: italic;
+    }
+
+    /* ========== BLOC INFO DEUX COLONNES ========== */
+    .info-columns {
+      display: flex;
+      gap: 20px;
+      margin-bottom: 18px;
+    }
+
+    .info-col {
+      flex: 1;
+    }
+
+    .info-col-title {
+      font-size: 7.5pt;
+      font-weight: 700;
+      color: var(--white);
+      background: var(--navy-mid);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      padding: 4px 10px;
+      margin-bottom: 8px;
+      border-radius: 2px;
+    }
+
+    .info-col table {
+      border-collapse: collapse;
+      width: 100%;
+      font-size: 8.5pt;
+    }
+
+    .info-col table td {
+      padding: 3px 0;
+      vertical-align: top;
+    }
+
+    .info-col table td:first-child {
+      color: var(--text-light);
+      width: 40%;
+      padding-right: 6px;
+      white-space: nowrap;
+    }
+
+    .info-col table td:last-child {
+      color: var(--text-dark);
+    }
+
+    /* ========== TEXTE INTRODUCTION ========== */
+    .intro-text {
+      text-align: center;
+      font-size: 8.5pt;
+      color: var(--text-mid);
+      background: var(--bg-accent);
+      border: 1px solid #c7d7f9;
+      border-radius: 3px;
+      padding: 10px 16px;
+      margin-bottom: 18px;
+      line-height: 1.6;
+    }
+
+    .intro-text strong {
+      color: var(--navy);
+      display: block;
+      font-size: 9pt;
+      margin-bottom: 4px;
+    }
+
+    /* ========== TABLEAU PRESTATIONS ========== */
+    .section-title {
+      font-size: 8.5pt;
+      font-weight: 700;
+      color: var(--white);
+      background: var(--navy);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      padding: 5px 10px;
+      margin-bottom: 0;
+      border-radius: 2px 2px 0 0;
+    }
+
+    .prestation-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 8.5pt;
+      margin-bottom: 16px;
+    }
+
+    .prestation-table thead tr {
+      background: var(--navy-mid);
+      color: var(--white);
+    }
+
+    .prestation-table thead th {
+      padding: 6px 8px;
+      text-align: left;
+      font-weight: 600;
+      font-size: 8pt;
+      letter-spacing: 0.3px;
+      border: 1px solid var(--navy-mid);
+    }
+
+    .prestation-table thead th.col-right {
+      text-align: right;
+    }
+
+    .prestation-table tbody tr:nth-child(even) {
+      background: var(--bg-row);
+    }
+
+    .prestation-table tbody tr:nth-child(odd) {
+      background: var(--white);
+    }
+
+    .prestation-table tbody td {
+      padding: 6px 8px;
+      border: 1px solid var(--border);
+      vertical-align: top;
+    }
+
+    .prestation-table tbody td.col-right {
+      text-align: right;
+    }
+
+    .prestation-table .row-desc {
+      font-weight: 500;
+      color: var(--text-dark);
+    }
+
+    .prestation-table .row-sub {
+      font-size: 7.5pt;
+      color: var(--text-light);
+      margin-top: 2px;
+    }
+
+    .prestation-table .row-empty {
+      color: var(--text-muted);
+      font-style: italic;
+    }
+
+    /* Ligne total sous-total */
+    .prestation-table tfoot tr {
+      background: var(--bg-row);
+      font-weight: 600;
+    }
+
+    .prestation-table tfoot td {
+      padding: 5px 8px;
+      border: 1px solid var(--border);
+      border-top: 2px solid var(--navy);
+    }
+
+    /* ========== SECTION TOTAUX ========== */
+    .totaux-outer {
+      display: flex;
+      justify-content: flex-end;
+      margin-bottom: 18px;
+    }
+
+    .totaux-box {
+      width: 260px;
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+
+    .totaux-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 6px 12px;
+      font-size: 9pt;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .totaux-row:last-child {
+      border-bottom: none;
+    }
+
+    .totaux-row .tot-label {
+      color: var(--text-mid);
+    }
+
+    .totaux-row .tot-val {
+      font-weight: 500;
+      color: var(--text-dark);
+    }
+
+    .totaux-row.ttc-row {
+      background: var(--navy);
+      color: var(--white);
+    }
+
+    .totaux-row.ttc-row .tot-label {
+      color: rgba(255,255,255,0.85);
+      font-weight: 600;
+    }
+
+    .totaux-row.ttc-row .tot-val {
+      color: var(--white);
+      font-size: 11pt;
+      font-weight: 700;
+    }
+
+    /* ========== CONDITIONS COMMERCIALES ========== */
+    .conditions-section {
+      margin-bottom: 14px;
+    }
+
+    .conditions-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      font-size: 8.5pt;
+      border: 1px solid var(--border);
+      border-radius: 0 0 2px 2px;
+    }
+
+    .cond-item {
+      padding: 6px 10px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+    }
+
+    .cond-item:nth-last-child(-n+2) {
+      border-bottom: none;
+    }
+
+    .cond-label {
+      font-size: 7.5pt;
+      font-weight: 700;
+      color: var(--text-light);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .cond-val {
+      color: var(--text-dark);
+    }
+
+    /* ========== ENGAGEMENTS ========== */
+    .engagements-section {
+      margin-bottom: 14px;
+    }
+
+    .engagements-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0;
+      border: 1px solid var(--border);
+      border-radius: 0 0 2px 2px;
+    }
+
+    .eng-item {
+      padding: 6px 10px;
+      font-size: 8.5pt;
+      border-bottom: 1px solid var(--border);
+      border-right: 1px solid var(--border);
+      color: var(--text-dark);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .eng-item:nth-child(even) {
+      border-right: none;
+    }
+
+    .eng-item:nth-last-child(-n+2) {
+      border-bottom: none;
+    }
+
+    .eng-check {
+      color: var(--navy-light);
+      font-weight: 700;
+      font-size: 10pt;
+    }
+
+    /* ========== MENTIONS LÉGALES ========== */
+    .mentions-section {
+      font-size: 7.5pt;
+      color: var(--text-muted);
+      background: #f9fafb;
+      border: 1px solid var(--border);
+      border-radius: 2px;
+      padding: 8px 10px;
+      margin-bottom: 14px;
+      line-height: 1.55;
+    }
+
+    .mentions-title {
+      font-weight: 700;
+      color: var(--text-light);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      font-size: 7pt;
+      margin-bottom: 4px;
+    }
+
+    .mentions-section p {
+      margin-bottom: 2px;
+    }
+
+    /* ========== PIED DE PAGE ========== */
+    .doc-footer {
+      margin-top: auto;
+      padding-top: 10px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      font-size: 7.5pt;
+      color: var(--text-muted);
+    }
+
+    .footer-left {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .footer-center {
+      text-align: center;
+      color: var(--text-light);
+    }
+
+    .footer-right {
+      text-align: right;
+      color: var(--navy-light);
+      font-weight: 500;
+    }
+
+    /* ========== SIGNATURE ZONE ========== */
+    .signature-section {
+      margin-bottom: 16px;
+    }
+
+    .signature-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      border: 1px solid var(--border);
+      border-radius: 0 0 2px 2px;
+      padding: 12px;
+    }
+
+    .sig-block {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .sig-label {
+      font-size: 8pt;
+      font-weight: 700;
+      color: var(--text-light);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 2px;
+    }
+
+    .sig-line {
+      height: 1px;
+      background: var(--border);
+      margin-top: 36px;
+    }
+
+    .sig-sub {
+      font-size: 7.5pt;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    /* ========== SÉPARATEUR ========== */
+    .sep {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 12px 0;
+    }
+
+    /* ---- Impression ---- */
+    @media print {
+      #toolbar { display: none !important; }
+      body { background: white; }
+      #preview-zone { padding: 0; }
+      .a4-page {
+        box-shadow: none;
+        width: 100%;
+        min-height: auto;
+      }
+    }
+
+    @page {
+      size: A4;
+      margin: 20mm 15mm 15mm 15mm;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ================= TOOLBAR ================= -->
+  <div id="toolbar">
+    <div class="tb-brand">CRBR Solutions — Modèle de Devis</div>
+    <div class="tb-actions">
+      <button class="tb-btn tb-btn-primary" onclick="generatePDF()">&#8681; Télécharger PDF</button>
+      <button class="tb-btn tb-btn-secondary" onclick="window.print()">&#128424; Imprimer</button>
+    </div>
+    <div id="pdf-status">Prêt à exporter</div>
+  </div>
+
+  <!-- ================= ZONE DE PRÉVISUALISATION ================= -->
+  <div id="preview-zone">
+    <div class="a4-page" id="a4-content">
+
+      <!-- ========== EN-TÊTE ========== -->
+      <header class="doc-header">
+        <div class="doc-header-left">
+          <img
+            class="hdr-logo"
+            id="hdr-logo"
+            src="https://raw.githubusercontent.com/torp-fr/CRBR-Solution/main/vitrine/img/CRBR_logo_CARRÉ.svg"
+            alt="CRBR Solutions"
+            crossorigin="anonymous"
+            onerror="this.style.display='none';document.getElementById('hdr-logo-fb').style.display='block';"
+          >
+          <div class="hdr-logo-fallback" id="hdr-logo-fb" style="display:none;">CRBR<br>Solutions</div>
+          <div class="hdr-tagline">Conception de Réponse Basées sur les Retex</div>
+        </div>
+        <div class="doc-header-right">
+          <div class="hdr-devis-label">DEVIS</div>
+          <table class="hdr-meta-table">
+            <tr>
+              <td>Numéro</td>
+              <td><strong class="field-placeholder">CRBR-2026-001</strong></td>
+            </tr>
+            <tr>
+              <td>Date d'émission</td>
+              <td><span class="field-placeholder">JJ/MM/AAAA</span></td>
+            </tr>
+            <tr>
+              <td>Valable jusqu'au</td>
+              <td><span class="field-placeholder">JJ/MM/AAAA</span></td>
+            </tr>
+            <tr>
+              <td>Durée de validité</td>
+              <td>30 jours</td>
+            </tr>
+          </table>
+        </div>
+      </header>
+
+      <!-- ========== INFO ENTREPRISE + CLIENT ========== -->
+      <div class="info-columns">
+
+        <!-- Colonne gauche : CRBR Solutions -->
+        <div class="info-col">
+          <div class="info-col-title">Émetteur</div>
+          <table>
+            <tr><td>Société</td><td><strong>CRBR Solutions</strong></td></tr>
+            <tr><td>Forme juridique</td><td>SASU</td></tr>
+            <tr><td>SIREN</td><td><span class="field-placeholder">[À COMPLÉTER]</span></td></tr>
+            <tr><td>SIRET</td><td><span class="field-placeholder">[À COMPLÉTER]</span></td></tr>
+            <tr><td>Siège social</td><td><span class="field-placeholder">[À COMPLÉTER]</span></td></tr>
+            <tr><td>Email</td><td>info@crbr-solution.fr</td></tr>
+            <tr><td>Téléphone</td><td>06 65 44 52 26</td></tr>
+            <tr><td>Site web</td><td>www.crbr-solution.fr</td></tr>
+          </table>
+        </div>
+
+        <!-- Colonne droite : Client -->
+        <div class="info-col">
+          <div class="info-col-title">Destinataire</div>
+          <table>
+            <tr><td>Organisation</td><td><span class="field-placeholder">[À COMPLÉTER]</span></td></tr>
+            <tr><td>Adresse</td><td><span class="field-placeholder">[À COMPLÉTER]</span></td></tr>
+            <tr><td>Contact</td><td><span class="field-placeholder">[À COMPLÉTER]</span></td></tr>
+            <tr><td>Email contact</td><td><span class="field-placeholder">[À COMPLÉTER]</span></td></tr>
+            <tr><td>Tél. contact</td><td><span class="field-placeholder">[À COMPLÉTER]</span></td></tr>
+            <tr><td>Réf. commande</td><td><span class="field-placeholder">[À COMPLÉTER]</span></td></tr>
+            <tr><td>&nbsp;</td><td></td></tr>
+            <tr><td>&nbsp;</td><td></td></tr>
+          </table>
+        </div>
+
+      </div>
+
+      <!-- ========== INTRODUCTION ========== -->
+      <div class="intro-text">
+        <strong>Analyse de mission — Conception sur-mesure — Déploiement &amp; suivi</strong>
+        CRBR Solutions est un consultant-intégrateur pour solutions opérationnelles d'entraînement.<br>
+        Nous analysons vos besoins et déployons une réponse intégrée, personnalisée, adaptée à votre réalité terrain.
+      </div>
+
+      <!-- ========== TABLEAU PRESTATIONS ========== -->
+      <div class="section-title">Détail des prestations</div>
+      <table class="prestation-table">
+        <thead>
+          <tr>
+            <th style="width:36%">Description</th>
+            <th style="width:9%" class="col-right">Quantité</th>
+            <th style="width:16%" class="col-right">Prix unitaire HT</th>
+            <th style="width:16%" class="col-right">Montant HT</th>
+            <th style="width:23%">Notes</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Ligne 1 : Formule -->
+          <tr>
+            <td>
+              <div class="row-desc">Formule <span class="field-placeholder">[Essentiel / Opérationnel / Premium / Déploiement Mobile]</span></div>
+              <div class="row-sub">Solution d'entraînement adaptée au profil de l'unité</div>
+            </td>
+            <td class="col-right"><span class="field-placeholder">1</span></td>
+            <td class="col-right"><span class="field-placeholder">— €</span></td>
+            <td class="col-right"><span class="field-placeholder">— €</span></td>
+            <td><span class="row-empty">Palier sélectionné selon analyse mission</span></td>
+          </tr>
+          <!-- Ligne 2 : Installation -->
+          <tr>
+            <td>
+              <div class="row-desc">Installation &amp; déploiement sur site</div>
+              <div class="row-sub">Mise en place, configuration, tests opérationnels</div>
+            </td>
+            <td class="col-right"><span class="field-placeholder">1</span></td>
+            <td class="col-right"><span class="field-placeholder">— €</span></td>
+            <td class="col-right"><span class="field-placeholder">— €</span></td>
+            <td><span class="row-empty">Inclus ou en option selon formule</span></td>
+          </tr>
+          <!-- Ligne 3 : Formation -->
+          <tr>
+            <td>
+              <div class="row-desc">Formation des référents internes</div>
+              <div class="row-sub">Prise en main complète, protocoles d'utilisation</div>
+            </td>
+            <td class="col-right"><span class="field-placeholder">1 j</span></td>
+            <td class="col-right"><span class="field-placeholder">— €</span></td>
+            <td class="col-right"><span class="field-placeholder">— €</span></td>
+            <td><span class="row-empty">Durée à confirmer selon effectifs</span></td>
+          </tr>
+          <!-- Ligne 4 : Maintenance -->
+          <tr>
+            <td>
+              <div class="row-desc">Maintenance &amp; support préventif</div>
+              <div class="row-sub">Suivi technique, interventions planifiées</div>
+            </td>
+            <td class="col-right"><span class="field-placeholder">12 mois</span></td>
+            <td class="col-right"><span class="field-placeholder">— €/mois</span></td>
+            <td class="col-right"><span class="field-placeholder">— €</span></td>
+            <td><span class="row-empty">Contrat reconductible annuellement</span></td>
+          </tr>
+          <!-- Ligne 5 : Scénarios & mises à jour -->
+          <tr>
+            <td>
+              <div class="row-desc">Scénarios &amp; mises à jour logicielles</div>
+              <div class="row-sub">Nouveaux scénarios, correctifs, évolutions fonctionnelles</div>
+            </td>
+            <td class="col-right"><span class="field-placeholder">—</span></td>
+            <td class="col-right"><span class="field-placeholder">—</span></td>
+            <td class="col-right"><span class="field-placeholder">— €</span></td>
+            <td><span class="row-empty">Inclus selon abonnement actif</span></td>
+          </tr>
+          <!-- Ligne 6 : Optionnel -->
+          <tr>
+            <td>
+              <div class="row-desc row-empty">[Prestation complémentaire à préciser]</div>
+            </td>
+            <td class="col-right"><span class="field-placeholder">—</span></td>
+            <td class="col-right"><span class="field-placeholder">—</span></td>
+            <td class="col-right"><span class="field-placeholder">—</span></td>
+            <td></td>
+          </tr>
+        </tbody>
+        <tfoot>
+          <tr>
+            <td colspan="3" style="text-align:right;font-size:8pt;color:var(--text-light);">Sous-total avant remise</td>
+            <td class="col-right"><span class="field-placeholder">— €</span></td>
+            <td></td>
+          </tr>
+        </tfoot>
+      </table>
+
+      <!-- ========== TOTAUX ========== -->
+      <div class="totaux-outer">
+        <div class="totaux-box">
+          <div class="totaux-row">
+            <span class="tot-label">Remise commerciale</span>
+            <span class="tot-val field-placeholder">— €</span>
+          </div>
+          <div class="totaux-row">
+            <span class="tot-label">Sous-total HT</span>
+            <span class="tot-val field-placeholder">— €</span>
+          </div>
+          <div class="totaux-row">
+            <span class="tot-label">TVA (20 % standard)</span>
+            <span class="tot-val field-placeholder">— €</span>
+          </div>
+          <div class="totaux-row ttc-row">
+            <span class="tot-label">MONTANT TTC</span>
+            <span class="tot-val field-placeholder">— €</span>
+          </div>
+        </div>
+      </div>
+
+      <hr class="sep">
+
+      <!-- ========== CONDITIONS COMMERCIALES ========== -->
+      <div class="conditions-section">
+        <div class="section-title" style="border-radius:2px 2px 0 0;">Conditions commerciales</div>
+        <div class="conditions-grid">
+          <div class="cond-item">
+            <div class="cond-label">Validité du devis</div>
+            <div class="cond-val">30 jours à compter de la date d'émission</div>
+          </div>
+          <div class="cond-item">
+            <div class="cond-label">Acompte demandé</div>
+            <div class="cond-val">30 % à la commande</div>
+          </div>
+          <div class="cond-item">
+            <div class="cond-label">Solde</div>
+            <div class="cond-val">30 jours date de facture</div>
+          </div>
+          <div class="cond-item">
+            <div class="cond-label">Délais de mise en place</div>
+            <div class="cond-val"><span class="field-placeholder">[À COMPLÉTER]</span> semaines après signature</div>
+          </div>
+          <div class="cond-item">
+            <div class="cond-label">Maintenance &amp; support</div>
+            <div class="cond-val">Inclus dans le contrat</div>
+          </div>
+          <div class="cond-item">
+            <div class="cond-label">Modalités de paiement</div>
+            <div class="cond-val">Virement bancaire — RIB disponible sur demande</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ========== ENGAGEMENTS CRBR ========== -->
+      <div class="engagements-section">
+        <div class="section-title" style="border-radius:2px 2px 0 0;">Nos engagements</div>
+        <div class="engagements-grid">
+          <div class="eng-item"><span class="eng-check">✓</span> Réponse sous 48h ouvrés</div>
+          <div class="eng-item"><span class="eng-check">✓</span> Partenaire opérationnel sur la durée</div>
+          <div class="eng-item"><span class="eng-check">✓</span> Discrétion garantie</div>
+          <div class="eng-item"><span class="eng-check">✓</span> Adaptation possible en cours de contrat</div>
+        </div>
+      </div>
+
+      <!-- ========== SIGNATURE ========== -->
+      <div class="signature-section">
+        <div class="section-title" style="border-radius:2px 2px 0 0;">Bon pour accord</div>
+        <div class="signature-grid">
+          <div class="sig-block">
+            <div class="sig-label">CRBR Solutions — Émetteur</div>
+            <div class="sig-line"></div>
+            <div class="sig-sub">Nom, qualité, date et signature</div>
+          </div>
+          <div class="sig-block">
+            <div class="sig-label">Client — Signataire habilité</div>
+            <div class="sig-line"></div>
+            <div class="sig-sub">Nom, qualité, cachet, date et signature — «&nbsp;Bon pour accord&nbsp;»</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ========== MENTIONS LÉGALES ========== -->
+      <div class="mentions-section">
+        <div class="mentions-title">Mentions légales &amp; confidentialité</div>
+        <p>Document confidentiel — propriété exclusive de CRBR Solutions. Toute reproduction ou diffusion sans autorisation est interdite.</p>
+        <p>Droit applicable&nbsp;: Loi française. Tout litige sera soumis aux tribunaux compétents du ressort du siège social de CRBR Solutions.</p>
+        <p>Conditions Générales de Vente CRBR Solutions 2026 — disponibles sur&nbsp;: <strong>www.crbr-solution.fr/cgv.html</strong></p>
+      </div>
+
+      <!-- ========== PIED DE PAGE ========== -->
+      <footer class="doc-footer">
+        <div class="footer-left">
+          <span><strong>CRBR Solutions</strong> — SASU</span>
+          <span>info@crbr-solution.fr &nbsp;|&nbsp; 06 65 44 52 26</span>
+          <span>SIRET&nbsp;: <span class="field-placeholder">[À COMPLÉTER]</span></span>
+        </div>
+        <div class="footer-center">
+          Page 1 / 1
+        </div>
+        <div class="footer-right">
+          www.crbr-solution.fr
+        </div>
+      </footer>
+
+    </div><!-- /.a4-page -->
+  </div><!-- /#preview-zone -->
+
+  <script>
+    /* ============================================================
+       GÉNÉRATION PDF via html2canvas + jsPDF
+       ============================================================ */
+
+    async function generatePDF() {
+      var statusEl = document.getElementById('pdf-status');
+      var btnPDF   = document.querySelector('.tb-btn-primary');
+
+      statusEl.textContent = 'Capture en cours…';
+      btnPDF.disabled = true;
+      btnPDF.style.opacity = '0.6';
+
+      try {
+        var page = document.getElementById('a4-content');
+
+        /* Attendre que le logo SVG soit chargé */
+        var logo = document.getElementById('hdr-logo');
+        if (logo && !logo.complete) {
+          await new Promise(function(resolve) {
+            logo.onload  = resolve;
+            logo.onerror = resolve;
+            setTimeout(resolve, 2000);
+          });
+        }
+
+        statusEl.textContent = 'Rendu HTML…';
+
+        var canvas = await html2canvas(page, {
+          scale: 2,
+          useCORS: true,
+          allowTaint: false,
+          logging: false,
+          backgroundColor: '#ffffff',
+          width: page.offsetWidth,
+          height: page.offsetHeight
+        });
+
+        statusEl.textContent = 'Création du PDF…';
+
+        var { jsPDF } = window.jspdf;
+        var pdf = new jsPDF({
+          orientation: 'portrait',
+          unit: 'mm',
+          format: 'a4',
+          compress: true
+        });
+
+        var pdfW  = pdf.internal.pageSize.getWidth();
+        var pdfH  = pdf.internal.pageSize.getHeight();
+        var ratio = pdfW / canvas.width;
+        var imgH  = canvas.height * ratio;
+
+        var imgData = canvas.toDataURL('image/jpeg', 0.92);
+
+        /* Pagination si le contenu dépasse une page A4 */
+        var pageHeightPx = pdfH / ratio;
+        var position = 0;
+        var remaining = canvas.height;
+
+        while (remaining > 0) {
+          var sliceH = Math.min(pageHeightPx, remaining);
+
+          var sliceCanvas  = document.createElement('canvas');
+          sliceCanvas.width  = canvas.width;
+          sliceCanvas.height = sliceH;
+          var ctx = sliceCanvas.getContext('2d');
+          ctx.drawImage(canvas, 0, position, canvas.width, sliceH, 0, 0, canvas.width, sliceH);
+
+          var sliceData = sliceCanvas.toDataURL('image/jpeg', 0.92);
+          var sliceImgH = sliceH * ratio;
+
+          if (position > 0) pdf.addPage();
+          pdf.addImage(sliceData, 'JPEG', 0, 0, pdfW, sliceImgH);
+
+          position  += sliceH;
+          remaining -= sliceH;
+        }
+
+        pdf.save('CRBR_Devis_Template.pdf');
+
+        statusEl.textContent = '✓ PDF téléchargé';
+        setTimeout(function() {
+          statusEl.textContent = 'Prêt à exporter';
+        }, 3000);
+
+      } catch (err) {
+        console.error('Erreur génération PDF :', err);
+        statusEl.textContent = '✗ Erreur — voir console';
+        alert('Erreur lors de la génération du PDF. Consultez la console pour les détails.\n\n' + err.message);
+      } finally {
+        btnPDF.disabled = false;
+        btnPDF.style.opacity = '1';
+      }
+    }
+  </script>
+
+</body>
+</html>
