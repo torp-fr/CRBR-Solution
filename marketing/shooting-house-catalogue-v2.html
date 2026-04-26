@@ -1,0 +1,1192 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>SHOOTING HOUSE MODULAIRE — Catalogue V2</title>
+<style>
+:root {
+  --gold:#C9A84C;--gold-l:#E2C068;--gold-d:#9C7A2E;
+  --ga06:rgba(201,168,76,0.06);--ga12:rgba(201,168,76,0.12);
+  --ga20:rgba(201,168,76,0.20);--ga35:rgba(201,168,76,0.35);
+  --bg:#111114;--bg2:#1a1a1e;--card:#1f1f26;--acc:#2A2A35;
+  --white:#F0EFE9;--grey:#8A8A96;--grey-l:#C0C0CA;
+  --border:rgba(201,168,76,0.18);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{background:#0a0a0d;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;}
+.page{width:210mm;min-height:297mm;max-height:297mm;background:var(--bg);
+  overflow:hidden;position:relative;page-break-after:always;break-after:page;
+  display:flex;flex-direction:column;}
+.pi{padding:13mm 12mm 11mm;flex:1;display:flex;flex-direction:column;}
+.label{font-size:6.5pt;letter-spacing:3px;text-transform:uppercase;color:var(--gold);}
+.tag{display:inline-block;background:var(--ga12);border:1px solid var(--ga35);
+  color:var(--gold);font-size:6pt;letter-spacing:2px;padding:2px 8px;text-transform:uppercase;}
+.h2{font-size:17pt;font-weight:900;color:var(--white);text-transform:uppercase;letter-spacing:-0.3px;}
+.h3{font-size:9pt;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:1.5px;}
+.h4{font-size:8pt;font-weight:700;color:var(--white);text-transform:uppercase;letter-spacing:0.5px;}
+.body{font-size:8pt;color:var(--grey-l);line-height:1.55;}
+.xs{font-size:7pt;color:var(--grey);line-height:1.5;}
+.gl{width:32px;height:2px;background:var(--gold);display:inline-block;flex-shrink:0;}
+.div{height:1px;background:linear-gradient(90deg,var(--gold),transparent);margin:6px 0;}
+.divc{height:1px;background:var(--border);margin:5px 0;}
+.card{background:var(--card);border:1px solid var(--border);border-radius:2px;padding:8px 10px;}
+.cardl{background:var(--card);border-left:3px solid var(--gold);border-radius:0 2px 2px 0;padding:7px 10px;}
+.srow{display:flex;justify-content:space-between;align-items:baseline;
+  padding:2px 0;border-bottom:1px solid rgba(201,168,76,0.07);}
+.sk{font-size:6.5pt;color:var(--grey-l);}
+.sv{font-size:7.5pt;color:var(--gold);font-weight:700;}
+.badge{min-width:22px;height:22px;border:1.5px solid var(--gold);border-radius:50%;
+  display:inline-flex;align-items:center;justify-content:center;color:var(--gold);font-size:7pt;font-weight:700;}
+.ul{list-style:none;padding:0;}
+.ul li{font-size:7pt;color:var(--grey-l);line-height:1.6;padding-left:11px;position:relative;}
+.ul li::before{content:'—';position:absolute;left:0;color:var(--gold);font-size:6.5pt;}
+.pn{position:absolute;bottom:6mm;right:8mm;font-size:6.5pt;color:var(--grey);letter-spacing:2px;}
+.ph{position:absolute;bottom:6mm;left:8mm;font-size:5.5pt;color:var(--grey);letter-spacing:1.5px;opacity:0.6;text-transform:uppercase;}
+/* SVG plan base styles */
+.plan-wall{fill:#1a1a20;stroke:rgba(201,168,76,0.55);stroke-width:0.6;}
+.plan-int{fill:rgba(201,168,76,0.06);}
+.plan-door{fill:none;stroke:rgba(201,168,76,0.5);stroke-width:0.8;stroke-dasharray:3,2;}
+.plan-win{fill:none;stroke:#C9A84C;stroke-width:1.2;}
+.plan-lbl{font-size:5.5px;fill:#8A8A96;font-family:Helvetica,sans-serif;text-anchor:middle;}
+@media print{body{background:#0a0a0d;}.page{margin:0;box-shadow:none;}}
+@media screen{body{padding:14px;}.page{margin:0 auto 18px;box-shadow:0 8px 40px rgba(0,0,0,0.7);}}
+</style>
+</head>
+<body>
+
+
+<!-- ══════════════════════════════════════
+     P1 — COUVERTURE
+══════════════════════════════════════ -->
+<div class="page">
+  <!-- Photo réelle du shooting house -->
+  <img src="../vitrine/img/shooting-house.jpg"
+       style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0;" alt="">
+  <!-- Gradient sombre -->
+  <div style="position:absolute;inset:0;z-index:1;
+    background:linear-gradient(180deg,rgba(17,17,20,0.55) 0%,rgba(17,17,20,0.25) 30%,rgba(17,17,20,0.80) 65%,#111114 100%);"></div>
+  <!-- Barre latérale or -->
+  <div style="position:absolute;top:0;left:0;width:7mm;height:100%;background:linear-gradient(180deg,var(--gold-d),var(--gold),var(--gold-d));opacity:0.95;z-index:2;"></div>
+
+  <div style="position:relative;z-index:3;padding:13mm 13mm 11mm 19mm;flex:1;display:flex;flex-direction:column;">
+    <!-- Tag confidentiel -->
+    <div><span class="tag">Document Commercial — Usage Professionnel</span></div>
+
+    <!-- Logo CRBR -->
+    <div style="margin-top:auto;margin-bottom:18px;">
+      <img src="../vitrine/img/CRBR.Logo CRBR Solutions avec tête de loup.png"
+           style="height:12mm;filter:drop-shadow(0 2px 8px rgba(0,0,0,0.8));opacity:0.95;" alt="CRBR Solutions">
+    </div>
+
+    <!-- Titre -->
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:7px;">
+      <div class="gl"></div>
+      <span class="label" style="font-size:7pt;letter-spacing:4px;">CRBR SOLUTIONS — ÉQUIPEMENTS TACTIQUES</span>
+      <div class="gl"></div>
+    </div>
+    <div style="font-size:30pt;font-weight:900;color:var(--white);text-transform:uppercase;line-height:1.0;letter-spacing:-0.5px;margin-bottom:6px;">
+      SHOOTING HOUSE<br>MODULAIRE
+    </div>
+    <div style="font-size:10.5pt;color:var(--gold);font-weight:300;letter-spacing:2px;margin-bottom:5px;">
+      Système bois modulaire d'entraînement
+    </div>
+    <div class="body" style="max-width:140mm;margin-bottom:14px;color:rgba(240,239,233,0.8);">
+      Infrastructure tactique reconfigurable pour centres d'entraînement au tir,
+      unités d'intervention et opérateurs spécialisés. Montage rapide, configurations modulaires infinies.
+    </div>
+
+    <!-- Stats -->
+    <div style="display:flex;gap:0;border-top:1px solid rgba(201,168,76,0.35);padding-top:9px;">
+      <div style="flex:1;text-align:center;">
+        <div style="font-size:19pt;font-weight:900;color:var(--gold);">3</div>
+        <div style="font-size:5.5pt;color:rgba(240,239,233,0.6);letter-spacing:1.5px;text-transform:uppercase;">Gammes</div>
+      </div>
+      <div style="width:1px;background:rgba(201,168,76,0.3);"></div>
+      <div style="flex:1;text-align:center;">
+        <div style="font-size:19pt;font-weight:900;color:var(--gold);">5</div>
+        <div style="font-size:5.5pt;color:rgba(240,239,233,0.6);letter-spacing:1.5px;text-transform:uppercase;">Modules</div>
+      </div>
+      <div style="width:1px;background:rgba(201,168,76,0.3);"></div>
+      <div style="flex:1;text-align:center;">
+        <div style="font-size:19pt;font-weight:900;color:var(--gold);">10</div>
+        <div style="font-size:5.5pt;color:rgba(240,239,233,0.6);letter-spacing:1.5px;text-transform:uppercase;">Pièces types</div>
+      </div>
+      <div style="width:1px;background:rgba(201,168,76,0.3);"></div>
+      <div style="flex:1;text-align:center;">
+        <div style="font-size:12pt;font-weight:900;color:var(--gold);">Sur-mesure</div>
+        <div style="font-size:5.5pt;color:rgba(240,239,233,0.6);letter-spacing:1.5px;text-transform:uppercase;">Devis personnalisé</div>
+      </div>
+    </div>
+    <div style="margin-top:7px;display:flex;justify-content:space-between;">
+      <span style="font-size:6pt;color:rgba(240,239,233,0.4);letter-spacing:1px;">V2.0 — Édition 2026</span>
+      <span style="font-size:6pt;color:rgba(240,239,233,0.4);letter-spacing:1px;">www.crbr-solution.fr</span>
+    </div>
+  </div>
+  <span class="pn">01</span>
+</div>
+
+
+<!-- ══════════════════════════════════════
+     P2 — CONCEPT GÉNÉRAL
+══════════════════════════════════════ -->
+<div class="page">
+  <div class="pi">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:3px;">
+      <div>
+        <div class="label" style="margin-bottom:3px;">Shooting House Modulaire — Concept</div>
+        <div class="h2">Concept Général</div>
+      </div>
+      <span class="tag">Système Bois</span>
+    </div>
+    <div class="div" style="margin-bottom:8px;"></div>
+
+    <!-- Intro + photo opérateur -->
+    <div style="display:flex;gap:10px;margin-bottom:9px;">
+      <div style="flex:1;">
+        <div class="body" style="margin-bottom:8px;line-height:1.65;">
+          Le <strong style="color:var(--white);">Shooting House Modulaire</strong> est une infrastructure d'entraînement
+          au tir conçue autour d'un principe de construction par panneaux bois standardisés. Chaque module
+          est une unité structurelle indépendante, combinable à volonté pour former des pièces,
+          puis des complexes complets — de la cellule simple au bâtiment tactique multi-pièces.
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;">
+          <div class="cardl">
+            <div class="h3" style="font-size:7pt;margin-bottom:4px;">Modularité</div>
+            <div class="xs">Panneaux interchangeables, boulonnage réversible. Reconfiguration sans démolition.</div>
+          </div>
+          <div class="cardl">
+            <div class="h3" style="font-size:7pt;margin-bottom:4px;">Flexibilité</div>
+            <div class="xs">Des dizaines de configurations distinctes à partir d'une même bibliothèque de modules.</div>
+          </div>
+          <div class="cardl">
+            <div class="h3" style="font-size:7pt;margin-bottom:4px;">Opérabilité</div>
+            <div class="xs">Conçu pour l'entraînement intensif. Montage rapide, adaptation terrain.</div>
+          </div>
+        </div>
+      </div>
+      <!-- Photo opérateurs -->
+      <div style="width:58mm;flex-shrink:0;">
+        <img src="../vitrine/img/operator-training.jpg"
+             style="width:100%;height:55mm;object-fit:cover;border-radius:2px;border:1px solid var(--border);" alt="">
+        <div class="xs" style="margin-top:3px;text-align:center;opacity:0.6;">Entraînement CQB en cellules</div>
+      </div>
+    </div>
+
+    <!-- 3 niveaux -->
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+      <div class="gl" style="width:22px;"></div>
+      <div class="h3" style="font-size:8pt;">Architecture en 3 Niveaux</div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 24px 1fr 24px 1fr;gap:4px;margin-bottom:9px;align-items:center;">
+      <div class="card">
+        <div style="font-size:22pt;font-weight:900;color:rgba(201,168,76,0.12);line-height:1;margin-bottom:2px;">1</div>
+        <div class="h3" style="font-size:8.5pt;margin-bottom:4px;">MODULE</div>
+        <div class="xs">Panneau bois indépendant, usinable, transportable. Unité élémentaire du système.</div>
+        <div style="margin-top:4px;font-size:6pt;color:var(--gold);">M1 · M2 · M3 · M4 · M5</div>
+      </div>
+      <div style="text-align:center;color:var(--gold);font-size:10pt;opacity:0.5;">▶</div>
+      <div class="card" style="border-color:var(--ga35);">
+        <div style="font-size:22pt;font-weight:900;color:rgba(201,168,76,0.15);line-height:1;margin-bottom:2px;">2</div>
+        <div class="h3" style="font-size:8.5pt;margin-bottom:4px;">PIÈCE</div>
+        <div class="xs">Assemblage fermé de modules formant un espace tactique clos et indépendant.</div>
+        <div style="margin-top:4px;font-size:6pt;color:var(--gold);">P1 à P10</div>
+      </div>
+      <div style="text-align:center;color:var(--gold);font-size:10pt;opacity:0.5;">▶</div>
+      <div class="card">
+        <div style="font-size:22pt;font-weight:900;color:rgba(201,168,76,0.12);line-height:1;margin-bottom:2px;">3</div>
+        <div class="h3" style="font-size:8.5pt;margin-bottom:4px;">COMPLEXE</div>
+        <div class="xs">Ensemble de pièces. Les espaces inter-pièces forment les couloirs de circulation.</div>
+        <div style="margin-top:4px;font-size:6pt;color:var(--gold);">BASIC · PRO · PREMIUM</div>
+      </div>
+    </div>
+
+    <!-- Principes -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;">
+      <div class="card">
+        <div class="h4" style="margin-bottom:5px;font-size:7pt;">Structure & Matériaux</div>
+        <ul class="ul">
+          <li>Panneaux bois : structure + parement OSB double face</li>
+          <li>Épaisseur totale : 153 mm</li>
+          <li>Dimensions standard : 2 500 × 1 250 mm</li>
+          <li>Assemblage boulonné — acier galvanisé M12</li>
+          <li>Montage sans outillage spécialisé</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="h4" style="margin-bottom:5px;font-size:7pt;">Logique Constructive</div>
+        <ul class="ul">
+          <li>Module → brique de base interchangeable</li>
+          <li>Pièce → 4 à 8 modules assemblés</li>
+          <li>Complexe → ensemble de pièces organisées</li>
+          <li>Couloirs = espaces entre les pièces</li>
+          <li>Extension sans reconstruction</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <span class="ph">Shooting House Modulaire — Catalogue Produit 2026</span>
+  <span class="pn">02</span>
+</div>
+
+
+<!-- ══════════════════════════════════════
+     P3 — MODULES STANDARD 1/2
+══════════════════════════════════════ -->
+<div class="page">
+  <div class="pi">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:3px;">
+      <div>
+        <div class="label" style="margin-bottom:3px;">Éléments de base — Panneaux</div>
+        <div class="h2">Modules Standard <span style="font-size:10pt;color:var(--grey);font-weight:400;">(1 / 2)</span></div>
+      </div>
+      <span class="tag">Bibliothèque Modules</span>
+    </div>
+    <div class="div" style="margin-bottom:9px;"></div>
+
+    <!-- MODULE M1 -->
+    <div style="display:flex;gap:0;background:var(--card);border:1px solid var(--border);border-radius:2px;overflow:hidden;margin-bottom:8px;">
+      <!-- Plan SVG — élévation frontale mur plein -->
+      <div style="width:48mm;background:rgba(201,168,76,0.04);border-right:1px solid var(--border);display:flex;align-items:center;justify-content:center;padding:6px;">
+        <svg viewBox="0 0 110 65" style="width:100%;max-height:38mm;">
+          <!-- Panel face -->
+          <rect x="8" y="8" width="94" height="49" class="plan-wall"/>
+          <!-- OSB texture lines -->
+          <line x1="8" y1="20" x2="102" y2="20" stroke="rgba(201,168,76,0.1)" stroke-width="0.4"/>
+          <line x1="8" y1="32" x2="102" y2="32" stroke="rgba(201,168,76,0.1)" stroke-width="0.4"/>
+          <line x1="8" y1="44" x2="102" y2="44" stroke="rgba(201,168,76,0.1)" stroke-width="0.4"/>
+          <!-- Vertical frame -->
+          <rect x="10" y="10" width="3" height="45" fill="rgba(201,168,76,0.18)"/>
+          <rect x="99" y="10" width="3" height="45" fill="rgba(201,168,76,0.18)"/>
+          <!-- Dimensions -->
+          <line x1="8" y1="4" x2="102" y2="4" stroke="var(--gold)" stroke-width="0.4"/>
+          <line x1="8" y1="2" x2="8" y2="6" stroke="var(--gold)" stroke-width="0.4"/>
+          <line x1="102" y1="2" x2="102" y2="6" stroke="var(--gold)" stroke-width="0.4"/>
+          <text x="55" y="3" class="plan-lbl" style="font-size:5px;fill:var(--gold);">2 500 mm</text>
+          <line x1="104" y1="8" x2="104" y2="57" stroke="var(--gold)" stroke-width="0.4"/>
+          <text x="107" y="33" class="plan-lbl" style="font-size:4.5px;fill:var(--gold);text-anchor:start;">1 250</text>
+          <text x="4" y="62" class="plan-lbl" style="font-size:4.5px;fill:var(--grey);">VUE FRONTALE — MUR PLEIN M1</text>
+        </svg>
+      </div>
+      <div style="padding:9px 11px;flex:1;">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+          <div class="badge">M1</div>
+          <div class="h3" style="font-size:9pt;">Mur Plein</div>
+          <span class="tag" style="margin-left:auto;">Module de base</span>
+        </div>
+        <div class="xs" style="margin-bottom:5px;">Panneau structurel de cloisonnement. Unité fondamentale du système — constitue les parois pleines des cellules et les séparations entre espaces.</div>
+        <div class="divc"></div>
+        <div class="srow"><span class="sk">Dimensions</span><span class="sv">2 500 × 1 250 × 153 mm</span></div>
+        <div class="srow"><span class="sk">Structure</span><span class="sv">Bois massif + parement OSB double face</span></div>
+        <div class="srow"><span class="sk">Fonction</span><span class="sv">Cloisonnement / paroi porteuse</span></div>
+        <div class="srow" style="border:none;"><span class="sk">Fixation</span><span class="sv">Boulonnage standard M12</span></div>
+      </div>
+    </div>
+
+    <!-- MODULE M2 -->
+    <div style="display:flex;gap:0;background:var(--card);border:1px solid var(--border);border-radius:2px;overflow:hidden;margin-bottom:8px;">
+      <div style="width:48mm;background:rgba(201,168,76,0.04);border-right:1px solid var(--border);display:flex;align-items:center;justify-content:center;padding:6px;">
+        <svg viewBox="0 0 110 65" style="width:100%;max-height:38mm;">
+          <!-- Panel avec fenêtre -->
+          <rect x="8" y="8" width="94" height="16" class="plan-wall"/>
+          <rect x="8" y="41" width="94" height="16" class="plan-wall"/>
+          <rect x="8" y="24" width="18" class="plan-wall" height="17"/>
+          <rect x="84" y="24" width="18" height="17" class="plan-wall"/>
+          <!-- Fenêtre highlight -->
+          <rect x="26" y="24" width="58" height="17" fill="rgba(201,168,76,0.12)" stroke="var(--gold)" stroke-width="1"/>
+          <!-- Marqueurs fenêtre -->
+          <line x1="30" y1="28" x2="30" y2="37" stroke="var(--gold)" stroke-width="1.5"/>
+          <line x1="80" y1="28" x2="80" y2="37" stroke="var(--gold)" stroke-width="1.5"/>
+          <line x1="26" y1="32" x2="84" y2="32" stroke="rgba(201,168,76,0.4)" stroke-width="0.6" stroke-dasharray="3,2"/>
+          <text x="55" y="34.5" class="plan-lbl" style="font-size:4.5px;fill:var(--gold);">FENÊTRE</text>
+          <text x="4" y="62" class="plan-lbl" style="font-size:4.5px;fill:var(--grey);">VUE FRONTALE — MUR FENÊTRE M2</text>
+        </svg>
+      </div>
+      <div style="padding:9px 11px;flex:1;">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+          <div class="badge">M2</div>
+          <div class="h3" style="font-size:9pt;">Mur avec Fenêtre</div>
+          <span class="tag" style="margin-left:auto;">Variante M1</span>
+        </div>
+        <div class="xs" style="margin-bottom:5px;">Dérivé du mur plein avec réservation d'ouverture renforcée. Permet la surveillance, les tirs traversants et les scénarios d'interaction inter-pièces.</div>
+        <div class="divc"></div>
+        <div class="srow"><span class="sk">Base</span><span class="sv">Module mur standard M1</span></div>
+        <div class="srow"><span class="sk">Ouverture</span><span class="sv">Réservation à cadre renforcé</span></div>
+        <div class="srow"><span class="sk">Usage</span><span class="sv">Observation / tir traversant / interaction</span></div>
+        <div class="srow" style="border:none;"><span class="sk">Option</span><span class="sv">Volet obturateur amovible</span></div>
+      </div>
+    </div>
+
+    <!-- MODULE M3 avec photo breach-door -->
+    <div style="display:flex;gap:0;background:var(--card);border:1px solid var(--border);border-radius:2px;overflow:hidden;">
+      <div style="width:48mm;flex-shrink:0;position:relative;">
+        <img src="../vitrine/img/breach-door.jpg"
+             style="width:100%;height:100%;object-fit:cover;opacity:0.7;" alt="">
+        <div style="position:absolute;inset:0;background:linear-gradient(90deg,transparent 60%,var(--card));"></div>
+        <div style="position:absolute;bottom:5px;left:5px;">
+          <span class="tag" style="font-size:5pt;">Module M3 — Porte</span>
+        </div>
+      </div>
+      <div style="padding:9px 11px;flex:1;">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+          <div class="badge">M3</div>
+          <div class="h3" style="font-size:9pt;">Module Porte</div>
+          <span class="tag" style="margin-left:auto;">Accès / Breach</span>
+        </div>
+        <div class="xs" style="margin-bottom:5px;">Module de franchissement. Absence de traverse basse pour entrées dynamiques. Linteau renforcé. Compatible vantaux 1 ou 2 battants.</div>
+        <div class="divc"></div>
+        <div class="srow"><span class="sk">Traverse basse</span><span class="sv">Absente — passage libre au sol</span></div>
+        <div class="srow"><span class="sk">Linteau</span><span class="sv">Renforcé — charge augmentée</span></div>
+        <div class="srow"><span class="sk">Évolutivité</span><span class="sv">Compatible 1 ou 2 battants</span></div>
+        <div class="srow" style="border:none;"><span class="sk">Usage</span><span class="sv">Entrée dynamique / franchissement tactique</span></div>
+      </div>
+    </div>
+  </div>
+  <span class="ph">Shooting House Modulaire — Catalogue Produit 2026</span>
+  <span class="pn">03</span>
+</div>
+
+
+<!-- ══════════════════════════════════════
+     P4 — MODULES STANDARD 2/2
+══════════════════════════════════════ -->
+<div class="page">
+  <div class="pi">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:3px;">
+      <div>
+        <div class="label" style="margin-bottom:3px;">Éléments de base — Panneaux</div>
+        <div class="h2">Modules Standard <span style="font-size:10pt;color:var(--grey);font-weight:400;">(2 / 2)</span></div>
+      </div>
+      <span class="tag">Bibliothèque Modules</span>
+    </div>
+    <div class="div" style="margin-bottom:9px;"></div>
+
+    <!-- MODULE M4 -->
+    <div style="display:flex;gap:0;background:var(--card);border:1px solid var(--border);border-radius:2px;overflow:hidden;margin-bottom:8px;">
+      <div style="width:48mm;background:rgba(201,168,76,0.04);border-right:1px solid var(--border);display:flex;align-items:center;justify-content:center;padding:6px;">
+        <svg viewBox="0 0 110 65" style="width:100%;max-height:38mm;">
+          <!-- Passage libre: juste les montants verticaux, rien au milieu -->
+          <rect x="8" y="8" width="14" height="49" class="plan-wall"/>
+          <rect x="88" y="8" width="14" height="49" class="plan-wall"/>
+          <!-- Poutre supérieure -->
+          <rect x="8" y="8" width="94" height="8" fill="rgba(201,168,76,0.25)" stroke="var(--gold)" stroke-width="0.6"/>
+          <!-- Espace ouvert -->
+          <rect x="22" y="16" width="66" height="41" fill="rgba(201,168,76,0.08)" stroke="rgba(201,168,76,0.3)" stroke-width="0.5" stroke-dasharray="4,3"/>
+          <text x="55" y="37" class="plan-lbl" style="fill:rgba(201,168,76,0.5);font-size:5px;">OUVERTURE</text>
+          <text x="55" y="43" class="plan-lbl" style="fill:rgba(201,168,76,0.5);font-size:4.5px;">PLEINE HAUTEUR</text>
+          <!-- Poutre label -->
+          <text x="55" y="13" class="plan-lbl" style="fill:var(--gold);font-size:4px;">POUTRE RENFORT</text>
+          <text x="4" y="62" class="plan-lbl" style="font-size:4.5px;fill:var(--grey);">VUE FRONTALE — PASSAGE LIBRE M4</text>
+        </svg>
+      </div>
+      <div style="padding:9px 11px;flex:1;">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+          <div class="badge">M4</div>
+          <div class="h3" style="font-size:9pt;">Passage Libre</div>
+          <span class="tag" style="margin-left:auto;">Ouverture totale</span>
+        </div>
+        <div class="xs" style="margin-bottom:5px;">Emplacement sans panneau, maintenu structurellement par un renfort supérieur. Crée un passage pleine hauteur. Utilisé pour les connexions inter-pièces larges.</div>
+        <div class="divc"></div>
+        <div class="srow"><span class="sk">Panneau</span><span class="sv">Absent — ouverture complète</span></div>
+        <div class="srow"><span class="sk">Renfort</span><span class="sv">Poutre supérieure structurelle</span></div>
+        <div class="srow"><span class="sk">Largeur</span><span class="sv">1 250 mm (module standard)</span></div>
+        <div class="srow" style="border:none;"><span class="sk">Usage</span><span class="sv">Connexion inter-pièces / couloir large</span></div>
+      </div>
+    </div>
+
+    <!-- MODULE M5 -->
+    <div style="display:flex;gap:0;background:var(--card);border:1px solid var(--border);border-radius:2px;overflow:hidden;margin-bottom:12px;">
+      <div style="width:48mm;background:rgba(201,168,76,0.04);border-right:1px solid var(--border);display:flex;align-items:center;justify-content:center;padding:6px;">
+        <svg viewBox="0 0 110 65" style="width:100%;max-height:38mm;">
+          <!-- Détail jonction : 2 panneaux + boulons -->
+          <!-- Panneau gauche -->
+          <rect x="8" y="10" width="40" height="45" class="plan-wall"/>
+          <!-- Panneau droit -->
+          <rect x="62" y="10" width="40" height="45" class="plan-wall"/>
+          <!-- Zone de jonction -->
+          <rect x="46" y="10" width="18" height="45" fill="rgba(201,168,76,0.2)" stroke="var(--gold)" stroke-width="0.8"/>
+          <!-- Boulons (cercles) -->
+          <circle cx="55" cy="22" r="3" fill="var(--gold)" opacity="0.8"/>
+          <circle cx="55" cy="33" r="3" fill="var(--gold)" opacity="0.8"/>
+          <circle cx="55" cy="44" r="3" fill="var(--gold)" opacity="0.8"/>
+          <text x="55" y="57" class="plan-lbl" style="fill:rgba(201,168,76,0.7);font-size:4.5px;">JONCTION M12</text>
+          <text x="4" y="63" class="plan-lbl" style="font-size:4.5px;fill:var(--grey);">DÉTAIL FIXATION — VUE DE DESSUS M5</text>
+        </svg>
+      </div>
+      <div style="padding:9px 11px;flex:1;">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+          <div class="badge">M5</div>
+          <div class="h3" style="font-size:9pt;">Système de Fixation</div>
+          <span class="tag" style="margin-left:auto;">Assemblage</span>
+        </div>
+        <div class="xs" style="margin-bottom:5px;">Ensemble des éléments de connexion inter-modules. Assure la rigidité structurelle de l'assemblage tout en maintenant la réversibilité — chaque jonction peut être défaite sans altérer les panneaux.</div>
+        <div class="divc"></div>
+        <div class="srow"><span class="sk">Type</span><span class="sv">Boulonnage acier galvanisé M12</span></div>
+        <div class="srow"><span class="sk">Montage</span><span class="sv">Rapide — outillage standard</span></div>
+        <div class="srow"><span class="sk">Démontage</span><span class="sv">Réversible — panneaux non endommagés</span></div>
+        <div class="srow" style="border:none;"><span class="sk">Points</span><span class="sv">Verticaux + horizontaux + d'angle</span></div>
+      </div>
+    </div>
+
+    <!-- Récap modules -->
+    <div class="card" style="background:var(--acc);">
+      <div class="h4" style="margin-bottom:8px;font-size:7pt;">Récapitulatif — 5 Modules Standard du Système</div>
+      <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;">
+        <div style="text-align:center;"><div class="badge" style="margin:0 auto 4px;">M1</div><div class="xs" style="font-size:6pt;">Mur Plein</div></div>
+        <div style="text-align:center;"><div class="badge" style="margin:0 auto 4px;">M2</div><div class="xs" style="font-size:6pt;">Mur Fenêtre</div></div>
+        <div style="text-align:center;"><div class="badge" style="margin:0 auto 4px;">M3</div><div class="xs" style="font-size:6pt;">Module Porte</div></div>
+        <div style="text-align:center;"><div class="badge" style="margin:0 auto 4px;">M4</div><div class="xs" style="font-size:6pt;">Passage Libre</div></div>
+        <div style="text-align:center;"><div class="badge" style="margin:0 auto 4px;">M5</div><div class="xs" style="font-size:6pt;">Fixation</div></div>
+      </div>
+    </div>
+  </div>
+  <span class="ph">Shooting House Modulaire — Catalogue Produit 2026</span>
+  <span class="pn">04</span>
+</div>
+
+
+<!-- ══════════════════════════════════════
+     P5 — LOGIQUE D'ASSEMBLAGE
+══════════════════════════════════════ -->
+<div class="page">
+  <div class="pi">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:3px;">
+      <div>
+        <div class="label" style="margin-bottom:3px;">Architecture Système — Construction</div>
+        <div class="h2">Logique d'Assemblage</div>
+      </div>
+      <span class="tag">Module → Pièce → Complexe</span>
+    </div>
+    <div class="div" style="margin-bottom:9px;"></div>
+
+    <!-- Schéma progression SVG -->
+    <div style="background:rgba(201,168,76,0.04);border:1px solid var(--border);border-radius:2px;padding:8px;margin-bottom:9px;">
+      <svg viewBox="0 0 540 95" style="width:100%;height:auto;">
+        <!-- NIVEAU 1 — MODULE (panneau isolé) -->
+        <rect x="20" y="20" width="70" height="55" fill="#1a1a20" stroke="rgba(201,168,76,0.6)" stroke-width="1.2"/>
+        <line x1="20" y1="35" x2="90" y2="35" stroke="rgba(201,168,76,0.12)" stroke-width="0.5"/>
+        <line x1="20" y1="50" x2="90" y2="50" stroke="rgba(201,168,76,0.12)" stroke-width="0.5"/>
+        <line x1="20" y1="65" x2="90" y2="65" stroke="rgba(201,168,76,0.12)" stroke-width="0.5"/>
+        <text x="55" y="88" font-size="8" fill="#C9A84C" text-anchor="middle" font-family="Helvetica" letter-spacing="1">MODULE</text>
+
+        <!-- Flèche 1 -->
+        <path d="M 100 47 L 130 47" stroke="rgba(201,168,76,0.5)" stroke-width="1.5" marker-end="url(#arr)"/>
+        <defs><marker id="arr" markerWidth="5" markerHeight="5" refX="4" refY="2.5" orient="auto"><path d="M0,0 L5,2.5 L0,5 Z" fill="rgba(201,168,76,0.7)"/></marker></defs>
+        <text x="115" y="44" font-size="6" fill="#8A8A96" text-anchor="middle" font-family="Helvetica">×4-8</text>
+
+        <!-- NIVEAU 2 — PIÈCE (room plan) -->
+        <g transform="translate(135,10)">
+          <!-- Room exterior walls -->
+          <rect x="0" y="10" width="105" height="75" fill="rgba(201,168,76,0.05)" stroke="rgba(201,168,76,0.4)" stroke-width="0.8" stroke-dasharray="3,2"/>
+          <!-- Wall segments -->
+          <rect x="0" y="10" width="105" height="7" fill="#1a1a20" stroke="rgba(201,168,76,0.5)" stroke-width="0.5"/>
+          <rect x="0" y="10" width="7" height="75" fill="#1a1a20" stroke="rgba(201,168,76,0.5)" stroke-width="0.5"/>
+          <rect x="98" y="10" width="7" height="75" fill="#1a1a20" stroke="rgba(201,168,76,0.5)" stroke-width="0.5"/>
+          <!-- Bottom wall with door -->
+          <rect x="0" y="78" width="37" height="7" fill="#1a1a20" stroke="rgba(201,168,76,0.5)" stroke-width="0.5"/>
+          <rect x="68" y="78" width="37" height="7" fill="#1a1a20" stroke="rgba(201,168,76,0.5)" stroke-width="0.5"/>
+          <!-- Door arc -->
+          <path d="M 37 78 A 31 31 0 0 0 68 47" fill="none" stroke="rgba(201,168,76,0.45)" stroke-width="0.8" stroke-dasharray="3,2"/>
+          <line x1="37" y1="47" x2="68" y2="47" stroke="rgba(201,168,76,0.6)" stroke-width="0.8"/>
+          <!-- Interior label -->
+          <text x="52" y="60" font-size="7" fill="rgba(201,168,76,0.4)" text-anchor="middle" font-family="Helvetica">PIÈCE</text>
+        </g>
+        <text x="190" y="92" font-size="8" fill="#C9A84C" text-anchor="middle" font-family="Helvetica" letter-spacing="1">PIÈCE</text>
+
+        <!-- Flèche 2 -->
+        <path d="M 252 47 L 282 47" stroke="rgba(201,168,76,0.5)" stroke-width="1.5" marker-end="url(#arr)"/>
+        <text x="267" y="44" font-size="6" fill="#8A8A96" text-anchor="middle" font-family="Helvetica">×3-10</text>
+
+        <!-- NIVEAU 3 — COMPLEXE (multi-pièces) -->
+        <g transform="translate(288,5)">
+          <!-- Room 1 TL -->
+          <rect x="0" y="5" width="55" height="45" fill="#1a1a20" stroke="rgba(201,168,76,0.5)" stroke-width="0.7"/>
+          <rect x="4" y="9" width="47" height="37" fill="rgba(201,168,76,0.05)"/>
+          <!-- Room 2 TR -->
+          <rect x="68" y="5" width="55" height="45" fill="#1a1a20" stroke="rgba(201,168,76,0.5)" stroke-width="0.7"/>
+          <rect x="72" y="9" width="47" height="37" fill="rgba(201,168,76,0.05)"/>
+          <!-- Room 3 BL -->
+          <rect x="0" y="58" width="55" height="37" fill="#1a1a20" stroke="rgba(201,168,76,0.5)" stroke-width="0.7"/>
+          <rect x="4" y="62" width="47" height="29" fill="rgba(201,168,76,0.05)"/>
+          <!-- Room 4 BR -->
+          <rect x="68" y="58" width="55" height="37" fill="#1a1a20" stroke="rgba(201,168,76,0.5)" stroke-width="0.7"/>
+          <rect x="72" y="62" width="47" height="29" fill="rgba(201,168,76,0.05)"/>
+          <!-- Couloir H -->
+          <rect x="55" y="20" width="13" height="15" fill="rgba(201,168,76,0.12)"/>
+          <!-- Couloir V -->
+          <rect x="20" y="50" width="15" height="8" fill="rgba(201,168,76,0.12)"/>
+          <rect x="88" y="50" width="15" height="8" fill="rgba(201,168,76,0.12)"/>
+          <!-- Door marks -->
+          <line x1="55" y1="23" x2="68" y2="23" stroke="rgba(201,168,76,0.6)" stroke-width="0.8"/>
+          <line x1="55" y1="32" x2="68" y2="32" stroke="rgba(201,168,76,0.6)" stroke-width="0.8"/>
+          <!-- Labels pièces -->
+          <text x="27" y="30" font-size="5.5" fill="rgba(201,168,76,0.45)" text-anchor="middle" font-family="Helvetica">P1</text>
+          <text x="95" y="30" font-size="5.5" fill="rgba(201,168,76,0.45)" text-anchor="middle" font-family="Helvetica">P3</text>
+          <text x="27" y="78" font-size="5.5" fill="rgba(201,168,76,0.45)" text-anchor="middle" font-family="Helvetica">P2</text>
+          <text x="95" y="78" font-size="5.5" fill="rgba(201,168,76,0.45)" text-anchor="middle" font-family="Helvetica">P4</text>
+          <text x="61" y="57" font-size="5" fill="rgba(201,168,76,0.6)" text-anchor="middle" font-family="Helvetica">COULOIR</text>
+        </g>
+        <text x="415" y="93" font-size="8" fill="#C9A84C" text-anchor="middle" font-family="Helvetica" letter-spacing="1">COMPLEXE</text>
+      </svg>
+    </div>
+
+    <!-- Règles en 2 colonnes -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:8px;">
+      <div class="cardl">
+        <div class="h4" style="margin-bottom:5px;font-size:7pt;">Règles de Composition</div>
+        <ul class="ul">
+          <li>Chaque pièce doit être structurellement fermée (4 côtés min.)</li>
+          <li>Portes et passages s'intercalent entre les murs</li>
+          <li>Renforts de jonction obligatoires aux coins d'angle</li>
+          <li>Hauteur constante : 2 500 mm sur tout le complexe</li>
+        </ul>
+      </div>
+      <div class="cardl">
+        <div class="h4" style="margin-bottom:5px;font-size:7pt;">Couloirs & Circulation</div>
+        <ul class="ul">
+          <li>Aucun module "couloir" — espace créé entre les pièces</li>
+          <li>Largeur min. recommandée : 1 200 mm</li>
+          <li>Standard couloir : 1 250 mm (1 module + marge)</li>
+          <li>Intersections : prévoir 2 500 × 2 500 mm</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- 3 niveaux détail -->
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;">
+      <div class="card" style="position:relative;">
+        <div style="position:absolute;top:7px;right:8px;font-size:24pt;font-weight:900;color:rgba(201,168,76,0.07);">1</div>
+        <div class="h3" style="margin-bottom:4px;font-size:8pt;">MODULE</div>
+        <div class="xs">Unité élémentaire. Panneau indépendant, usinable, stockable.</div>
+        <div class="divc"></div>
+        <div class="xs" style="color:var(--gold);">Ex. : mur plein, porte, fenêtre</div>
+      </div>
+      <div class="card" style="position:relative;border-color:var(--ga35);">
+        <div style="position:absolute;top:7px;right:8px;font-size:24pt;font-weight:900;color:rgba(201,168,76,0.10);">2</div>
+        <div class="h3" style="margin-bottom:4px;font-size:8pt;">PIÈCE</div>
+        <div class="xs">Assemblage fermé. Espace tactique autonome et combinable.</div>
+        <div class="divc"></div>
+        <div class="xs" style="color:var(--gold);">Ex. : cellule simple, angle, double</div>
+      </div>
+      <div class="card" style="position:relative;">
+        <div style="position:absolute;top:7px;right:8px;font-size:24pt;font-weight:900;color:rgba(201,168,76,0.07);">3</div>
+        <div class="h3" style="margin-bottom:4px;font-size:8pt;">COMPLEXE</div>
+        <div class="xs">Ensemble de pièces. Couloirs = espaces naturels entre pièces.</div>
+        <div class="divc"></div>
+        <div class="xs" style="color:var(--gold);">Ex. : BASIC 40m², PRO 80m²</div>
+      </div>
+    </div>
+  </div>
+  <span class="ph">Shooting House Modulaire — Catalogue Produit 2026</span>
+  <span class="pn">05</span>
+</div>
+
+
+<!-- ══════════════════════════════════════
+     P6 — PIÈCES TYPES 1/2  (P1–P5)
+══════════════════════════════════════ -->
+<div class="page">
+  <div class="pi">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:3px;">
+      <div>
+        <div class="label" style="margin-bottom:3px;">Plans types — Vue de dessus</div>
+        <div class="h2">Bibliothèque des Pièces <span style="font-size:10pt;color:var(--grey);font-weight:400;">(1 / 2)</span></div>
+      </div>
+      <span class="tag">P1 — P5</span>
+    </div>
+    <div class="div" style="margin-bottom:8px;"></div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;flex:1;">
+
+      <!-- P1 Cellule Simple -->
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:2px;overflow:hidden;">
+        <div style="background:var(--acc);padding:4px 8px;display:flex;align-items:center;gap:6px;">
+          <div class="badge" style="width:18px;height:18px;font-size:6pt;">P1</div>
+          <div class="h4" style="font-size:7pt;">Cellule Simple</div>
+          <span class="tag" style="margin-left:auto;font-size:5pt;">Base</span>
+        </div>
+        <div style="padding:6px 8px;display:flex;gap:7px;">
+          <svg viewBox="0 0 90 80" style="width:32mm;flex-shrink:0;height:auto;">
+            <rect x="3" y="3" width="84" height="74" class="plan-int"/>
+            <rect x="3" y="3" width="84" height="6" class="plan-wall"/>
+            <rect x="3" y="3" width="6" height="74" class="plan-wall"/>
+            <rect x="81" y="3" width="6" height="74" class="plan-wall"/>
+            <rect x="3" y="71" width="28" height="6" class="plan-wall"/>
+            <rect x="59" y="71" width="28" height="6" class="plan-wall"/>
+            <path d="M 31 71 A 28 28 0 0 0 59 43" class="plan-door"/>
+            <line x1="31" y1="43" x2="59" y2="43" stroke="rgba(201,168,76,0.55)" stroke-width="0.8"/>
+            <text x="45" y="35" class="plan-lbl">CELLULE</text>
+            <text x="45" y="41" class="plan-lbl">SIMPLE</text>
+          </svg>
+          <div>
+            <ul class="ul" style="margin-top:2px;">
+              <li>5 murs pleins (M1)</li>
+              <li>1 module porte (M3)</li>
+              <li>1 entrée — espace fermé</li>
+              <li>Usage : fouille, engagement simple</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- P2 Cellule Observation -->
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:2px;overflow:hidden;">
+        <div style="background:var(--acc);padding:4px 8px;display:flex;align-items:center;gap:6px;">
+          <div class="badge" style="width:18px;height:18px;font-size:6pt;">P2</div>
+          <div class="h4" style="font-size:7pt;">Cellule Observation</div>
+          <span class="tag" style="margin-left:auto;font-size:5pt;">Surveillance</span>
+        </div>
+        <div style="padding:6px 8px;display:flex;gap:7px;">
+          <svg viewBox="0 0 90 80" style="width:32mm;flex-shrink:0;height:auto;">
+            <rect x="3" y="3" width="84" height="74" class="plan-int"/>
+            <!-- Top wall with window -->
+            <rect x="3" y="3" width="22" height="6" class="plan-wall"/>
+            <rect x="65" y="3" width="22" height="6" class="plan-wall"/>
+            <rect x="25" y="3" width="40" height="6" fill="rgba(201,168,76,0.2)" stroke="var(--gold)" stroke-width="0.8"/>
+            <line x1="29" y1="5" x2="29" y2="7" stroke="var(--gold)" stroke-width="1.2"/>
+            <line x1="61" y1="5" x2="61" y2="7" stroke="var(--gold)" stroke-width="1.2"/>
+            <!-- Side walls -->
+            <rect x="3" y="3" width="6" height="74" class="plan-wall"/>
+            <rect x="81" y="3" width="6" height="74" class="plan-wall"/>
+            <!-- Bottom with door -->
+            <rect x="3" y="71" width="28" height="6" class="plan-wall"/>
+            <rect x="59" y="71" width="28" height="6" class="plan-wall"/>
+            <path d="M 31 71 A 28 28 0 0 0 59 43" class="plan-door"/>
+            <line x1="31" y1="43" x2="59" y2="43" stroke="rgba(201,168,76,0.55)" stroke-width="0.8"/>
+            <text x="45" y="38" class="plan-lbl">OBS.</text>
+          </svg>
+          <div>
+            <ul class="ul" style="margin-top:2px;">
+              <li>4 murs pleins (M1)</li>
+              <li>1 mur fenêtre (M2)</li>
+              <li>1 module porte (M3)</li>
+              <li>Usage : poste obs. / angle de tir</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- P3 Cellule Traversante -->
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:2px;overflow:hidden;">
+        <div style="background:var(--acc);padding:4px 8px;display:flex;align-items:center;gap:6px;">
+          <div class="badge" style="width:18px;height:18px;font-size:6pt;">P3</div>
+          <div class="h4" style="font-size:7pt;">Cellule Traversante</div>
+          <span class="tag" style="margin-left:auto;font-size:5pt;">Double entrée</span>
+        </div>
+        <div style="padding:6px 8px;display:flex;gap:7px;">
+          <svg viewBox="0 0 90 80" style="width:32mm;flex-shrink:0;height:auto;">
+            <rect x="3" y="3" width="84" height="74" class="plan-int"/>
+            <!-- Top with door -->
+            <rect x="3" y="3" width="28" height="6" class="plan-wall"/>
+            <rect x="59" y="3" width="28" height="6" class="plan-wall"/>
+            <path d="M 59 3 A 28 28 0 0 1 31 31" class="plan-door"/>
+            <line x1="31" y1="3" x2="31" y2="31" stroke="rgba(201,168,76,0.55)" stroke-width="0.8"/>
+            <!-- Side walls -->
+            <rect x="3" y="3" width="6" height="74" class="plan-wall"/>
+            <rect x="81" y="3" width="6" height="74" class="plan-wall"/>
+            <!-- Bottom with door -->
+            <rect x="3" y="71" width="28" height="6" class="plan-wall"/>
+            <rect x="59" y="71" width="28" height="6" class="plan-wall"/>
+            <path d="M 31 71 A 28 28 0 0 0 59 43" class="plan-door"/>
+            <line x1="31" y1="43" x2="59" y2="43" stroke="rgba(201,168,76,0.55)" stroke-width="0.8"/>
+            <text x="45" y="42" class="plan-lbl">TRAVERS.</text>
+          </svg>
+          <div>
+            <ul class="ul" style="margin-top:2px;">
+              <li>4 murs pleins (M1)</li>
+              <li>2 portes face à face (M3)</li>
+              <li>Traversée axiale</li>
+              <li>Usage : breach / progression</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- P4 Cellule Angle L -->
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:2px;overflow:hidden;">
+        <div style="background:var(--acc);padding:4px 8px;display:flex;align-items:center;gap:6px;">
+          <div class="badge" style="width:18px;height:18px;font-size:6pt;">P4</div>
+          <div class="h4" style="font-size:7pt;">Cellule Angle (L)</div>
+          <span class="tag" style="margin-left:auto;font-size:5pt;">Changement axe</span>
+        </div>
+        <div style="padding:6px 8px;display:flex;gap:7px;">
+          <svg viewBox="0 0 110 80" style="width:32mm;flex-shrink:0;height:auto;">
+            <!-- L-shape interior -->
+            <polygon points="3,3 55,3 55,38 107,38 107,77 3,77" class="plan-int"/>
+            <!-- Walls -->
+            <rect x="3" y="3" width="52" height="6" class="plan-wall"/>
+            <rect x="3" y="3" width="6" height="74" class="plan-wall"/>
+            <rect x="3" y="71" width="28" height="6" class="plan-wall"/>
+            <rect x="59" y="71" width="48" height="6" class="plan-wall"/>
+            <rect x="101" y="38" width="6" height="39" class="plan-wall"/>
+            <rect x="55" y="38" width="52" height="6" class="plan-wall"/>
+            <rect x="49" y="3" width="6" height="41" class="plan-wall"/>
+            <!-- Door bottom L -->
+            <path d="M 31 71 A 28 28 0 0 0 59 43" class="plan-door"/>
+            <line x1="31" y1="43" x2="59" y2="43" stroke="rgba(201,168,76,0.55)" stroke-width="0.8"/>
+            <text x="26" y="42" class="plan-lbl" style="font-size:5px;">ANGLE L</text>
+          </svg>
+          <div>
+            <ul class="ul" style="margin-top:2px;">
+              <li>Forme L — angle 90°</li>
+              <li>2 entrées perpendiculaires</li>
+              <li>Angle tactique intégré</li>
+              <li>Usage : angle / clearing</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- P5 Cellule Angle + Fenêtre -->
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:2px;overflow:hidden;grid-column:1/-1;">
+        <div style="background:var(--acc);padding:4px 8px;display:flex;align-items:center;gap:6px;">
+          <div class="badge" style="width:18px;height:18px;font-size:6pt;">P5</div>
+          <div class="h4" style="font-size:7pt;">Cellule Angle + Fenêtre</div>
+          <span class="tag" style="margin-left:auto;font-size:5pt;">Angle / Obs.</span>
+        </div>
+        <div style="padding:6px 8px;display:flex;gap:9px;">
+          <svg viewBox="0 0 110 80" style="width:38mm;flex-shrink:0;height:auto;">
+            <polygon points="3,3 55,3 55,38 107,38 107,77 3,77" class="plan-int"/>
+            <rect x="3" y="3" width="52" height="6" class="plan-wall"/>
+            <rect x="3" y="3" width="6" height="74" class="plan-wall"/>
+            <rect x="3" y="71" width="28" height="6" class="plan-wall"/>
+            <rect x="59" y="71" width="48" height="6" class="plan-wall"/>
+            <rect x="101" y="38" width="6" height="39" class="plan-wall"/>
+            <!-- Mur avec fenêtre sur le segment horizontal -->
+            <rect x="55" y="38" width="18" height="6" class="plan-wall"/>
+            <rect x="73" y="38" width="28" height="6" fill="rgba(201,168,76,0.2)" stroke="var(--gold)" stroke-width="0.7"/>
+            <line x1="76" y1="39" x2="76" y2="43" stroke="var(--gold)" stroke-width="1"/>
+            <line x1="98" y1="39" x2="98" y2="43" stroke="var(--gold)" stroke-width="1"/>
+            <rect x="49" y="3" width="6" height="41" class="plan-wall"/>
+            <path d="M 31 71 A 28 28 0 0 0 59 43" class="plan-door"/>
+            <line x1="31" y1="43" x2="59" y2="43" stroke="rgba(201,168,76,0.55)" stroke-width="0.8"/>
+            <text x="26" y="42" class="plan-lbl" style="font-size:4.5px;">ANGLE+FEN.</text>
+          </svg>
+          <div style="flex:1;">
+            <ul class="ul" style="margin-top:2px;">
+              <li>Cellule angle L avec mur fenêtre (M2) sur le segment extérieur</li>
+              <li>Fenêtre positionnée pour surveillance de l'axe latéral</li>
+              <li>2 accès : porte + passage selon configuration</li>
+              <li>Usage : poste avancé / COP / angle observation</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+  <span class="ph">Shooting House Modulaire — Catalogue Produit 2026</span>
+  <span class="pn">06</span>
+</div>
+
+
+<!-- ══════════════════════════════════════
+     P7 — PIÈCES TYPES 2/2  (P6–P10)
+══════════════════════════════════════ -->
+<div class="page">
+  <div class="pi">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:3px;">
+      <div>
+        <div class="label" style="margin-bottom:3px;">Plans types — Vue de dessus</div>
+        <div class="h2">Bibliothèque des Pièces <span style="font-size:10pt;color:var(--grey);font-weight:400;">(2 / 2)</span></div>
+      </div>
+      <span class="tag">P6 — P10</span>
+    </div>
+    <div class="div" style="margin-bottom:8px;"></div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;flex:1;">
+
+      <!-- P6 Cellule Double -->
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:2px;overflow:hidden;">
+        <div style="background:var(--acc);padding:4px 8px;display:flex;align-items:center;gap:6px;">
+          <div class="badge" style="width:18px;height:18px;font-size:6pt;">P6</div>
+          <div class="h4" style="font-size:7pt;">Cellule Double</div>
+          <span class="tag" style="margin-left:auto;font-size:5pt;">Grande surface</span>
+        </div>
+        <div style="padding:6px 8px;display:flex;gap:7px;">
+          <svg viewBox="0 0 140 60" style="width:36mm;flex-shrink:0;height:auto;">
+            <rect x="3" y="3" width="134" height="54" class="plan-int"/>
+            <rect x="3" y="3" width="134" height="5" class="plan-wall"/>
+            <rect x="3" y="3" width="5" height="54" class="plan-wall"/>
+            <rect x="132" y="3" width="5" height="54" class="plan-wall"/>
+            <rect x="3" y="52" width="43" height="5" class="plan-wall"/>
+            <rect x="98" y="52" width="39" height="5" class="plan-wall"/>
+            <path d="M 46 52 A 30 30 0 0 0 76 22" class="plan-door"/>
+            <line x1="46" y1="22" x2="76" y2="22" stroke="rgba(201,168,76,0.55)" stroke-width="0.7"/>
+            <text x="103" y="33" class="plan-lbl">DOUBLE</text>
+          </svg>
+          <div>
+            <ul class="ul" style="margin-top:2px;">
+              <li>2 cellules accolées</li>
+              <li>Surface doublée — espace ouvert</li>
+              <li>1 à 2 entrées possibles</li>
+              <li>Usage : salle principale</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- P7 Cellule Ouverte -->
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:2px;overflow:hidden;">
+        <div style="background:var(--acc);padding:4px 8px;display:flex;align-items:center;gap:6px;">
+          <div class="badge" style="width:18px;height:18px;font-size:6pt;">P7</div>
+          <div class="h4" style="font-size:7pt;">Cellule Ouverte</div>
+          <span class="tag" style="margin-left:auto;font-size:5pt;">Semi-ouverte</span>
+        </div>
+        <div style="padding:6px 8px;display:flex;gap:7px;">
+          <svg viewBox="0 0 90 80" style="width:32mm;flex-shrink:0;height:auto;">
+            <rect x="3" y="3" width="84" height="74" class="plan-int"/>
+            <rect x="3" y="3" width="84" height="6" class="plan-wall"/>
+            <rect x="3" y="3" width="6" height="74" class="plan-wall"/>
+            <rect x="81" y="3" width="6" height="74" class="plan-wall"/>
+            <!-- Bas ouvert — juste marqué en tirets -->
+            <rect x="3" y="71" width="84" height="6" fill="none" stroke="rgba(201,168,76,0.3)" stroke-width="1" stroke-dasharray="5,4"/>
+            <text x="45" y="42" class="plan-lbl">OUVERTE</text>
+            <text x="45" y="76" class="plan-lbl" style="font-size:4.5px;fill:rgba(201,168,76,0.45);">OUVERTURE</text>
+          </svg>
+          <div>
+            <ul class="ul" style="margin-top:2px;">
+              <li>3 côtés fermés</li>
+              <li>1 passage libre (M4)</li>
+              <li>Intégration en couloir/zone</li>
+              <li>Usage : zone couverte</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- P8 Cellule en U -->
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:2px;overflow:hidden;">
+        <div style="background:var(--acc);padding:4px 8px;display:flex;align-items:center;gap:6px;">
+          <div class="badge" style="width:18px;height:18px;font-size:6pt;">P8</div>
+          <div class="h4" style="font-size:7pt;">Cellule en U</div>
+          <span class="tag" style="margin-left:auto;font-size:5pt;">Enveloppe</span>
+        </div>
+        <div style="padding:6px 8px;display:flex;gap:7px;">
+          <svg viewBox="0 0 110 80" style="width:32mm;flex-shrink:0;height:auto;">
+            <!-- U: left arm, bottom, right arm -->
+            <rect x="3" y="3" width="28" height="74" fill="#1a1a20" stroke="rgba(201,168,76,0.55)" stroke-width="0.6"/>
+            <rect x="9" y="9" width="16" height="62" class="plan-int"/>
+            <rect x="3" y="68" width="104" height="9" class="plan-wall"/>
+            <rect x="79" y="3" width="28" height="74" fill="#1a1a20" stroke="rgba(201,168,76,0.55)" stroke-width="0.6"/>
+            <rect x="85" y="9" width="16" height="62" class="plan-int"/>
+            <!-- Intérieur central -->
+            <rect x="31" y="3" width="48" height="65" fill="rgba(201,168,76,0.05)"/>
+            <!-- Ouverture haut -->
+            <rect x="31" y="3" width="48" height="6" fill="none" stroke="rgba(201,168,76,0.3)" stroke-width="1" stroke-dasharray="4,3"/>
+            <text x="55" y="40" class="plan-lbl">EN U</text>
+            <text x="55" y="6" class="plan-lbl" style="fill:rgba(201,168,76,0.4);font-size:4.5px;">OUVERTURE</text>
+          </svg>
+          <div>
+            <ul class="ul" style="margin-top:2px;">
+              <li>3 murs + ouverture frontale</li>
+              <li>Enveloppe 3 côtés</li>
+              <li>Modulable selon largeur</li>
+              <li>Usage : sas / préparation</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- P9 Multi-entrée -->
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:2px;overflow:hidden;">
+        <div style="background:var(--acc);padding:4px 8px;display:flex;align-items:center;gap:6px;">
+          <div class="badge" style="width:18px;height:18px;font-size:6pt;">P9</div>
+          <div class="h4" style="font-size:7pt;">Cellule Multi-Entrée</div>
+          <span class="tag" style="margin-left:auto;font-size:5pt;">Nœud</span>
+        </div>
+        <div style="padding:6px 8px;display:flex;gap:7px;">
+          <svg viewBox="0 0 90 80" style="width:32mm;flex-shrink:0;height:auto;">
+            <rect x="3" y="3" width="84" height="74" class="plan-int"/>
+            <!-- Top door -->
+            <rect x="3" y="3" width="28" height="6" class="plan-wall"/>
+            <rect x="59" y="3" width="28" height="6" class="plan-wall"/>
+            <path d="M 59 3 A 28 28 0 0 1 31 31" class="plan-door"/>
+            <line x1="31" y1="3" x2="31" y2="31" stroke="rgba(201,168,76,0.55)" stroke-width="0.7"/>
+            <!-- Left door -->
+            <rect x="3" y="3" width="6" height="24" class="plan-wall"/>
+            <rect x="3" y="53" width="6" height="24" class="plan-wall"/>
+            <path d="M 3 29 A 24 24 0 0 1 27 53" class="plan-door"/>
+            <line x1="3" y1="29" x2="27" y2="29" stroke="rgba(201,168,76,0.55)" stroke-width="0.7"/>
+            <!-- Right wall -->
+            <rect x="81" y="3" width="6" height="74" class="plan-wall"/>
+            <!-- Bottom door -->
+            <rect x="3" y="71" width="28" height="6" class="plan-wall"/>
+            <rect x="59" y="71" width="28" height="6" class="plan-wall"/>
+            <path d="M 31 71 A 28 28 0 0 0 59 43" class="plan-door"/>
+            <line x1="31" y1="43" x2="59" y2="43" stroke="rgba(201,168,76,0.55)" stroke-width="0.7"/>
+            <text x="55" y="45" class="plan-lbl">MULTI-E.</text>
+          </svg>
+          <div>
+            <ul class="ul" style="margin-top:2px;">
+              <li>3 portes / passages</li>
+              <li>Accès sur 3 côtés</li>
+              <li>Nœud de distribution</li>
+              <li>Usage : carrefour</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- P10 Tactique Avancée -->
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:2px;overflow:hidden;grid-column:1/-1;">
+        <div style="background:var(--acc);padding:4px 8px;display:flex;align-items:center;gap:6px;">
+          <div class="badge" style="width:18px;height:18px;font-size:6pt;">P10</div>
+          <div class="h4" style="font-size:7pt;">Cellule Tactique Avancée</div>
+          <span class="tag" style="margin-left:auto;font-size:5pt;">Haute Complexité</span>
+        </div>
+        <div style="padding:6px 8px;display:flex;gap:9px;">
+          <svg viewBox="0 0 150 80" style="width:45mm;flex-shrink:0;height:auto;">
+            <!-- T-shape room -->
+            <polygon points="3,3 147,3 147,45 87,45 87,77 3,77" class="plan-int"/>
+            <!-- Top full wall -->
+            <rect x="3" y="3" width="144" height="6" class="plan-wall"/>
+            <!-- Right wall -->
+            <rect x="141" y="3" width="6" height="42" class="plan-wall"/>
+            <!-- Mid-right step -->
+            <rect x="81" y="39" width="66" height="6" class="plan-wall"/>
+            <!-- Lower right -->
+            <rect x="81" y="39" width="6" height="38" class="plan-wall"/>
+            <!-- Bottom right -->
+            <rect x="57" y="71" width="36" height="6" class="plan-wall"/>
+            <!-- Bottom left with door -->
+            <rect x="3" y="71" width="20" height="6" class="plan-wall"/>
+            <path d="M 23 71 A 22 22 0 0 0 45 49" class="plan-door"/>
+            <line x1="23" y1="49" x2="45" y2="49" stroke="rgba(201,168,76,0.55)" stroke-width="0.7"/>
+            <!-- Left wall -->
+            <rect x="3" y="3" width="6" height="74" class="plan-wall"/>
+            <!-- Window on right side -->
+            <rect x="141" y="10" width="6" height="9" fill="rgba(201,168,76,0.25)" stroke="var(--gold)" stroke-width="0.7"/>
+            <line x1="142" y1="12" x2="146" y2="12" stroke="var(--gold)" stroke-width="1"/>
+            <line x1="142" y1="16" x2="146" y2="16" stroke="var(--gold)" stroke-width="1"/>
+            <!-- Top door -->
+            <rect x="3" y="3" width="50" height="6" class="plan-wall"/>
+            <rect x="95" y="3" width="52" height="6" class="plan-wall"/>
+            <path d="M 53 3 A 30 30 0 0 0 83 33" class="plan-door" style="stroke:rgba(201,168,76,0.4);"/>
+            <line x1="53" y1="3" x2="53" y2="33" stroke="rgba(201,168,76,0.5)" stroke-width="0.7"/>
+            <text x="45" y="35" class="plan-lbl" style="font-size:5px;">TACTIQUE AVA.</text>
+          </svg>
+          <div style="flex:1;">
+            <div class="xs" style="margin-bottom:4px;">Configuration haute complexité combinant angle, multi-accès et ouvertures différenciées. Pour scénarios avancés à axes de menace multiples.</div>
+            <ul class="ul">
+              <li>Murs mixtes M1 + M2 + M3 + M4 selon scénario</li>
+              <li>2 à 4 entrées — axes et angles variables</li>
+              <li>Fenêtres pour observation croisée</li>
+              <li>Usage : hostage rescue, CQB intensif, coordination multi-équipes</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+  <span class="ph">Shooting House Modulaire — Catalogue Produit 2026</span>
+  <span class="pn">07</span>
+</div>
+
+
+<!-- ══════════════════════════════════════
+     P8 — GAMME BASIC  (~40 m²)
+══════════════════════════════════════ -->
+<div class="page" style="padding:0;">
+  <img src="../vitrine/img/shooting_house_1.png"
+       style="width:100%;height:100%;object-fit:contain;background:#111114;" alt="Gamme BASIC">
+  <span class="pn" style="color:rgba(240,239,233,0.4);">08</span>
+</div>
+
+
+<!-- ══════════════════════════════════════
+     P9 — GAMME PRO  (~70–85 m²)
+══════════════════════════════════════ -->
+<div class="page" style="padding:0;">
+  <img src="../vitrine/img/shooting_house_2.png"
+       style="width:100%;height:100%;object-fit:contain;background:#111114;" alt="Gamme PRO">
+  <span class="pn" style="color:rgba(240,239,233,0.4);">09</span>
+</div>
+
+
+<!-- ══════════════════════════════════════
+     P10 — GAMME PREMIUM  (~110–120 m²)
+══════════════════════════════════════ -->
+<div class="page" style="padding:0;">
+  <img src="../vitrine/img/shooting_house_3.png"
+       style="width:100%;height:100%;object-fit:contain;background:#111114;" alt="Gamme PREMIUM">
+  <span class="pn" style="color:rgba(240,239,233,0.4);">10</span>
+</div>
+
+
+<!-- ══════════════════════════════════════
+     P11 — MODULARITÉ & STRUCTURE EXT.
+══════════════════════════════════════ -->
+<div class="page">
+  <div class="pi">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:3px;">
+      <div>
+        <div class="label" style="margin-bottom:3px;">Évolutivité & Options</div>
+        <div class="h2">Modularité & Structure Extérieure</div>
+      </div>
+    </div>
+    <div class="div" style="margin-bottom:8px;"></div>
+
+    <div style="display:flex;align-items:center;gap:7px;margin-bottom:6px;">
+      <div class="gl" style="width:22px;"></div>
+      <div class="h3" style="font-size:9pt;">Évolution du Système</div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:11px;">
+      <div class="card">
+        <div class="h4" style="margin-bottom:5px;font-size:7pt;">Ajout de Modules</div>
+        <div class="xs" style="margin-bottom:5px;">Le système est conçu pour croître sans reconstruction. L'ajout d'une pièce ne nécessite pas de démonter l'existant — il suffit d'ouvrir un accès sur un mur et d'assembler les nouveaux panneaux.</div>
+        <ul class="ul">
+          <li>Ajout d'un panneau sur mur existant</li>
+          <li>Extension sans interruption d'exploitation</li>
+          <li>Réemploi des panneaux déplacés ailleurs</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="h4" style="margin-bottom:5px;font-size:7pt;">Modification des Configurations</div>
+        <div class="xs" style="margin-bottom:5px;">Une configuration peut être intégralement réagencée entre deux sessions d'entraînement. Le boulonnage réversible garantit qu'aucun panneau n'est endommagé lors du démontage.</div>
+        <ul class="ul">
+          <li>Changement de plan en quelques heures</li>
+          <li>Rotation des scénarios entre unités</li>
+          <li>Adaptation au niveau des stagiaires</li>
+        </ul>
+      </div>
+    </div>
+
+    <div style="display:flex;align-items:center;gap:7px;margin-bottom:6px;">
+      <div class="gl" style="width:22px;"></div>
+      <div class="h3" style="font-size:9pt;">Structure Extérieure <span style="color:var(--grey);font-weight:400;font-size:7.5pt;">— Option</span></div>
+    </div>
+    <div style="display:flex;gap:9px;">
+      <!-- Photo opérateur comme visuel contextuel -->
+      <div style="width:55mm;flex-shrink:0;">
+        <img src="../vitrine/img/operator-training.jpg"
+             style="width:100%;height:52mm;object-fit:cover;border-radius:2px;border:1px solid var(--border);opacity:0.85;" alt="">
+        <div class="xs" style="margin-top:3px;text-align:center;opacity:0.5;">Vue opérationnelle — travail au sol</div>
+      </div>
+      <div style="flex:1;display:flex;flex-direction:column;gap:6px;">
+        <div class="card">
+          <div class="h4" style="margin-bottom:4px;font-size:7pt;">Structure Métallique Périphérique</div>
+          <ul class="ul">
+            <li>Châssis acier galvanisé — indépendant du bois</li>
+            <li>Renfort extérieur pour charges complémentaires</li>
+            <li>Supporte la passerelle d'observation en hauteur</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="h4" style="margin-bottom:4px;font-size:7pt;">Passerelle d'Observation</div>
+          <ul class="ul">
+            <li>Accès formateurs en hauteur — vue plongeante complète</li>
+            <li>Travail au sol uniquement pour les stagiaires</li>
+            <li>Garde-corps sécurisé — charge homme équipé</li>
+          </ul>
+        </div>
+        <div class="card" style="background:var(--ga06);border-color:var(--ga35);">
+          <div class="xs" style="color:var(--gold);">Option disponible sur devis séparé. Ne modifie pas les dimensions ou l'agencement interne du shooting house.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <span class="ph">Shooting House Modulaire — Catalogue Produit 2026</span>
+  <span class="pn">11</span>
+</div>
+
+
+<!-- ══════════════════════════════════════
+     P12 — LOGIQUE PRODUIT & CONTACT
+══════════════════════════════════════ -->
+<div class="page">
+  <div class="pi">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:3px;">
+      <div>
+        <div class="label" style="margin-bottom:3px;">Approche Commerciale — Devis & Personnalisation</div>
+        <div class="h2">Logique Produit</div>
+      </div>
+    </div>
+    <div class="div" style="margin-bottom:9px;"></div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:10px;">
+      <div class="cardl">
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+          <div class="badge" style="width:19px;height:19px;font-size:6pt;">01</div>
+          <div class="h3" style="font-size:7.5pt;">Catalogue Normalisé</div>
+        </div>
+        <div class="xs">L'ensemble repose sur une bibliothèque finie de modules (M1–M5) et pièces (P1–P10). Pas de pièces sur-mesure — des <em style="color:var(--white);">combinaisons</em> sur-mesure.</div>
+      </div>
+      <div class="cardl">
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+          <div class="badge" style="width:19px;height:19px;font-size:6pt;">02</div>
+          <div class="h3" style="font-size:7.5pt;">Pièces Standard</div>
+        </div>
+        <div class="xs">Standardisation garantissant la compatibilité universelle, la disponibilité des pièces de remplacement et la maîtrise des délais. Chaque panneau est interchangeable.</div>
+      </div>
+      <div class="cardl">
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+          <div class="badge" style="width:19px;height:19px;font-size:6pt;">03</div>
+          <div class="h3" style="font-size:7.5pt;">Personnalisation</div>
+        </div>
+        <div class="xs">La personnalisation porte sur le plan — pas sur les pièces. Surface, pièces types, accès : le résultat est un complexe unique construit avec des briques universelles.</div>
+      </div>
+      <div class="cardl">
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+          <div class="badge" style="width:19px;height:19px;font-size:6pt;">04</div>
+          <div class="h3" style="font-size:7.5pt;">Devis par Quantités</div>
+        </div>
+        <div class="xs">Devis établi sur liste de modules : prix unitaire × quantité + options (passerelle, structure métal) + forfait installation.</div>
+      </div>
+    </div>
+
+    <!-- Processus 5 étapes -->
+    <div style="display:flex;align-items:center;gap:7px;margin-bottom:6px;">
+      <div class="gl" style="width:22px;"></div>
+      <div class="h3" style="font-size:8.5pt;">Processus de Commande</div>
+    </div>
+    <div style="display:flex;margin-bottom:10px;background:var(--card);border:1px solid var(--border);border-radius:2px;overflow:hidden;">
+      <div style="flex:1;text-align:center;padding:8px 4px;border-right:1px solid var(--border);">
+        <div class="badge" style="margin:0 auto 4px;">1</div>
+        <div style="font-size:6.5pt;font-weight:700;color:var(--white);">Brief</div>
+        <div class="xs" style="font-size:5.5pt;">Surface & contraintes site</div>
+      </div>
+      <div style="flex:1;text-align:center;padding:8px 4px;border-right:1px solid var(--border);">
+        <div class="badge" style="margin:0 auto 4px;">2</div>
+        <div style="font-size:6.5pt;font-weight:700;color:var(--white);">Plan</div>
+        <div class="xs" style="font-size:5.5pt;">Proposition de config.</div>
+      </div>
+      <div style="flex:1;text-align:center;padding:8px 4px;border-right:1px solid var(--border);">
+        <div class="badge" style="margin:0 auto 4px;">3</div>
+        <div style="font-size:6.5pt;font-weight:700;color:var(--white);">Devis</div>
+        <div class="xs" style="font-size:5.5pt;">Liste modules + options</div>
+      </div>
+      <div style="flex:1;text-align:center;padding:8px 4px;border-right:1px solid var(--border);">
+        <div class="badge" style="margin:0 auto 4px;">4</div>
+        <div style="font-size:6.5pt;font-weight:700;color:var(--white);">Fabrication</div>
+        <div class="xs" style="font-size:5.5pt;">Délais selon quantités</div>
+      </div>
+      <div style="flex:1;text-align:center;padding:8px 4px;background:var(--ga06);">
+        <div class="badge" style="margin:0 auto 4px;border-color:var(--gold-l);color:var(--gold-l);">5</div>
+        <div style="font-size:6.5pt;font-weight:700;color:var(--white);">Installation</div>
+        <div class="xs" style="font-size:5.5pt;">Sur site — clé en main</div>
+      </div>
+    </div>
+
+    <!-- Contact footer -->
+    <div style="margin-top:auto;display:flex;gap:10px;align-items:center;background:var(--acc);border:1px solid var(--border);border-radius:2px;padding:10px 12px;">
+      <img src="../vitrine/img/CRBR.Logo CRBR Solutions avec tête de loup.png"
+           style="height:11mm;opacity:0.9;flex-shrink:0;" alt="CRBR Solutions">
+      <div style="flex:1;">
+        <div style="font-size:10pt;font-weight:700;color:var(--white);">CRBR Solutions</div>
+        <div class="xs" style="margin-top:1px;">Infrastructures Tactiques — Systèmes d'Entraînement</div>
+      </div>
+      <div style="text-align:right;">
+        <div class="xs">www.crbr-solution.fr</div>
+        <div class="xs" style="color:var(--gold);margin-top:2px;">Devis sur demande</div>
+        <div class="xs" style="margin-top:2px;opacity:0.5;">Document confidentiel</div>
+      </div>
+    </div>
+  </div>
+  <span class="ph">Shooting House Modulaire — Catalogue Produit 2026</span>
+  <span class="pn">12</span>
+</div>
+
+
+</body>
+</html>
