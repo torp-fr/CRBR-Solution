@@ -78,7 +78,7 @@ const Editor2D = (() => {
     ctx.beginPath();
     ctx.moveTo(lx + legendPx, ly); ctx.lineTo(lx + legendPx, ly + 12); ctx.stroke();
     ctx.fillStyle = COLORS.text;
-    ctx.font = '11px Helvetica';
+    ctx.font = '11px -apple-system, Segoe UI, Helvetica, Arial, sans-serif';
     ctx.fillText('1250 mm', lx + legendPx + 6, ly + 10);
     ctx.restore();
   }
@@ -259,15 +259,15 @@ const Editor2D = (() => {
       ctx.save();
       ctx.setTransform(1, 0, 0, 1, 0, 0);
       ctx.textAlign = 'center';
-      ctx.font = 'bold 14px Helvetica Neue, Helvetica, Arial, sans-serif';
-      ctx.fillStyle = 'rgba(201,168,76,0.45)';
-      ctx.fillText('Aucun module posé', cw / 2, ch / 2 - 22);
-      ctx.font = '12px Helvetica Neue, Helvetica, Arial, sans-serif';
-      ctx.fillStyle = 'rgba(138,138,150,0.55)';
-      ctx.fillText('Sélectionnez un outil dans la barre latérale puis cliquez sur la grille', cw / 2, ch / 2 + 2);
-      ctx.font = '11px Helvetica Neue, Helvetica, Arial, sans-serif';
-      ctx.fillStyle = 'rgba(138,138,150,0.35)';
-      ctx.fillText('Ou chargez un gabarit de pièce pour démarrer rapidement', cw / 2, ch / 2 + 22);
+      ctx.font = 'bold 14px -apple-system, Segoe UI, Helvetica, Arial, sans-serif';
+      ctx.fillStyle = 'rgba(77,163,255,0.5)';
+      ctx.fillText('Aucun module posé', cw / 2, ch / 2 - 20);
+      ctx.font = '12px -apple-system, Segoe UI, Helvetica, Arial, sans-serif';
+      ctx.fillStyle = 'rgba(138,148,168,0.5)';
+      ctx.fillText('Sélectionnez un outil dans la barre latérale et cliquez sur la grille', cw / 2, ch / 2 + 4);
+      ctx.font = '11px -apple-system, Segoe UI, Helvetica, Arial, sans-serif';
+      ctx.fillStyle = 'rgba(80,88,106,0.7)';
+      ctx.fillText('Ou utilisez un gabarit de pièce pour démarrer rapidement', cw / 2, ch / 2 + 24);
       ctx.restore();
     }
 

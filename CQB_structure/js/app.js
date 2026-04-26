@@ -59,7 +59,8 @@ const App = {
     document.getElementById('btn-3d-front').addEventListener('click', () => Renderer3D.setCameraPreset('front'));
 
     // State listeners
-    AppState.on('modules', () => this.updateUI());
+    AppState.on('modules',  () => this.updateUI());
+    AppState.on('settings', () => this.updateUI());
 
     this.updateUI();
     this.syncToolbar();
@@ -70,11 +71,24 @@ const App = {
   switchTab(tab) {
     this.currentTab = tab;
 
+    // Activate tab button
     document.querySelectorAll('.tab-btn').forEach(b =>
       b.classList.toggle('active', b.dataset.tab === tab));
+
+    // Activate tab panel
     document.querySelectorAll('.tab-panel').forEach(p =>
       p.classList.toggle('active', p.id === 'tab-' + tab));
 
+    // Show / hide sidebar and right panel
+    const sidebar    = document.getElementById('left-sidebar');
+    const rightPanel = document.getElementById('right-panel');
+    const showSidebar = tab === 'plan';
+    const showRight   = tab === 'plan' || tab === '3d';
+
+    if (sidebar)    sidebar.classList.toggle('sidebar-hidden', !showSidebar);
+    if (rightPanel) rightPanel.classList.toggle('panel-hidden', !showRight);
+
+    // Tab-specific init
     if (tab === '3d') {
       Renderer3D.init(document.getElementById('canvas-3d'));
       Renderer3D.refresh();
@@ -84,6 +98,7 @@ const App = {
   },
 
   updateUI() {
+    UI.renderRightPanel();
     UI.renderModuleCounts();
     UI.renderDevis();
     if (this.currentTab === 'settings') UI.renderSettings();
@@ -107,9 +122,10 @@ const App = {
   },
 
   updateStatusBar() {
-    const toolEl  = document.getElementById('status-tool');
-    const rotEl   = document.getElementById('status-rot');
-    const hintEl  = document.getElementById('status-hint');
+    const toolEl   = document.getElementById('status-tool');
+    const rotEl    = document.getElementById('status-rot');
+    const hintEl   = document.getElementById('status-hint');
+    const sepRot   = document.getElementById('st-sep-rot');
     if (!toolEl) return;
 
     const t = Editor2D.tool;
@@ -123,7 +139,7 @@ const App = {
       opening: 'Passage libre',
     };
     const hints = {
-      select:  'Cliquer sur un module pour le sélectionner · Glisser pour déplacer · Suppr pour supprimer',
+      select:  'Cliquer pour sélectionner · Glisser pour déplacer · Suppr pour supprimer',
       wall:    'Cliquer sur la grille pour placer · R pour changer l\'orientation',
       window:  'Cliquer sur la grille pour placer · R pour changer l\'orientation',
       door:    'Cliquer sur la grille pour placer · R pour changer l\'orientation',
@@ -131,8 +147,14 @@ const App = {
     };
 
     toolEl.textContent = toolNames[t] || t;
-    rotEl.textContent  = (t !== 'select') ? (r === 0 ? '— Horizontal' : '| Vertical') : '';
-    hintEl.textContent = hints[t] || '';
+
+    const isPlacing = t !== 'select';
+    if (rotEl) {
+      rotEl.textContent  = isPlacing ? (r === 0 ? '— Horizontal' : '| Vertical') : '';
+      rotEl.style.display   = isPlacing ? '' : 'none';
+    }
+    if (sepRot) sepRot.style.display = isPlacing ? '' : 'none';
+    if (hintEl) hintEl.textContent = hints[t] || '';
   },
 };
 

@@ -222,22 +222,107 @@ const UI = {
     document.getElementById('header-price').textContent = `${sellPrice.toFixed(0)} € HT`;
   },
 
-  // ── Side panel module counts ───────────────────────────────
+  // ── Side panel module counts (legacy, no-op if element absent) ──
   renderModuleCounts() {
+    const el = document.getElementById('module-counts');
+    if (!el) return;
     const counts = { wall: 0, window: 0, door: 0, opening: 0 };
     AppState.modules.forEach(m => { if (counts[m.type] !== undefined) counts[m.type]++; });
     const total = Object.values(counts).reduce((s, v) => s + v, 0);
-
-    const el = document.getElementById('module-counts');
-    if (!el) return;
     if (total === 0) { el.innerHTML = '<div class="no-modules">Aucun module</div>'; return; }
-
     el.innerHTML = Object.keys(counts).map(t => counts[t] > 0
-      ? `<div class="mod-count-row">
-           <span>${MODULE_ICONS[t]}</span>
+      ? `<div class="mod-count-row"><span>${MODULE_ICONS[t]}</span>
            <span class="mod-count-label">${MODULE_LABELS[t]}</span>
-           <span class="mod-count-val">${counts[t]}</span>
-         </div>`
-      : '').join('');
+           <span class="mod-count-val">${counts[t]}</span></div>` : '').join('');
+  },
+
+  // ── Right panel — live pricing widget ─────────────────────
+  renderRightPanel() {
+    const el = document.getElementById('right-panel-content');
+    if (!el) return;
+
+    const res = Calculator.compute();
+    const { counts, moduleCosts, totalMat, sellPrice,
+            marginAmount, delivery, installation, totalModules } = res;
+
+    // Update header price display
+    const hdr = document.getElementById('header-price');
+    if (hdr) hdr.textContent = totalModules > 0
+      ? `${sellPrice.toLocaleString('fr-FR', { maximumFractionDigits: 0 })} € HT` : '—';
+
+    if (totalModules === 0) {
+      el.innerHTML = `
+        <div class="rp-empty">
+          <div class="rp-empty-icon">
+            <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5">
+              <rect x="6" y="6" width="16" height="16" rx="2"/>
+              <rect x="26" y="6" width="16" height="16" rx="2"/>
+              <rect x="6" y="26" width="16" height="16" rx="2"/>
+              <rect x="26" y="26" width="16" height="16" rx="2"/>
+            </svg>
+          </div>
+          <div class="rp-empty-title">Aucun module posé</div>
+          <div class="rp-empty-hint">Placez des modules sur la grille pour voir l'estimation en temps réel</div>
+        </div>`;
+      return;
+    }
+
+    // Module count tiles (all 4 types, show 0 for absent)
+    const typeList = ['wall', 'window', 'door', 'opening'];
+    const tiles = typeList.map(t => `
+      <div class="rp-count-tile">
+        <div class="rp-tile-icon">${MODULE_ICONS[t]}</div>
+        <div class="rp-tile-label">${MODULE_LABELS[t]}</div>
+        <div class="rp-tile-val${counts[t] === 0 ? ' zero' : ''}">${counts[t]}</div>
+      </div>`).join('');
+
+    // Price rows
+    const fmt = n => n.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    const fmtBig = n => n.toLocaleString('fr-FR', { maximumFractionDigits: 0 });
+
+    el.innerHTML = `
+      <div class="rp-section">
+        <div class="rp-section-title">Modules posés — ${totalModules} total</div>
+        <div class="rp-counts">${tiles}</div>
+      </div>
+
+      <div class="rp-section">
+        <div class="rp-section-title">Détail du prix</div>
+        <div class="rp-price-row">
+          <span class="rp-pr-label">Coût matériaux</span>
+          <span class="rp-pr-val">${fmt(totalMat)} €</span>
+        </div>
+        <div class="rp-price-row rp-pr-addon">
+          <span class="rp-pr-label">Marge (${AppState.settings.business.margin}%)</span>
+          <span class="rp-pr-val">+ ${fmt(marginAmount)} €</span>
+        </div>
+        <div class="rp-price-row rp-pr-addon">
+          <span class="rp-pr-label">Livraison</span>
+          <span class="rp-pr-val">+ ${fmt(delivery)} €</span>
+        </div>
+        <div class="rp-price-row rp-pr-addon">
+          <span class="rp-pr-label">Installation</span>
+          <span class="rp-pr-val">+ ${fmt(installation)} €</span>
+        </div>
+      </div>
+
+      <div class="rp-total-block">
+        <div class="rp-total-label">Prix de vente</div>
+        <div class="rp-total-price">${fmtBig(sellPrice)} €</div>
+        <div class="rp-total-ht">hors taxes (HT)</div>
+        <div class="rp-total-divider"></div>
+        <div class="rp-total-ttc">
+          TTC (TVA 20%)&ensp;<span>${fmtBig(sellPrice * 1.2)} €</span>
+        </div>
+      </div>
+
+      <div class="rp-actions">
+        <button class="btn-secondary full-width" onclick="App.switchTab('devis')">
+          ≡&nbsp; Voir le devis complet
+        </button>
+        <button class="btn-accent full-width" onclick="Export.exportPDF()" style="justify-content:center;">
+          ↓&nbsp; Exporter en PDF
+        </button>
+      </div>`;
   },
 };

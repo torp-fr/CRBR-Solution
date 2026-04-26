@@ -7,223 +7,265 @@
   <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
-
 <div id="app">
 
-  <!-- ── HEADER ──────────────────────────────────────── -->
+  <!-- ══════════════════════════════════════════════
+       HEADER
+  ══════════════════════════════════════════════ -->
   <header id="app-header">
-    <div class="header-left">
-      <div class="app-logo">
-        <span class="logo-text">CQB</span>
-        <span class="logo-sub">Structure</span>
+
+    <div class="hd-brand">
+      <div class="brand-logo">
+        <span class="brand-abbr">CQB</span>
+        <span class="brand-name">Structure</span>
       </div>
-      <div class="project-name-wrap">
-        <input id="project-name" type="text" value="Nouveau Projet" spellcheck="false" maxlength="60">
-      </div>
+      <div class="hd-sep"></div>
+      <input id="project-name" type="text" value="Nouveau Projet"
+             spellcheck="false" maxlength="60" placeholder="Nom du projet">
     </div>
-    <div class="header-right">
-      <button class="btn-ghost" id="btn-save-json">💾 Sauvegarder</button>
-      <button class="btn-ghost" id="btn-load-json">📂 Charger</button>
+
+    <nav id="app-nav">
+      <button class="tab-btn active" data-tab="plan">
+        <svg class="tab-ic" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="1" width="6" height="6" rx="1"/><rect x="9" y="1" width="6" height="6" rx="1"/><rect x="1" y="9" width="6" height="6" rx="1"/><rect x="9" y="9" width="6" height="6" rx="1"/></svg>
+        Plan 2D
+      </button>
+      <button class="tab-btn" data-tab="3d">
+        <svg class="tab-ic" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 2l6 3.5v5L8 14l-6-3.5v-5z"/><path d="M8 2v12M2 5.5l6 3.5 6-3.5"/></svg>
+        Vue 3D
+      </button>
+      <button class="tab-btn" data-tab="settings">
+        <svg class="tab-ic" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="2.5"/><path d="M8 1v2M8 13v2M1 8h2M13 8h2M3.05 3.05l1.41 1.41M11.54 11.54l1.41 1.41M3.05 12.95l1.41-1.41M11.54 4.46l1.41-1.41"/></svg>
+        Paramètres
+      </button>
+      <button class="tab-btn" data-tab="devis">
+        <svg class="tab-ic" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="12" height="12" rx="1.5"/><path d="M5 6h6M5 8.5h6M5 11h4"/></svg>
+        Devis
+      </button>
+    </nav>
+
+    <div class="hd-actions">
+      <button class="btn-icon" id="btn-save-json" title="Sauvegarder JSON">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 14V4.5L5 2h9v12H2z"/><rect x="5" y="9" width="6" height="5" rx=".5"/><rect x="5" y="2" width="5" height="4" rx=".5"/></svg>
+      </button>
+      <button class="btn-icon" id="btn-load-json" title="Charger un fichier">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 14V7H7.5l2 2H14v5H2z"/><path d="M5 7V2h6"/><path d="M8 4.5V7"/></svg>
+      </button>
       <input type="file" id="file-input" accept=".json,.cqb.json" style="display:none">
-      <button class="btn-primary" id="btn-export-pdf">↓ Export PDF</button>
+      <div class="hd-sep"></div>
+      <button class="btn-accent" id="btn-export-pdf">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M8 2v9M4.5 8l3.5 3.5L11.5 8"/><path d="M2 13h12"/></svg>
+        Export PDF
+      </button>
     </div>
+
   </header>
 
-  <!-- ── NAV TABS ────────────────────────────────────── -->
-  <nav id="app-nav">
-    <button class="tab-btn active" data-tab="plan">
-      <span class="tab-icon">⊞</span> Plan 2D
-    </button>
-    <button class="tab-btn" data-tab="3d">
-      <span class="tab-icon">◈</span> Vue 3D
-    </button>
-    <button class="tab-btn" data-tab="settings">
-      <span class="tab-icon">⚙</span> Paramètres
-    </button>
-    <button class="tab-btn" data-tab="devis">
-      <span class="tab-icon">≡</span> Devis
-    </button>
-    <div class="tab-cost-preview">
-      <span style="color:var(--grey);">Prix de vente</span>
-      <span id="header-price">—</span>
-    </div>
-  </nav>
+  <!-- ══════════════════════════════════════════════
+       WORKSPACE (3 colonnes)
+  ══════════════════════════════════════════════ -->
+  <div id="workspace">
 
-  <!-- ── MAIN ────────────────────────────────────────── -->
-  <main id="app-main">
+    <!-- ── COLONNE GAUCHE : outils ─────────────── -->
+    <aside id="left-sidebar">
 
-    <!-- ═══ TAB: PLAN 2D ═══ -->
-    <div class="tab-panel active" id="tab-plan">
+      <div class="sb-section">
+        <div class="sb-label">Outil</div>
+        <button class="tool-btn active" data-tool="select">
+          <svg class="tb-icon" viewBox="0 0 16 16" fill="currentColor"><path d="M3 2l10 6-5 .5-2.5 5z" opacity=".9"/></svg>
+          <span class="tb-text">Sélection</span>
+          <kbd>V</kbd>
+        </button>
+      </div>
 
-      <!-- Sidebar -->
-      <div class="editor-sidebar">
+      <div class="sb-section">
+        <div class="sb-label">Modules</div>
+        <button class="tool-btn" data-tool="wall">
+          <svg class="tb-icon" viewBox="0 0 24 6" fill="currentColor"><rect x="0" y="1" width="24" height="4" rx="1"/></svg>
+          <span class="tb-text">Mur plein</span>
+          <kbd>W</kbd>
+        </button>
+        <button class="tool-btn" data-tool="window">
+          <svg class="tb-icon" viewBox="0 0 24 6"><rect x="0" y="1" width="24" height="4" rx="1" fill="none" stroke="currentColor" stroke-width="1.5"/><rect x="7" y="1" width="10" height="4" fill="currentColor" opacity=".4"/></svg>
+          <span class="tb-text">Mur fenêtre</span>
+        </button>
+        <button class="tool-btn" data-tool="door">
+          <svg class="tb-icon" viewBox="0 0 24 6"><rect x="0" y="1" width="5" height="4" rx=".5" fill="currentColor"/><rect x="19" y="1" width="5" height="4" rx=".5" fill="currentColor"/><path d="M5 3 Q5 1 9 3" stroke="currentColor" stroke-width="1" fill="none" stroke-dasharray="2 1.5"/></svg>
+          <span class="tb-text">Module porte</span>
+          <kbd>D</kbd>
+        </button>
+        <button class="tool-btn" data-tool="opening">
+          <svg class="tb-icon" viewBox="0 0 24 6"><rect x="0" y="1" width="4" height="4" rx=".5" fill="currentColor"/><rect x="20" y="1" width="4" height="4" rx=".5" fill="currentColor"/><line x1="4" y1="3" x2="20" y2="3" stroke="currentColor" stroke-width="1" stroke-dasharray="3 2"/></svg>
+          <span class="tb-text">Passage libre</span>
+          <kbd>O</kbd>
+        </button>
+      </div>
 
-        <!-- Outils -->
-        <div class="tool-section">
-          <div class="tool-label">Outil actif</div>
-          <button class="tool-btn active" data-tool="select">
-            <span class="tool-icon-glyph">↖</span>
-            <span>Sélection <kbd>V</kbd></span>
+      <div class="sb-section">
+        <div class="sb-label">Orientation <kbd class="sb-kbd">R</kbd></div>
+        <div class="rot-group">
+          <button class="rot-btn active" data-rot="0">
+            <span class="rot-sym">—</span> Horizontal
+          </button>
+          <button class="rot-btn" data-rot="90">
+            <span class="rot-sym">|</span> Vertical
           </button>
         </div>
+      </div>
 
-        <!-- Modules -->
-        <div class="tool-section">
-          <div class="tool-label">Modules à placer</div>
-          <button class="tool-btn" data-tool="wall">
-            <span class="tool-icon-glyph">▬</span>
-            <span>Mur plein <kbd>W</kbd></span>
+      <div class="sb-section">
+        <div class="sb-label">Actions</div>
+        <button class="btn-danger-full" id="btn-delete" disabled>
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" width="14" height="14"><path d="M3 3l10 10M13 3L3 13"/></svg>
+          Supprimer la sélection
+        </button>
+        <div class="action-row">
+          <button class="btn-secondary btn-sm" id="btn-center">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" width="13" height="13"><circle cx="8" cy="8" r="3"/><path d="M8 1v3M8 12v3M1 8h3M12 8h3"/></svg>
+            Centrer
           </button>
-          <button class="tool-btn" data-tool="window">
-            <span class="tool-icon-glyph">▭</span>
-            <span>Mur fenêtre</span>
-          </button>
-          <button class="tool-btn" data-tool="door">
-            <span class="tool-icon-glyph">▮</span>
-            <span>Module porte <kbd>D</kbd></span>
-          </button>
-          <button class="tool-btn" data-tool="opening">
-            <span class="tool-icon-glyph">⊟</span>
-            <span>Passage libre <kbd>O</kbd></span>
+          <button class="btn-secondary btn-sm btn-danger-soft" id="btn-clear">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" width="13" height="13"><rect x="2" y="5" width="12" height="9" rx="1"/><path d="M1 5h14M6 5V3h4v2M6 8v4M10 8v4"/></svg>
+            Effacer tout
           </button>
         </div>
+      </div>
 
-        <!-- Rotation -->
-        <div class="tool-section">
-          <div class="tool-label">Orientation <kbd style="font-size:9px;color:var(--grey);background:var(--acc);border:1px solid var(--border);border-radius:2px;padding:0 4px;">R</kbd></div>
-          <div class="rotation-toggle">
-            <button class="rot-btn active" data-rot="0">
-              <span style="font-size:13px;">—</span> Horizontal
-            </button>
-            <button class="rot-btn" data-rot="90">
-              <span style="font-size:13px;">|</span> Vertical
-            </button>
+      <div class="sb-section">
+        <div class="sb-label">Gabarits</div>
+        <button class="tpl-btn" data-template="simple">
+          <svg class="tpl-icon" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="4" y="4" width="24" height="24" rx="2"/><path d="M4 16h24M13 16v12"/></svg>
+          <div>
+            <strong>Cellule simple</strong>
+            <span>3×2, 1 porte</span>
           </div>
-        </div>
-
-        <!-- Actions -->
-        <div class="tool-section">
-          <div class="tool-label">Actions</div>
-          <button class="btn-danger" id="btn-delete" disabled>✕ Supprimer sélection</button>
-          <button class="btn-ghost btn-sm" id="btn-center">⊙ Centrer la vue</button>
-          <button class="btn-ghost btn-sm" id="btn-clear">⬛ Tout effacer</button>
-        </div>
-
-        <!-- Gabarits -->
-        <div class="tool-section">
-          <div class="tool-label">Gabarits de pièces</div>
-          <button class="btn-ghost btn-sm" data-template="simple">+ Cellule simple</button>
-          <button class="btn-ghost btn-sm" data-template="traversante">+ Traversante</button>
-          <button class="btn-ghost btn-sm" data-template="observation">+ Observation</button>
-        </div>
-
-        <!-- Module counts -->
-        <div class="tool-section" id="module-count-panel">
-          <div class="tool-label">Modules posés</div>
-          <div id="module-counts">
-            <div class="no-modules">Aucun module</div>
+        </button>
+        <button class="tpl-btn" data-template="traversante">
+          <svg class="tpl-icon" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="4" y="4" width="24" height="24" rx="2"/><path d="M4 16h24M13 4v12M13 16v12"/></svg>
+          <div>
+            <strong>Traversante</strong>
+            <span>2 portes opposées</span>
           </div>
-        </div>
-
-        <!-- Raccourcis -->
-        <div class="tool-section shortcuts-section" style="margin-top:auto;">
-          <div class="tool-label">Raccourcis</div>
-          <div class="shortcut-grid">
-            <kbd>V</kbd><span>Sélection</span>
-            <kbd>W</kbd><span>Mur plein</span>
-            <kbd>D</kbd><span>Porte</span>
-            <kbd>O</kbd><span>Passage</span>
-            <kbd>R</kbd><span>Orientation</span>
-            <kbd>Suppr</kbd><span>Supprimer</span>
-            <kbd>Espace</kbd><span>Naviguer</span>
-            <kbd>Molette</kbd><span>Zoomer</span>
+        </button>
+        <button class="tpl-btn" data-template="observation">
+          <svg class="tpl-icon" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="4" y="4" width="24" height="24" rx="2"/><path d="M4 16h24M13 16v12"/><rect x="12" y="4" width="8" height="4" opacity=".5"/></svg>
+          <div>
+            <strong>Observation</strong>
+            <span>Fenêtre + porte</span>
           </div>
+        </button>
+      </div>
+
+      <div class="sb-section sb-shortcuts">
+        <div class="sb-label">Raccourcis clavier</div>
+        <div class="shortcut-grid">
+          <kbd>V</kbd><span>Sélection</span>
+          <kbd>W</kbd><span>Mur plein</span>
+          <kbd>D</kbd><span>Porte</span>
+          <kbd>O</kbd><span>Passage</span>
+          <kbd>R</kbd><span>Rotation</span>
+          <kbd>Suppr</kbd><span>Supprimer</span>
+          <kbd>Espace</kbd><span>Naviguer</span>
+          <kbd>Molette</kbd><span>Zoomer</span>
         </div>
+      </div>
 
-      </div><!-- /.editor-sidebar -->
+    </aside><!-- /#left-sidebar -->
 
-      <!-- Canvas 2D -->
-      <div class="editor-canvas-wrap" id="editor-canvas-wrap">
+    <!-- ── COLONNE CENTRALE ────────────────────── -->
+    <div id="app-main">
+
+      <!-- TAB : PLAN 2D -->
+      <div class="tab-panel active" id="tab-plan">
         <canvas id="canvas-2d"></canvas>
         <div id="status-bar">
-          <div class="status-seg">
-            Outil&nbsp;<span class="status-tool-name" id="status-tool">Sélection</span>
-          </div>
-          <div class="status-seg">
-            <span class="status-rot-val" id="status-rot">—</span>
-          </div>
-          <div class="status-seg">
-            <span class="status-hint-txt" id="status-hint">Cliquer sur un module pour le sélectionner · Espace+glisser pour naviguer · Molette pour zoomer</span>
+          <span class="st-seg">
+            <svg viewBox="0 0 10 10" fill="currentColor" width="9" height="9" style="opacity:.5"><path d="M1 1l8 4-4.5.5-2 4z"/></svg>
+            <strong id="status-tool">Sélection</strong>
+          </span>
+          <span class="st-sep">·</span>
+          <span class="st-seg" id="status-rot" style="display:none"></span>
+          <span class="st-sep" id="st-sep-rot" style="display:none">·</span>
+          <span class="st-seg st-hint" id="status-hint">Cliquer sur un module pour le sélectionner · Espace + glisser pour naviguer · Molette pour zoomer</span>
+        </div>
+      </div>
+
+      <!-- TAB : VUE 3D -->
+      <div class="tab-panel" id="tab-3d">
+        <div class="view3d-toolbar">
+          <button class="btn-secondary btn-sm" id="btn-3d-iso">⬡ Isométrique</button>
+          <button class="btn-secondary btn-sm" id="btn-3d-top">↑ Dessus</button>
+          <button class="btn-secondary btn-sm" id="btn-3d-front">→ Façade</button>
+          <span class="view3d-hint">Glisser pour orbiter · Scroll pour zoomer · Clic droit pour déplacer</span>
+        </div>
+        <canvas id="canvas-3d"></canvas>
+      </div>
+
+      <!-- TAB : PARAMÈTRES -->
+      <div class="tab-panel" id="tab-settings">
+        <div class="content-scroll">
+          <div class="settings-layout">
+
+            <section class="settings-card">
+              <h2 class="sc-title">Matériaux &amp; Tarifs unitaires</h2>
+              <div class="table-wrap">
+                <table id="table-materials"></table>
+              </div>
+            </section>
+
+            <section class="settings-card">
+              <h2 class="sc-title">Composition des modules</h2>
+              <p class="sc-desc">
+                Quantités de matériaux par module. Les montants bois sont comptés en
+                <strong>unités de 2500 mm</strong> (pas en ml).
+              </p>
+              <div id="compositions-panel"></div>
+            </section>
+
+            <section class="settings-card">
+              <h2 class="sc-title">Paramètres commerciaux</h2>
+              <div id="business-panel"></div>
+            </section>
+
           </div>
         </div>
       </div>
 
-    </div><!-- /#tab-plan -->
-
-
-    <!-- ═══ TAB: 3D ═══ -->
-    <div class="tab-panel" id="tab-3d">
-      <div class="view3d-controls">
-        <button id="btn-3d-iso">Vue isométrique</button>
-        <button id="btn-3d-top">Vue de dessus</button>
-        <button id="btn-3d-front">Vue de face</button>
-        <span style="font-size:10px;color:var(--grey);margin-left:8px;">
-          Cliquer + glisser pour orbiter · Scroll pour zoomer · Clic droit pour déplacer
-        </span>
-      </div>
-      <canvas id="canvas-3d"></canvas>
-    </div>
-
-
-    <!-- ═══ TAB: PARAMÈTRES ═══ -->
-    <div class="tab-panel" id="tab-settings">
-      <div class="settings-layout">
-
-        <section class="settings-section">
-          <h2>A. Matériaux &amp; Tarifs unitaires</h2>
-          <div style="background:var(--card);border:1px solid var(--border);border-radius:3px;overflow:hidden;">
-            <table id="table-materials"></table>
+      <!-- TAB : DEVIS -->
+      <div class="tab-panel" id="tab-devis">
+        <div class="content-scroll">
+          <div id="devis-content">
+            <div class="devis-empty">
+              <div class="devis-empty-icon">⊞</div>
+              <div>Aucun module posé.<br>Dessinez votre shooting house dans l'onglet <strong>Plan 2D</strong>.</div>
+            </div>
           </div>
-        </section>
-
-        <section class="settings-section">
-          <h2>B. Composition des modules</h2>
-          <p style="font-size:11px;color:var(--grey);margin-bottom:12px;line-height:1.6;">
-            Définissez les quantités de chaque matériau utilisées par module. Les montants bois sont
-            comptés en <strong style="color:var(--grey-l);">unités de 2500 mm</strong> (et non en ml).
-          </p>
-          <div id="compositions-panel"></div>
-        </section>
-
-        <section class="settings-section">
-          <h2>C. Paramètres business</h2>
-          <div id="business-panel"></div>
-        </section>
-
-      </div>
-    </div><!-- /#tab-settings -->
-
-
-    <!-- ═══ TAB: DEVIS ═══ -->
-    <div class="tab-panel" id="tab-devis">
-      <div id="devis-content">
-        <div class="devis-empty">
-          <div class="devis-empty-icon">⊞</div>
-          <div>Aucun module posé.<br>Dessinez votre shooting house dans l'onglet <strong>Plan 2D</strong>.</div>
         </div>
       </div>
-    </div><!-- /#tab-devis -->
 
-  </main><!-- /#app-main -->
+    </div><!-- /#app-main -->
 
+    <!-- ── COLONNE DROITE : prix live ─────────── -->
+    <aside id="right-panel">
+      <div id="right-panel-content">
+        <div class="rp-empty">
+          <div class="rp-empty-icon">
+            <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="6" y="6" width="16" height="16" rx="2"/><rect x="26" y="6" width="16" height="16" rx="2"/><rect x="6" y="26" width="16" height="16" rx="2"/><rect x="26" y="26" width="16" height="16" rx="2"/></svg>
+          </div>
+          <div class="rp-empty-title">Aucun module posé</div>
+          <div class="rp-empty-hint">Placez des modules pour voir l'estimation en temps réel</div>
+        </div>
+      </div>
+    </aside>
+
+  </div><!-- /#workspace -->
 </div><!-- /#app -->
 
-<!-- ── External libs ───────────────────────────── -->
+<!-- ── Libs externes ──────────────────────────────── -->
 <script src="https://unpkg.com/three@0.128.0/build/three.min.js"></script>
 <script src="https://unpkg.com/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
-<!-- ── App modules ─────────────────────────────── -->
+<!-- ── Modules app ───────────────────────────────── -->
 <script src="js/config.js"></script>
 <script src="js/state.js"></script>
 <script src="js/editor2d.js"></script>

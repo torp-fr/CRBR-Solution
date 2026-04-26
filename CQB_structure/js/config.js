@@ -25,17 +25,17 @@ const MODULE_ICONS = {
 
 // Colors used by 2D renderer
 const COLORS = {
-  bg:       '#0f0f12',
-  grid:     'rgba(201,168,76,0.13)',
-  gridMaj:  'rgba(201,168,76,0.25)',
-  wall:     '#252530',
-  wallStroke:'rgba(201,168,76,0.75)',
-  gold:     '#C9A84C',
-  goldD:    'rgba(201,168,76,0.45)',
-  select:   'rgba(201,168,76,0.85)',
-  ghost:    'rgba(201,168,76,0.25)',
-  ghostErr: 'rgba(210,50,50,0.55)',
-  text:     '#8A8A96',
+  bg:        '#0f1115',
+  grid:      'rgba(58,64,85,0.55)',
+  gridMaj:   'rgba(77,163,255,0.14)',
+  wall:      '#2c3040',
+  wallStroke:'rgba(201,168,76,0.80)',
+  gold:      '#C9A84C',
+  goldD:     'rgba(201,168,76,0.45)',
+  select:    'rgba(77,163,255,0.90)',
+  ghost:     'rgba(77,163,255,0.20)',
+  ghostErr:  'rgba(239,68,68,0.55)',
+  text:      '#8a94a8',
 };
 
 // Default material prices
