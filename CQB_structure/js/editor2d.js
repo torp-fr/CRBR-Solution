@@ -239,18 +239,38 @@ const Editor2D = (() => {
   // ── Main render loop ───────────────────────────────────────
   function render() {
     if (!canvas) return;
-    canvas.width  = canvas.clientWidth;
-    canvas.height = canvas.clientHeight;
+    const cw = canvas.clientWidth  || canvas.parentElement.clientWidth  || 800;
+    const ch = canvas.clientHeight || canvas.parentElement.clientHeight || 600;
+    canvas.width  = cw;
+    canvas.height = ch;
 
     ctx.setTransform(1, 0, 0, 1, 0, 0);
     ctx.fillStyle = COLORS.bg;
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillRect(0, 0, cw, ch);
 
     ctx.setTransform(zoom, 0, 0, zoom, panX, panY);
 
     drawGrid();
     AppState.modules.forEach(m => drawModule(m));
     drawGhost();
+
+    // Empty state overlay
+    if (AppState.modules.length === 0) {
+      ctx.save();
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.textAlign = 'center';
+      ctx.font = 'bold 14px Helvetica Neue, Helvetica, Arial, sans-serif';
+      ctx.fillStyle = 'rgba(201,168,76,0.45)';
+      ctx.fillText('Aucun module posé', cw / 2, ch / 2 - 22);
+      ctx.font = '12px Helvetica Neue, Helvetica, Arial, sans-serif';
+      ctx.fillStyle = 'rgba(138,138,150,0.55)';
+      ctx.fillText('Sélectionnez un outil dans la barre latérale puis cliquez sur la grille', cw / 2, ch / 2 + 2);
+      ctx.font = '11px Helvetica Neue, Helvetica, Arial, sans-serif';
+      ctx.fillStyle = 'rgba(138,138,150,0.35)';
+      ctx.fillText('Ou chargez un gabarit de pièce pour démarrer rapidement', cw / 2, ch / 2 + 22);
+      ctx.restore();
+    }
+
     requestAnimationFrame(render);
   }
 

@@ -64,6 +64,7 @@ const App = {
     this.updateUI();
     this.syncToolbar();
     this.syncRotation();
+    this.updateStatusBar();
   },
 
   switchTab(tab) {
@@ -95,12 +96,43 @@ const App = {
 
     const deleteable = Editor2D.selectedId !== null;
     document.getElementById('btn-delete').disabled = !deleteable;
+    this.updateStatusBar();
   },
 
   syncRotation() {
     const r = Editor2D.rotation;
     document.querySelectorAll('.rot-btn').forEach(btn =>
       btn.classList.toggle('active', +btn.dataset.rot === r));
+    this.updateStatusBar();
+  },
+
+  updateStatusBar() {
+    const toolEl  = document.getElementById('status-tool');
+    const rotEl   = document.getElementById('status-rot');
+    const hintEl  = document.getElementById('status-hint');
+    if (!toolEl) return;
+
+    const t = Editor2D.tool;
+    const r = Editor2D.rotation;
+
+    const toolNames = {
+      select:  'Sélection',
+      wall:    'Mur plein',
+      window:  'Mur fenêtre',
+      door:    'Module porte',
+      opening: 'Passage libre',
+    };
+    const hints = {
+      select:  'Cliquer sur un module pour le sélectionner · Glisser pour déplacer · Suppr pour supprimer',
+      wall:    'Cliquer sur la grille pour placer · R pour changer l\'orientation',
+      window:  'Cliquer sur la grille pour placer · R pour changer l\'orientation',
+      door:    'Cliquer sur la grille pour placer · R pour changer l\'orientation',
+      opening: 'Cliquer sur la grille pour placer · R pour changer l\'orientation',
+    };
+
+    toolEl.textContent = toolNames[t] || t;
+    rotEl.textContent  = (t !== 'select') ? (r === 0 ? '— Horizontal' : '| Vertical') : '';
+    hintEl.textContent = hints[t] || '';
   },
 };
 

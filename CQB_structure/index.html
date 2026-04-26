@@ -44,7 +44,8 @@
       <span class="tab-icon">≡</span> Devis
     </button>
     <div class="tab-cost-preview">
-      Prix de vente : <span id="header-price">—</span>
+      <span style="color:var(--grey);">Prix de vente</span>
+      <span id="header-price">—</span>
     </div>
   </nav>
 
@@ -59,9 +60,10 @@
 
         <!-- Outils -->
         <div class="tool-section">
-          <div class="tool-label">Outils</div>
+          <div class="tool-label">Outil actif</div>
           <button class="tool-btn active" data-tool="select">
-            ↖ Sélection <small style="color:var(--grey);font-size:10px;">(V)</small>
+            <span class="tool-icon-glyph">↖</span>
+            <span>Sélection <kbd>V</kbd></span>
           </button>
         </div>
 
@@ -69,25 +71,33 @@
         <div class="tool-section">
           <div class="tool-label">Modules à placer</div>
           <button class="tool-btn" data-tool="wall">
-            <span style="color:var(--gold);">▬</span> Mur plein <small style="color:var(--grey);font-size:10px;">(W)</small>
+            <span class="tool-icon-glyph">▬</span>
+            <span>Mur plein <kbd>W</kbd></span>
           </button>
           <button class="tool-btn" data-tool="window">
-            <span style="color:var(--gold);">▭</span> Mur fenêtre
+            <span class="tool-icon-glyph">▭</span>
+            <span>Mur fenêtre</span>
           </button>
           <button class="tool-btn" data-tool="door">
-            <span style="color:var(--gold);">▮</span> Module porte <small style="color:var(--grey);font-size:10px;">(D)</small>
+            <span class="tool-icon-glyph">▮</span>
+            <span>Module porte <kbd>D</kbd></span>
           </button>
           <button class="tool-btn" data-tool="opening">
-            <span style="color:var(--gold);">⊟</span> Passage libre <small style="color:var(--grey);font-size:10px;">(O)</small>
+            <span class="tool-icon-glyph">⊟</span>
+            <span>Passage libre <kbd>O</kbd></span>
           </button>
         </div>
 
         <!-- Rotation -->
         <div class="tool-section">
-          <div class="tool-label">Orientation <small style="color:var(--grey);font-size:10px;">(R)</small></div>
+          <div class="tool-label">Orientation <kbd style="font-size:9px;color:var(--grey);background:var(--acc);border:1px solid var(--border);border-radius:2px;padding:0 4px;">R</kbd></div>
           <div class="rotation-toggle">
-            <button class="rot-btn active" data-rot="0">— Horizontal</button>
-            <button class="rot-btn"        data-rot="90">| Vertical</button>
+            <button class="rot-btn active" data-rot="0">
+              <span style="font-size:13px;">—</span> Horizontal
+            </button>
+            <button class="rot-btn" data-rot="90">
+              <span style="font-size:13px;">|</span> Vertical
+            </button>
           </div>
         </div>
 
@@ -116,17 +126,17 @@
         </div>
 
         <!-- Raccourcis -->
-        <div class="tool-section" style="margin-top:auto;">
-          <div class="tool-label">Raccourcis clavier</div>
-          <div style="font-size:10px;color:var(--grey);line-height:1.9;padding:2px;">
-            <span style="color:var(--grey-l);">V</span> Sélection<br>
-            <span style="color:var(--grey-l);">W</span> Mur plein<br>
-            <span style="color:var(--grey-l);">D</span> Porte<br>
-            <span style="color:var(--grey-l);">O</span> Passage libre<br>
-            <span style="color:var(--grey-l);">R</span> Basculer rotation<br>
-            <span style="color:var(--grey-l);">Suppr</span> Supprimer<br>
-            <span style="color:var(--grey-l);">Espace+glisser</span> Naviguer<br>
-            <span style="color:var(--grey-l);">Molette</span> Zoomer
+        <div class="tool-section shortcuts-section" style="margin-top:auto;">
+          <div class="tool-label">Raccourcis</div>
+          <div class="shortcut-grid">
+            <kbd>V</kbd><span>Sélection</span>
+            <kbd>W</kbd><span>Mur plein</span>
+            <kbd>D</kbd><span>Porte</span>
+            <kbd>O</kbd><span>Passage</span>
+            <kbd>R</kbd><span>Orientation</span>
+            <kbd>Suppr</kbd><span>Supprimer</span>
+            <kbd>Espace</kbd><span>Naviguer</span>
+            <kbd>Molette</kbd><span>Zoomer</span>
           </div>
         </div>
 
@@ -135,8 +145,16 @@
       <!-- Canvas 2D -->
       <div class="editor-canvas-wrap" id="editor-canvas-wrap">
         <canvas id="canvas-2d"></canvas>
-        <div class="canvas-hint">
-          Cliquer pour placer · Espace + glisser pour naviguer · Molette pour zoomer
+        <div id="status-bar">
+          <div class="status-seg">
+            Outil&nbsp;<span class="status-tool-name" id="status-tool">Sélection</span>
+          </div>
+          <div class="status-seg">
+            <span class="status-rot-val" id="status-rot">—</span>
+          </div>
+          <div class="status-seg">
+            <span class="status-hint-txt" id="status-hint">Cliquer sur un module pour le sélectionner · Espace+glisser pour naviguer · Molette pour zoomer</span>
+          </div>
         </div>
       </div>
 

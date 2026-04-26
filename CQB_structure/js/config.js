@@ -2,7 +2,7 @@
 
 // Grid & rendering constants
 const GRID   = 80;   // px per 1250mm module width (world space)
-const WALL_T = 11;   // wall thickness in px (153mm represented)
+const WALL_T = 16;   // wall thickness in px (153mm represented)
 const ZOOM_MIN = 0.4;
 const ZOOM_MAX = 4;
 const ZOOM_STEP = 0.12;
@@ -26,8 +26,8 @@ const MODULE_ICONS = {
 // Colors used by 2D renderer
 const COLORS = {
   bg:       '#0f0f12',
-  grid:     'rgba(201,168,76,0.07)',
-  gridMaj:  'rgba(201,168,76,0.14)',
+  grid:     'rgba(201,168,76,0.13)',
+  gridMaj:  'rgba(201,168,76,0.25)',
   wall:     '#252530',
   wallStroke:'rgba(201,168,76,0.75)',
   gold:     '#C9A84C',
