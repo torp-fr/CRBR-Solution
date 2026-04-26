@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CQB Structure — Shooting House Designer</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<div id="app">
+
+  <!-- ── HEADER ──────────────────────────────────────── -->
+  <header id="app-header">
+    <div class="header-left">
+      <div class="app-logo">
+        <span class="logo-text">CQB</span>
+        <span class="logo-sub">Structure</span>
+      </div>
+      <div class="project-name-wrap">
+        <input id="project-name" type="text" value="Nouveau Projet" spellcheck="false" maxlength="60">
+      </div>
+    </div>
+    <div class="header-right">
+      <button class="btn-ghost" id="btn-save-json">💾 Sauvegarder</button>
+      <button class="btn-ghost" id="btn-load-json">📂 Charger</button>
+      <input type="file" id="file-input" accept=".json,.cqb.json" style="display:none">
+      <button class="btn-primary" id="btn-export-pdf">↓ Export PDF</button>
+    </div>
+  </header>
+
+  <!-- ── NAV TABS ────────────────────────────────────── -->
+  <nav id="app-nav">
+    <button class="tab-btn active" data-tab="plan">
+      <span class="tab-icon">⊞</span> Plan 2D
+    </button>
+    <button class="tab-btn" data-tab="3d">
+      <span class="tab-icon">◈</span> Vue 3D
+    </button>
+    <button class="tab-btn" data-tab="settings">
+      <span class="tab-icon">⚙</span> Paramètres
+    </button>
+    <button class="tab-btn" data-tab="devis">
+      <span class="tab-icon">≡</span> Devis
+    </button>
+    <div class="tab-cost-preview">
+      Prix de vente : <span id="header-price">—</span>
+    </div>
+  </nav>
+
+  <!-- ── MAIN ────────────────────────────────────────── -->
+  <main id="app-main">
+
+    <!-- ═══ TAB: PLAN 2D ═══ -->
+    <div class="tab-panel active" id="tab-plan">
+
+      <!-- Sidebar -->
+      <div class="editor-sidebar">
+
+        <!-- Outils -->
+        <div class="tool-section">
+          <div class="tool-label">Outils</div>
+          <button class="tool-btn active" data-tool="select">
+            ↖ Sélection <small style="color:var(--grey);font-size:10px;">(V)</small>
+          </button>
+        </div>
+
+        <!-- Modules -->
+        <div class="tool-section">
+          <div class="tool-label">Modules à placer</div>
+          <button class="tool-btn" data-tool="wall">
+            <span style="color:var(--gold);">▬</span> Mur plein <small style="color:var(--grey);font-size:10px;">(W)</small>
+          </button>
+          <button class="tool-btn" data-tool="window">
+            <span style="color:var(--gold);">▭</span> Mur fenêtre
+          </button>
+          <button class="tool-btn" data-tool="door">
+            <span style="color:var(--gold);">▮</span> Module porte <small style="color:var(--grey);font-size:10px;">(D)</small>
+          </button>
+          <button class="tool-btn" data-tool="opening">
+            <span style="color:var(--gold);">⊟</span> Passage libre <small style="color:var(--grey);font-size:10px;">(O)</small>
+          </button>
+        </div>
+
+        <!-- Rotation -->
+        <div class="tool-section">
+          <div class="tool-label">Orientation <small style="color:var(--grey);font-size:10px;">(R)</small></div>
+          <div class="rotation-toggle">
+            <button class="rot-btn active" data-rot="0">— Horizontal</button>
+            <button class="rot-btn"        data-rot="90">| Vertical</button>
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="tool-section">
+          <div class="tool-label">Actions</div>
+          <button class="btn-danger" id="btn-delete" disabled>✕ Supprimer sélection</button>
+          <button class="btn-ghost btn-sm" id="btn-center">⊙ Centrer la vue</button>
+          <button class="btn-ghost btn-sm" id="btn-clear">⬛ Tout effacer</button>
+        </div>
+
+        <!-- Gabarits -->
+        <div class="tool-section">
+          <div class="tool-label">Gabarits de pièces</div>
+          <button class="btn-ghost btn-sm" data-template="simple">+ Cellule simple</button>
+          <button class="btn-ghost btn-sm" data-template="traversante">+ Traversante</button>
+          <button class="btn-ghost btn-sm" data-template="observation">+ Observation</button>
+        </div>
+
+        <!-- Module counts -->
+        <div class="tool-section" id="module-count-panel">
+          <div class="tool-label">Modules posés</div>
+          <div id="module-counts">
+            <div class="no-modules">Aucun module</div>
+          </div>
+        </div>
+
+        <!-- Raccourcis -->
+        <div class="tool-section" style="margin-top:auto;">
+          <div class="tool-label">Raccourcis clavier</div>
+          <div style="font-size:10px;color:var(--grey);line-height:1.9;padding:2px;">
+            <span style="color:var(--grey-l);">V</span> Sélection<br>
+            <span style="color:var(--grey-l);">W</span> Mur plein<br>
+            <span style="color:var(--grey-l);">D</span> Porte<br>
+            <span style="color:var(--grey-l);">O</span> Passage libre<br>
+            <span style="color:var(--grey-l);">R</span> Basculer rotation<br>
+            <span style="color:var(--grey-l);">Suppr</span> Supprimer<br>
+            <span style="color:var(--grey-l);">Espace+glisser</span> Naviguer<br>
+            <span style="color:var(--grey-l);">Molette</span> Zoomer
+          </div>
+        </div>
+
+      </div><!-- /.editor-sidebar -->
+
+      <!-- Canvas 2D -->
+      <div class="editor-canvas-wrap" id="editor-canvas-wrap">
+        <canvas id="canvas-2d"></canvas>
+        <div class="canvas-hint">
+          Cliquer pour placer · Espace + glisser pour naviguer · Molette pour zoomer
+        </div>
+      </div>
+
+    </div><!-- /#tab-plan -->
+
+
+    <!-- ═══ TAB: 3D ═══ -->
+    <div class="tab-panel" id="tab-3d">
+      <div class="view3d-controls">
+        <button id="btn-3d-iso">Vue isométrique</button>
+        <button id="btn-3d-top">Vue de dessus</button>
+        <button id="btn-3d-front">Vue de face</button>
+        <span style="font-size:10px;color:var(--grey);margin-left:8px;">
+          Cliquer + glisser pour orbiter · Scroll pour zoomer · Clic droit pour déplacer
+        </span>
+      </div>
+      <canvas id="canvas-3d"></canvas>
+    </div>
+
+
+    <!-- ═══ TAB: PARAMÈTRES ═══ -->
+    <div class="tab-panel" id="tab-settings">
+      <div class="settings-layout">
+
+        <section class="settings-section">
+          <h2>A. Matériaux &amp; Tarifs unitaires</h2>
+          <div style="background:var(--card);border:1px solid var(--border);border-radius:3px;overflow:hidden;">
+            <table id="table-materials"></table>
+          </div>
+        </section>
+
+        <section class="settings-section">
+          <h2>B. Composition des modules</h2>
+          <p style="font-size:11px;color:var(--grey);margin-bottom:12px;line-height:1.6;">
+            Définissez les quantités de chaque matériau utilisées par module. Les montants bois sont
+            comptés en <strong style="color:var(--grey-l);">unités de 2500 mm</strong> (et non en ml).
+          </p>
+          <div id="compositions-panel"></div>
+        </section>
+
+        <section class="settings-section">
+          <h2>C. Paramètres business</h2>
+          <div id="business-panel"></div>
+        </section>
+
+      </div>
+    </div><!-- /#tab-settings -->
+
+
+    <!-- ═══ TAB: DEVIS ═══ -->
+    <div class="tab-panel" id="tab-devis">
+      <div id="devis-content">
+        <div class="devis-empty">
+          <div class="devis-empty-icon">⊞</div>
+          <div>Aucun module posé.<br>Dessinez votre shooting house dans l'onglet <strong>Plan 2D</strong>.</div>
+        </div>
+      </div>
+    </div><!-- /#tab-devis -->
+
+  </main><!-- /#app-main -->
+
+</div><!-- /#app -->
+
+<!-- ── External libs ───────────────────────────── -->
+<script src="https://unpkg.com/three@0.128.0/build/three.min.js"></script>
+<script src="https://unpkg.com/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<!-- ── App modules ─────────────────────────────── -->
+<script src="js/config.js"></script>
+<script src="js/state.js"></script>
+<script src="js/editor2d.js"></script>
+<script src="js/renderer3d.js"></script>
+<script src="js/calculator.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/export.js"></script>
+<script src="js/app.js"></script>
+
+</body>
+</html>
